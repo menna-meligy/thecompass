@@ -22,7 +22,7 @@ const NODES: RoadmapNode[] = [
   { id: 3, titleAr: "المتقدم",  titleEn: "Advanced",     xpRequired: 300,  icon: "⭐", color: "#9C27B0" },
   { id: 4, titleAr: "الخبير",   titleEn: "Expert",       xpRequired: 600,  icon: "🎯", color: "#FF5722" },
   { id: 5, titleAr: "المحترف",  titleEn: "Professional", xpRequired: 1000, icon: "🏆", color: "#D4A017" },
-  { id: 6, titleAr: "الأسطورة", titleEn: "Legend",       xpRequired: 1500, icon: "👑", color: "#8B0000" },
+  { id: 6, titleAr: "الأسطورة", titleEn: "Legend",       xpRequired: 1500, icon: "👑", color: "#F59E0B" },
 ];
 
 /* ── SVG path waypoints for the winding game path ── */
@@ -106,7 +106,7 @@ export function RoadmapPath({ progress }: RoadmapPathProps) {
         transition={{ duration: 0.5 }}
         className="relative overflow-hidden rounded-2xl"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-[#5A0000] via-[#8B0000] to-[#C41E3A]" />
+        <div className="absolute inset-0" style={{background:"rgba(15,23,42,0.85)"}} />
         {/* Pattern overlay */}
         <div className="absolute inset-0 opacity-10">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
@@ -186,7 +186,7 @@ export function RoadmapPath({ progress }: RoadmapPathProps) {
               ref={undefined}
               d={PATH_D}
               fill="none"
-              stroke="#8B0000"
+              stroke="#F59E0B"
               strokeWidth="8"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -258,7 +258,7 @@ export function RoadmapPath({ progress }: RoadmapPathProps) {
                   fill={
                     isLocked   ? "#F0E8E8" :
                     isCurrent  ? "#D4A017" :
-                                 "#8B0000"
+                                 "#F59E0B"
                   }
                   stroke={
                     isLocked   ? "#E8E0E0" :
@@ -316,7 +316,7 @@ export function RoadmapPath({ progress }: RoadmapPathProps) {
                   dominantBaseline="middle"
                   fontSize="11"
                   fontWeight="700"
-                  fill={isCompleted ? "#8B0000" : "#9E8E8E"}
+                  fill={isCompleted ? "#F59E0B" : "#9E8E8E"}
                   style={{ userSelect: "none" }}
                 >
                   {node.titleAr}
@@ -384,7 +384,7 @@ export function RoadmapPath({ progress }: RoadmapPathProps) {
       {/* ── Legend ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { color: "#8B0000", label: "مكتمل", dot: true },
+          { color: "#F59E0B", label: "مكتمل", dot: true },
           { color: "#D4A017", label: "أنت هنا", dot: true },
           { color: "#E8E0E0", label: "مقفل",  dot: true },
         ].map(({ color, label }) => (

@@ -71,7 +71,7 @@ export default async function DashboardPage() {
 
       {/* Roadmap preview */}
       {progress && (
-        <div className="relative rounded-2xl p-6 mb-8 text-white overflow-hidden bg-gradient-to-r from-[#7f1d1d] via-[#991B1B] to-[#7f1d1d]">
+        <div className="relative rounded-2xl p-6 mb-8 text-white overflow-hidden bg-[rgba(30,41,59,0.7)] border border-[rgba(245,158,11,0.18)]">
           {/* Dot pattern */}
           <div
             aria-hidden="true"

@@ -32,7 +32,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex min-h-screen bg-[#0f172a]">
       {/* Sidebar */}
-      <aside className="w-16 md:w-60 flex-shrink-0 flex flex-col bg-[#0d1526] border-e border-[rgba(245,158,11,0.10)]">
+      <aside className="w-20 md:w-72 flex-shrink-0 flex flex-col bg-[#0d1526] border-e border-[rgba(245,158,11,0.10)]">
         {/* Logo */}
         <div className="h-16 flex items-center justify-center md:justify-start md:px-5 border-b border-[rgba(245,158,11,0.08)]">
           <Link href={`/${locale}`} className="flex items-center gap-3 group">
@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Compass className="h-4 w-4 text-[#0d1526]" />
             </div>
             <span className="hidden md:block text-sm font-black text-white tracking-wide">
-              {locale === "ar" ? "البوصلة" : "Al-Bosla"}
+              {locale === "ar" ? "البوصلة" : "ElBosla"}
             </span>
           </Link>
         </div>

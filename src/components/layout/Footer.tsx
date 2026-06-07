@@ -85,7 +85,7 @@ export function Footer() {
               <img src="/logo.svg" alt="البوصلة" className="h-11 w-auto" loading="lazy" />
               <div>
                 <div className="text-white font-black text-lg leading-none">
-                  {isRtl ? "البوصلة" : "Al-Bosla"}
+                  {isRtl ? "البوصلة" : "ElBosla"}
                 </div>
                 <div className="text-[#F59E0B]/60 text-xs mt-0.5">
                   {isRtl ? "دليلك نحو أهدافك" : "Your compass to your goals"}
@@ -150,7 +150,7 @@ export function Footer() {
             <ul className="space-y-3 mb-7">
               <li>
                 <a
-                  href="mailto:info@albosla.com"
+                  href="mailto:thecompass555@gmail.com"
                   className="flex items-center gap-3 text-sm text-white/45 hover:text-white transition-colors group"
                 >
                   <div
@@ -159,12 +159,12 @@ export function Footer() {
                   >
                     <Mail className="h-3.5 w-3.5 text-[#F59E0B]/60" />
                   </div>
-                  info@albosla.com
+                  thecompass555@gmail.com
                 </a>
               </li>
               <li>
                 <a
-                  href="tel:+201000000000"
+                  href="tel:+201093036736"
                   className="flex items-center gap-3 text-sm text-white/45 hover:text-white transition-colors group"
                 >
                   <div
@@ -173,7 +173,7 @@ export function Footer() {
                   >
                     <Phone className="h-3.5 w-3.5 text-[#F59E0B]/60" />
                   </div>
-                  +20 100 000 0000
+                  01093036736
                 </a>
               </li>
             </ul>
@@ -241,7 +241,7 @@ export function Footer() {
           style={{ borderTop: "1px solid rgba(245,158,11,0.10)" }}
         >
           <p className="text-white/25 text-xs">
-            © {year} {isRtl ? "البوصلة" : "Al-Bosla"} · {t("rights")}
+            © {year} {isRtl ? "البوصلة" : "ElBosla"} · {t("rights")}
           </p>
           <div className="flex items-center gap-4 text-[11px] text-white/25">
             <Link href={`/${locale}`} className="hover:text-white/60 transition-colors">
