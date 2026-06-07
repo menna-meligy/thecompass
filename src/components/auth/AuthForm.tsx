@@ -106,7 +106,7 @@ export function AuthForm() {
     <div className="w-full" style={{ maxWidth: "440px" }}>
       {/* Logo + title */}
       <div className="text-center mb-8">
-        <img src="/logo.svg" alt="البوصلة" className="h-16 w-auto mx-auto mb-4" />
+        <img src="/logo.png" alt="البوصلة" className="h-16 w-auto mx-auto mb-4" />
         <h1 className="text-xl font-black text-white">البوصلة</h1>
         <p className="text-white/40 text-xs mt-1">منصة التطوير الشخصي والمهني</p>
       </div>

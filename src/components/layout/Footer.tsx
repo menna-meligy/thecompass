@@ -82,7 +82,7 @@ export function Footer() {
           <div className="md:col-span-5">
             {/* Logo + name */}
             <div className="flex items-center gap-3 mb-5">
-              <img src="/logo.svg" alt="البوصلة" className="h-11 w-auto" loading="lazy" />
+              <img src="/logo.png" alt="البوصلة" className="h-11 w-auto" loading="lazy" />
               <div>
                 <div className="text-white font-black text-lg leading-none">
                   {isRtl ? "البوصلة" : "ElBosla"}

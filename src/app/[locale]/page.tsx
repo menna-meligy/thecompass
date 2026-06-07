@@ -232,7 +232,7 @@ export default async function HomePage() {
 
       {/* ── Featured Workshops ── */}
       {workshops && workshops.length > 0 && (
-        <section className="bg-[#0f172a] py-24">
+        <section className="bg-[#0f172a]" style={{paddingTop:"7rem",paddingBottom:"7rem"}}>
           <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
             {/* Centered section header */}
             <div className="mb-14" style={{ textAlign: "center" }}>
@@ -254,7 +254,7 @@ export default async function HomePage() {
             <div className="mt-10 flex justify-center">
               <Link
                 href={`/${locale}/workshops`}
-                className="inline-flex items-center justify-center px-5 py-2 rounded border border-[#F59E0B]/40 text-[#F59E0B] font-bold text-sm hover:bg-[#F59E0B] hover:text-[#0f172a] transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 font-bold transition-all duration-200 hover:-translate-y-0.5" style={{padding:"12px 36px",borderRadius:"6px",border:"1.5px solid rgba(245,158,11,0.4)",color:"#F59E0B",fontSize:"0.9rem"}}
               >
                 {t("viewAll")}
                 <ChevronRight className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} />
@@ -265,7 +265,7 @@ export default async function HomePage() {
       )}
 
       {/* ── How It Works ── */}
-      <section className="bg-[#0d1526] py-24">
+      <section className="bg-[#0d1526]" style={{paddingTop:"7rem",paddingBottom:"7rem"}}>
         <div style={{maxWidth:"64rem",margin:"0 auto",padding:"0 1.5rem"}}>
           <div className="mb-16" style={{ textAlign: "center" }}>
             <div style={{display:"flex",justifyContent:"center",marginBottom:"1.5rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
@@ -317,7 +317,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── Testimonials ── */}
-      <section className="bg-[#0f172a] py-24">
+      <section className="bg-[#0f172a]" style={{paddingTop:"7rem",paddingBottom:"7rem"}}>
         <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
           <div className="mb-16" style={{ textAlign: "center" }}>
             <div style={{display:"flex",justifyContent:"center",marginBottom:"1.5rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
@@ -373,7 +373,7 @@ export default async function HomePage() {
 
       {/* ── Latest Vlogs ── */}
       {vlogs && vlogs.length > 0 && (
-        <section className="bg-[#0d1526] py-20">
+        <section className="bg-[#0d1526]" style={{paddingTop:"6rem",paddingBottom:"6rem"}}>
           <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
             {/* Centered section header */}
             <div className="mb-12" style={{ textAlign: "center" }}>
@@ -395,7 +395,7 @@ export default async function HomePage() {
             <div className="mt-10 flex justify-center">
               <Link
                 href={`/${locale}/vlogs`}
-                className="inline-flex items-center justify-center px-5 py-2 rounded border border-[#F59E0B]/40 text-[#F59E0B] font-bold text-sm hover:bg-[#F59E0B] hover:text-[#0f172a] transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 font-bold transition-all duration-200 hover:-translate-y-0.5" style={{padding:"12px 36px",borderRadius:"6px",border:"1.5px solid rgba(245,158,11,0.4)",color:"#F59E0B",fontSize:"0.9rem"}}
               >
                 {t("viewAll")}
                 <ChevronRight className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} />
@@ -406,7 +406,7 @@ export default async function HomePage() {
       )}
 
       {/* ── CTA Band ── */}
-      <section className="relative bg-[#0f172a] py-24 md:py-32 overflow-hidden">
+      <section className="relative bg-[#0f172a] overflow-hidden" style={{paddingTop:"8rem",paddingBottom:"8rem"}}>
         {/* Compass watermark */}
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -452,7 +452,7 @@ export default async function HomePage() {
               ? "انضم لمئات العملاء الذين غيّروا مساراتهم مع البوصلة"
               : "Join hundreds of clients who transformed their paths with Al-Bosla"}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
             <Link
               href={`/${locale}/auth`}
               className="inline-flex items-center justify-center px-10 py-3 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-colors shadow-[0_4px_20px_rgba(245,158,11,0.35)]"

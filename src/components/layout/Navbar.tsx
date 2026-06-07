@@ -97,7 +97,7 @@ export function Navbar({ user }: NavbarProps) {
               aria-label="البوصلة"
             >
               <img
-                src="/logo.svg"
+                src="/logo.png"
                 alt="البوصلة"
                 className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
               />
@@ -236,7 +236,7 @@ export function Navbar({ user }: NavbarProps) {
           {/* ── Mobile header row (visible only on mobile) ── */}
           <div className="md:hidden flex items-center justify-between h-16">
             <Link href={`/${locale}`} aria-label="البوصلة">
-              <img src="/logo.svg" alt="البوصلة" className="h-10 w-auto" />
+              <img src="/logo.png" alt="البوصلة" className="h-10 w-auto" />
             </Link>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -292,7 +292,7 @@ export function Navbar({ user }: NavbarProps) {
             >
               <X className="h-5 w-5" />
             </button>
-            <img src="/logo.svg" alt="البوصلة" className="h-10 w-auto mb-2" />
+            <img src="/logo.png" alt="البوصلة" className="h-10 w-auto mb-2" />
           </div>
 
           <div className="p-5 overflow-y-auto h-[calc(100vh-10rem)]">
