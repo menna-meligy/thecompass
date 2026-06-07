@@ -1,26 +1,478 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   AL-BOSLA DARK DESIGN SYSTEM
+   ============================================================ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ── Core Palette ── */
+  --bg-base:        #0f172a;
+  --bg-surface:     #1e293b;
+  --bg-elevated:    #293548;
+  --bg-input:       #162032;
+
+  /* ── Gold Accent ── */
+  --gold:           #F59E0B;
+  --gold-light:     #FCD34D;
+  --gold-dark:      #B45309;
+  --gold-dim:       rgba(245,158,11,0.15);
+  --gold-border:    rgba(245,158,11,0.20);
+  --gold-glow:      0 0 24px rgba(245,158,11,0.35);
+
+  /* ── Crimson Accent ── */
+  --crimson:        #DC2626;
+  --crimson-light:  #EF4444;
+  --crimson-dark:   #991B1B;
+  --crimson-dim:    rgba(220,38,38,0.15);
+  --crimson-border: rgba(220,38,38,0.25);
+  --crimson-glow:   0 0 24px rgba(220,38,38,0.35);
+
+  /* ── Text ── */
+  --text-primary:   #F8FAFC;
+  --text-secondary: rgba(248,250,252,0.65);
+  --text-muted:     rgba(248,250,252,0.38);
+
+  /* ── Borders ── */
+  --border-subtle:  rgba(148,163,184,0.08);
+  --border-default: rgba(148,163,184,0.14);
+  --border-gold:    rgba(245,158,11,0.20);
+
+  /* ── Shadows ── */
+  --shadow-sm:   0 2px 8px rgba(0,0,0,0.40);
+  --shadow-md:   0 4px 20px rgba(0,0,0,0.50);
+  --shadow-lg:   0 8px 40px rgba(0,0,0,0.60);
+  --shadow-gold: 0 0 32px rgba(245,158,11,0.22);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(245,158,11,0.08) inset;
+
+  /* ── Transitions ── */
+  --t-fast: 150ms cubic-bezier(0.4,0,0.2,1);
+  --t-base: 250ms cubic-bezier(0.4,0,0.2,1);
+  --t-slow: 400ms cubic-bezier(0.4,0,0.2,1);
+
+  /* ── Radius ── */
+  --r-sm:  6px;
+  --r-md:  10px;
+  --r-lg:  14px;
+  --r-xl:  20px;
+  --r-2xl: 28px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* ============================================================
+   RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: 'Cairo', 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
+
+[dir="rtl"] body { font-family: 'Cairo', system-ui, sans-serif; }
+[dir="ltr"] body { font-family: 'Inter', 'Cairo', system-ui, sans-serif; }
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+* { scrollbar-width: thin; scrollbar-color: var(--gold-dark) var(--bg-base); }
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--t-fast);
+}
+
+/* ============================================================
+   TRANSITIONS
+   ============================================================ */
+button, a, input, select, textarea {
+  transition:
+    color var(--t-fast),
+    background-color var(--t-fast),
+    border-color var(--t-fast),
+    box-shadow var(--t-fast),
+    opacity var(--t-fast),
+    transform var(--t-fast);
+}
+
+/* ============================================================
+   GLASS MORPHISM
+   ============================================================ */
+.glass {
+  background: rgba(30,41,59,0.55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-gold);
+}
+
+.glass-subtle {
+  background: rgba(15,23,42,0.70);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-surface {
+  background: rgba(30,41,59,0.80);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border-default);
+}
+
+/* ============================================================
+   GRADIENT BACKGROUNDS
+   ============================================================ */
+.hero-pattern {
+  position: relative;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(245,158,11,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 20% 100%, rgba(220,38,38,0.06) 0%, transparent 60%),
+    linear-gradient(180deg, #0f172a 0%, #0d1526 50%, #0f172a 100%);
+}
+
+.dark-section {
+  background:
+    radial-gradient(ellipse 100% 50% at 50% 50%, rgba(245,158,11,0.04) 0%, transparent 70%),
+    #0f172a;
+}
+
+.surface-section {
+  background: var(--bg-surface);
+}
+
+/* ============================================================
+   COMPASS WATERMARK BACKGROUND
+   ============================================================ */
+.compass-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400' width='560' height='560' opacity='0.04'%3E%3Ccircle cx='200' cy='200' r='185' stroke='%23F59E0B' stroke-width='1.5' fill='none'/%3E%3Ccircle cx='200' cy='200' r='150' stroke='%23F59E0B' stroke-width='0.7' fill='none'/%3E%3Ccircle cx='200' cy='200' r='110' stroke='%23F59E0B' stroke-width='0.5' fill='none'/%3E%3Ccircle cx='200' cy='200' r='70' stroke='%23F59E0B' stroke-width='0.5' fill='none'/%3E%3Cpolygon points='200,20 210,185 200,200 190,185' fill='%23F59E0B'/%3E%3Cpolygon points='200,380 210,215 200,200 190,215' fill='%23F59E0B' opacity='0.6'/%3E%3Cpolygon points='20,200 185,190 200,200 185,210' fill='%23F59E0B' opacity='0.6'/%3E%3Cpolygon points='380,200 215,190 200,200 215,210' fill='%23F59E0B'/%3E%3Cpolygon points='200,20 205,188 200,200 195,188' fill='%23F59E0B' opacity='0.4' transform='rotate(45 200 200)'/%3E%3Cpolygon points='200,380 205,212 200,200 195,212' fill='%23F59E0B' opacity='0.4' transform='rotate(45 200 200)'/%3E%3Cpolygon points='20,200 188,195 200,200 188,205' fill='%23F59E0B' opacity='0.4' transform='rotate(45 200 200)'/%3E%3Cpolygon points='380,200 212,195 200,200 212,205' fill='%23F59E0B' opacity='0.4' transform='rotate(45 200 200)'/%3E%3Ccircle cx='200' cy='200' r='6' fill='%23F59E0B'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 560px 560px;
+  pointer-events: none;
+}
+
+/* ============================================================
+   CARD VARIANTS
+   ============================================================ */
+.card-glass {
+  background: rgba(30,41,59,0.6);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t-base), box-shadow var(--t-base), border-color var(--t-base);
+}
+
+.card-glass:hover {
+  transform: translateY(-3px);
+  border-color: rgba(245,158,11,0.35);
+  box-shadow: var(--shadow-lg), var(--shadow-gold);
+}
+
+.card-surface {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+
+.card-surface:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   NAV LINK
+   ============================================================ */
+.nav-link {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  inset-inline-start: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gold);
+  border-radius: 9999px;
+  transition: width var(--t-base);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after { width: 100%; }
+
+/* ============================================================
+   GOLD DIVIDER
+   ============================================================ */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  opacity: 0.3;
+}
+
+.gold-line {
+  width: 48px;
+  height: 3px;
+  background: linear-gradient(to right, var(--gold), var(--gold-light));
+  border-radius: 9999px;
+}
+
+/* ============================================================
+   BADGE / STATUS
+   ============================================================ */
+.badge-gold {
+  background: var(--gold-dim);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-light);
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  letter-spacing: 0.04em;
+}
+
+.badge-crimson {
+  background: var(--crimson-dim);
+  border: 1px solid var(--crimson-border);
+  color: #FCA5A5;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 10px;
+}
+
+.badge-success {
+  background: rgba(34,197,94,0.12);
+  border: 1px solid rgba(34,197,94,0.25);
+  color: #86EFAC;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 10px;
+}
+
+.badge-neutral {
+  background: rgba(148,163,184,0.12);
+  border: 1px solid rgba(148,163,184,0.20);
+  color: rgba(148,163,184,0.9);
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 10px;
+}
+
+/* ============================================================
+   INPUT DARK
+   ============================================================ */
+.input-dark {
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  color: var(--text-primary);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+  width: 100%;
+  outline: none;
+}
+
+.input-dark::placeholder { color: var(--text-muted); }
+
+.input-dark:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+}
+
+/* ============================================================
+   STAT CARD
+   ============================================================ */
+.stat-card {
+  background: rgba(30,41,59,0.7);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--r-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--t-base), box-shadow var(--t-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(245,158,11,0.12);
+}
+
+/* ============================================================
+   TABLE DARK
+   ============================================================ */
+.table-dark {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-dark thead tr {
+  background: rgba(15,23,42,0.8);
+  border-bottom: 1px solid var(--gold-border);
+}
+
+.table-dark thead th {
+  padding: 12px 16px;
+  text-align: start;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.table-dark tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color var(--t-fast);
+}
+
+.table-dark tbody tr:hover {
+  background: rgba(30,41,59,0.5);
+}
+
+.table-dark tbody td {
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   STEP INDICATOR
+   ============================================================ */
+.step-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--gold-border), rgba(245,158,11,0.05));
+}
+
+/* ============================================================
+   PROGRESS RING (SVG based — circle override)
+   ============================================================ */
+.ring-track { stroke: rgba(148,163,184,0.12); }
+.ring-fill-gold { stroke: var(--gold); }
+.ring-fill-crimson { stroke: var(--crimson); }
+
+/* ============================================================
+   GLOW EFFECTS
+   ============================================================ */
+.glow-gold  { box-shadow: var(--gold-glow); }
+.glow-crimson { box-shadow: var(--crimson-glow); }
+.text-glow-gold { text-shadow: 0 0 20px rgba(245,158,11,0.6); }
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse-gold {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.15); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-up    { animation: fade-up 0.6s ease-out forwards; }
+.animate-fade-in    { animation: fade-in 0.4s ease-out forwards; }
+.animate-pulse-gold { animation: pulse-gold 2.5s ease-in-out infinite; }
+.animate-spin-slow  { animation: spin-slow 20s linear infinite; }
+
+.delay-1 { animation-delay: 0.1s; opacity: 0; }
+.delay-2 { animation-delay: 0.2s; opacity: 0; }
+.delay-3 { animation-delay: 0.3s; opacity: 0; }
+.delay-4 { animation-delay: 0.4s; opacity: 0; }
+
+/* ============================================================
+   SHIMMER LOADING
+   ============================================================ */
+.shimmer {
+  background: linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-elevated) 50%, var(--bg-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.aspect-video { aspect-ratio: 16/9; }
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 60%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.border-gold-gradient {
+  border-image: linear-gradient(135deg, var(--gold), var(--gold-light), var(--gold)) 1;
+}
+
+/* ============================================================
+   RTL HELPERS
+   ============================================================ */
+[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
