@@ -206,7 +206,7 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
           </h1>
           <p className="text-white/55 text-sm leading-relaxed max-w-sm mx-auto">
             {isAr
-              ? "تقييم شخصي صادق في 21 سؤال: يكشف أين أنت الآن في ست محاور حياتية، ويوجّهك للخطوة المناسبة لك."
+              ? "تقييم شخصي صادق في 21 سؤال: يكشف انت فين دلوقتي في 6 محاور من حياتك، ويوجّهك للخطوة اللي تناسبك."
               : "An honest self-assessment in 21 questions: reveals where you stand across 6 life dimensions and points you to what fits next."}
           </p>
         </div>
@@ -245,7 +245,7 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
 
         <p className="text-center text-white/30 text-xs mt-6">
           {isAr
-            ? "لا يوجد إجابات صح أو غلط، كن صادقاً مع نفسك."
+            ? "مفيش إجابات صح أو غلط، كن صادق مع نفسك."
             : "There are no right or wrong answers, just be honest with yourself."}
         </p>
       </PageWrap>
@@ -380,7 +380,7 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
 
     const ctaHref =
       r.recommendation.type === "session"
-        ? `/${locale}/book`
+        ? `/${locale}/book/general`
         : `/${locale}/workshops?topic=${r.recommendation.workshopTopic ?? ""}`;
 
     return (

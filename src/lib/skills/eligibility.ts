@@ -57,7 +57,7 @@ export function getEligibilityMessage(
 
   if (state === "BASELINE_OPEN") {
     return locale === "ar"
-      ? { title: "ابدأ رحلتك", body: "خذ قراءتك الأولى واعرف أين أنت الآن.", cta: "ابدأ القراءة" }
+      ? { title: "ابدأ رحلتك", body: "خُد قراءتك الأولى واعرف انت فين دلوقتي.", cta: "ابدأ القراءة" }
       : { title: "Start your journey", body: "Take your first reading and discover where you are right now.", cta: "Start reading" };
   }
 

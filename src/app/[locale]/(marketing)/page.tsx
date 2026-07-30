@@ -43,7 +43,7 @@ export default async function HomePage() {
     {
       name: "نور حسن",
       role: "مديرة مشاريع",
-      text: "تجربة رائعة! تعلمت كيف أضع أهدافاً واقعية وأحققها خطوة بخطوة. الآن عندي خارطة طريق واضحة.",
+      text: "تجربة جامدة! اتعلمت إزاي أحط أهداف واقعية وأحققها خطوة بخطوة. دلوقتي عندي خارطة طريق واضحة.",
       stars: 5,
       avatar: "نح",
     },
@@ -378,7 +378,7 @@ export default async function HomePage() {
           </h2>
           <p className="text-white/55 text-lg" style={{ maxWidth: "36rem", margin: "0 auto 2.75rem" }}>
             {isRtl
-              ? "انضم لمئات العملاء الذين غيّروا مساراتهم مع البوصلة"
+              ? "انضم لمئات العملاء اللي غيّروا مساراتهم مع البوصلة"
               : "Join hundreds of clients who transformed their paths with The Compass"}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -387,7 +387,7 @@ export default async function HomePage() {
               className="inline-flex items-center justify-center px-10 py-4 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-all duration-200 hover:-translate-y-0.5 shadow-[0_8px_24px_rgba(245,158,11,0.30)] hover:shadow-[0_14px_36px_rgba(245,158,11,0.45)]"
               style={{ borderRadius: "12px", minWidth: "196px" }}
             >
-              {isRtl ? "سجّل الآن مجاناً" : "Sign Up Free"}
+              {isRtl ? "سجّل دلوقتي مجاناً" : "Sign Up Free"}
             </Link>
             <Link
               href={`/${locale}/workshops`}

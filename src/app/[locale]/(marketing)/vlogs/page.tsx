@@ -31,7 +31,7 @@ export default async function VlogsPage() {
             style={{ border: "1px dashed rgba(245,158,11,0.15)", borderRadius: "10px", background: "rgba(30,41,59,0.2)" }}
           >
             <p className="text-white/40 font-semibold text-sm">
-              {vlogs === null ? "Error loading content" : "No content yet"}
+              {vlogs === null ? t("error") : t("empty")}
             </p>
           </div>
         ) : (

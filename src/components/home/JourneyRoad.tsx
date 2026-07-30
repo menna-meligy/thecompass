@@ -31,7 +31,7 @@ const MILESTONES = [
     t: 0.16,
     icon: MapPin,
     path: "workshops",
-    titleAr: "اكتشف",
+    titleAr: "شوف",
     titleEn: "Explore",
     descAr: "تصفّح الورش والمحتوى واختر اللي يناسب رحلتك",
     descEn: "Browse workshops and content, find what fits you",

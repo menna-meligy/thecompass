@@ -300,10 +300,10 @@ export default function BookingFlow({
         >
           {proofPreview ? (
             <div className="relative">
-              <img src={proofPreview} alt="Receipt" style={{ maxHeight: "200px", maxWidth: "100%", borderRadius: "6px", margin: "0 auto", display: "block" }} />
+              <img src={proofPreview} alt={isAr ? "إيصال الدفع" : "Payment receipt"} style={{ maxHeight: "200px", maxWidth: "100%", borderRadius: "6px", margin: "0 auto", display: "block" }} />
               <button
                 onClick={(e) => { e.stopPropagation(); setProofFile(null); setProofPreview(null); setVerifyStatus("idle"); }}
-                style={{ position: "absolute", top: "-8px", right: "-8px", width: "24px", height: "24px", borderRadius: "50%", background: "#0f172a", border: "1px solid rgba(255,255,255,0.2)", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                style={{ position: "absolute", top: "-8px", insetInlineEnd: "-8px", width: "24px", height: "24px", borderRadius: "50%", background: "#0f172a", border: "1px solid rgba(255,255,255,0.2)", color: "white", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -326,7 +326,7 @@ export default function BookingFlow({
         {verifyStatus === "fail" && (
           <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
             {isAr
-              ? "تعذّر التحقق من رقم الحساب في هذه الصورة. تأكد من أن الصورة واضحة وتُظهر تفاصيل التحويل."
+              ? "معرفناش نتأكد من رقم الحساب في الصورة دي. اتأكد إن الصورة واضحة وبتبيّن تفاصيل التحويل."
               : "Could not verify the account number in this image. Make sure the screenshot is clear and shows transfer details."}
           </div>
         )}
@@ -334,7 +334,7 @@ export default function BookingFlow({
           <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5, display: "flex", gap: "8px" }}>
             <span style={{ flexShrink: 0 }}>⚠️</span>
             {isAr
-              ? "هذا الإيصال مستخدم من قبل لحجز آخر. من فضلك أرفع صورة جديدة خاصة بهذا التحويل."
+              ? "الإيصال ده اتستخدم قبل كده في حجز تاني. من فضلك ارفع صورة جديدة خاصة بالتحويل ده."
               : "This receipt was already used for another booking. Please upload a fresh screenshot for this transfer."}
           </div>
         )}

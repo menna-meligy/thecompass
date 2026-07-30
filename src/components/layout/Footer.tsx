@@ -164,7 +164,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="tel:+201093036736"
+                  href="tel:+201027857707"
                   className="flex items-center gap-3 text-sm text-white/45 hover:text-white transition-colors group"
                 >
                   <div
@@ -173,7 +173,7 @@ export function Footer() {
                   >
                     <Phone className="h-3.5 w-3.5 text-[#F59E0B]/60" />
                   </div>
-                  01093036736
+                  01027857707
                 </a>
               </li>
             </ul>
@@ -244,11 +244,11 @@ export function Footer() {
             © {year} {isRtl ? "البوصلة" : "The Compass"} · {t("rights")}
           </p>
           <div className="flex items-center gap-4 text-[11px] text-white/25">
-            <Link href={`/${locale}`} className="hover:text-white/60 transition-colors">
+            <Link href={`/${locale}/privacy`} className="hover:text-white/60 transition-colors">
               {isRtl ? "سياسة الخصوصية" : "Privacy Policy"}
             </Link>
             <span style={{ opacity: 0.3 }}>·</span>
-            <Link href={`/${locale}`} className="hover:text-white/60 transition-colors">
+            <Link href={`/${locale}/terms`} className="hover:text-white/60 transition-colors">
               {isRtl ? "شروط الاستخدام" : "Terms of Use"}
             </Link>
           </div>

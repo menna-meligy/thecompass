@@ -10,10 +10,10 @@
     "profile": "الملف الشخصي"
   },
   "home": {
-    "heroTitle": "اكتشف اتجاهك",
+    "heroTitle": "لاقي اتجاهك",
     "heroSubtitle": "البوصلة: منصة تدريب وتطوير ذاتي مصممة لتوجيهك نحو أهدافك",
     "heroButton": "ابدأ رحلتك",
-    "heroSecondaryButton": "استكشف الورش",
+    "heroSecondaryButton": "شوف الورش",
     "featuredWorkshops": "ورش مميزة",
     "viewAll": "عرض الكل",
     "latestVlogs": "أحدث المحتويات",
@@ -26,7 +26,7 @@
     "subtitle": "اختر الورشة المناسبة لك وابدأ رحلتك",
     "filterAll": "الكل",
     "noResults": "لا توجد ورش متاحة",
-    "bookNow": "احجز الآن",
+    "bookNow": "احجز دلوقتي",
     "learnMore": "اعرف المزيد",
     "sessions": "الجلسات المتاحة",
     "group": "جماعية",
@@ -120,10 +120,10 @@
     "materials": "المواد",
     "profile": "الملف الشخصي",
     "noBookings": "لا توجد حجوزات بعد",
-    "exploreWorkshops": "استكشف الورش",
+    "exploreWorkshops": "شوف الورش",
     "bookGeneral": "احجز جلسة فردية",
-    "discoverWorkshops": "اكتشف الورش",
-    "generalSessionDesc": "جلسة تدريب فردي مع المدربة",
+    "discoverWorkshops": "اتفرّج على الورش",
+    "generalSessionDesc": "جلسة تدريب فردي مع المنتور",
     "workshopSessionDesc": "انضم إلى ورشة تدريبية جماعية"
   },
   "roadmap": {
@@ -140,7 +140,9 @@
   "vlogs": {
     "title": "المحتوى التعليمي",
     "subtitle": "مقاطع فيديو ومحتوى متنوع لدعم رحلتك",
-    "watch": "مشاهدة"
+    "watch": "مشاهدة",
+    "empty": "لسه مفيش محتوى",
+    "error": "حصل خطأ وإحنا بنحمّل المحتوى"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -239,7 +241,7 @@
       "DIR": "الوضوح والاتجاه",
       "PRD": "الإنتاجية والتركيز",
       "CNF": "الثقة والقيمة الذاتية",
-      "COM": "التواصل والتواصل",
+      "COM": "التواصل والعلاقات",
       "NRG": "الطاقة والعافية"
     },
     "levels": {
@@ -250,7 +252,7 @@
       "5": "إتقان"
     },
     "selfLevel": "تقييمك لنفسك",
-    "mentorLevel": "تقييم المرشد",
+    "mentorLevel": "تقييم المنتور",
     "combinedLevel": "المستوى المجمّع",
     "gap": "فجوة",
     "lastUpdated": "آخر تحديث",

@@ -140,7 +140,9 @@
   "vlogs": {
     "title": "Educational Content",
     "subtitle": "Videos and diverse content to support your journey",
-    "watch": "Watch"
+    "watch": "Watch",
+    "empty": "No content yet",
+    "error": "Error loading content"
   },
   "auth": {
     "login": "Login",

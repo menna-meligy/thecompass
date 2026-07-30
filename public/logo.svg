@@ -1,95 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 280" fill="none">
-  <!-- Outer ring / bezel -->
-  <circle cx="120" cy="120" r="110" fill="#1a2a40" stroke="#8B6914" stroke-width="4"/>
-  <circle cx="120" cy="120" r="106" fill="none" stroke="#C9A84C" stroke-width="1" stroke-dasharray="4 3" opacity="0.5"/>
-
-  <!-- Parchment background -->
-  <circle cx="120" cy="120" r="100" fill="#C9A057" opacity="0.15"/>
-  <circle cx="120" cy="120" r="100" fill="url(#parchment)"/>
-
-  <!-- Inner compass ring -->
-  <circle cx="120" cy="120" r="100" fill="none" stroke="#8B6914" stroke-width="2"/>
-  <circle cx="120" cy="120" r="88" fill="none" stroke="#C9A84C" stroke-width="0.8" opacity="0.6"/>
-  <circle cx="120" cy="120" r="42" fill="#1a2a40" stroke="#8B6914" stroke-width="2.5"/>
-  <circle cx="120" cy="120" r="38" fill="#0f172a" stroke="#C9A84C" stroke-width="1"/>
-
-  <!-- Map texture lines -->
-  <g opacity="0.12" stroke="#8B6914" stroke-width="0.5">
-    <path d="M30 90 Q80 80 130 95 Q170 108 210 100"/>
-    <path d="M25 110 Q70 100 120 115 Q165 128 215 118"/>
-    <path d="M28 140 Q75 130 125 145 Q168 158 212 148"/>
-    <path d="M35 165 Q80 155 130 168 Q172 180 210 170"/>
-    <path d="M85 25 Q95 75 90 120 Q87 160 92 200"/>
-    <path d="M115 22 Q125 72 120 118 Q117 158 122 200"/>
-    <path d="M148 28 Q155 78 150 123 Q147 163 152 202"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none" role="img" aria-label="البوصلة">
+  <!-- outer ring -->
+  <circle cx="48" cy="48" r="42" stroke="#F59E0B" stroke-width="3"/>
+  <!-- cardinal ticks -->
+  <g stroke="#F59E0B" stroke-width="3" stroke-linecap="round">
+    <line x1="48" y1="7" x2="48" y2="16"/>
+    <line x1="48" y1="80" x2="48" y2="89"/>
+    <line x1="7" y1="48" x2="16" y2="48"/>
+    <line x1="80" y1="48" x2="89" y2="48"/>
   </g>
-
-  <!-- 8-pointed compass star -->
-  <!-- N point (gold) -->
-  <polygon points="120,18 126,105 120,120 114,105" fill="#C9A84C"/>
-  <!-- S point -->
-  <polygon points="120,222 126,135 120,120 114,135" fill="#8B6914" opacity="0.8"/>
-  <!-- E point -->
-  <polygon points="222,120 135,126 120,120 135,114" fill="#C9A84C" opacity="0.9"/>
-  <!-- W point -->
-  <polygon points="18,120 105,126 120,120 105,114" fill="#C9A84C" opacity="0.9"/>
-  <!-- NE diagonal -->
-  <polygon points="185,55 132,113 120,120 126,107" fill="#C9A84C" opacity="0.7" transform="rotate(45 120 120)"/>
-  <!-- SW diagonal -->
-  <polygon points="185,55 132,113 120,120 126,107" fill="#8B6914" opacity="0.6" transform="rotate(225 120 120)"/>
-  <!-- NW diagonal -->
-  <polygon points="185,55 132,113 120,120 126,107" fill="#C9A84C" opacity="0.65" transform="rotate(315 120 120)"/>
-  <!-- SE diagonal -->
-  <polygon points="185,55 132,113 120,120 126,107" fill="#8B6914" opacity="0.55" transform="rotate(135 120 120)"/>
-
-  <!-- Center circle hub -->
-  <circle cx="120" cy="120" r="14" fill="#1a2a40" stroke="#C9A84C" stroke-width="1.5"/>
-  <circle cx="120" cy="120" r="5" fill="#C9A84C"/>
-
-  <!-- Silhouette: person running on path -->
-  <g transform="translate(96, 96)" opacity="0.85">
-    <!-- Sun rays -->
-    <circle cx="24" cy="10" r="6" fill="#C9A84C" opacity="0.8"/>
-    <line x1="24" y1="2" x2="24" y2="0" stroke="#C9A84C" stroke-width="1.2"/>
-    <line x1="32" y1="4" x2="34" y2="2" stroke="#C9A84C" stroke-width="1.2"/>
-    <line x1="36" y1="10" x2="38" y2="10" stroke="#C9A84C" stroke-width="1.2"/>
-    <line x1="16" y1="4" x2="14" y2="2" stroke="#C9A84C" stroke-width="1.2"/>
-    <line x1="12" y1="10" x2="10" y2="10" stroke="#C9A84C" stroke-width="1.2"/>
-    <!-- Path/road -->
-    <path d="M4 44 Q14 35 24 30 Q34 35 44 44" fill="none" stroke="#C9A84C" stroke-width="1.2" opacity="0.7"/>
-    <path d="M10 44 Q20 38 24 34 Q28 38 38 44" fill="#C9A84C" opacity="0.2"/>
-    <!-- Running person silhouette -->
-    <circle cx="24" cy="20" r="3" fill="#C9A057"/>
-    <line x1="24" y1="23" x2="24" y2="33" stroke="#C9A057" stroke-width="2"/>
-    <line x1="24" y1="26" x2="20" y2="30" stroke="#C9A057" stroke-width="1.5"/>
-    <line x1="24" y1="26" x2="28" y2="29" stroke="#C9A057" stroke-width="1.5"/>
-    <line x1="24" y1="33" x2="21" y2="38" stroke="#C9A057" stroke-width="1.5"/>
-    <line x1="24" y1="33" x2="27" y2="38" stroke="#C9A057" stroke-width="1.5"/>
-  </g>
-
-  <!-- Cardinal labels -->
-  <text x="120" y="12" text-anchor="middle" fill="#C9A84C" font-size="10" font-family="serif" font-weight="bold">N</text>
-  <text x="120" y="237" text-anchor="middle" fill="#C9A84C" font-size="9" font-family="serif" opacity="0.8">S</text>
-  <text x="228" y="124" text-anchor="middle" fill="#C9A84C" font-size="9" font-family="serif" opacity="0.8">E</text>
-  <text x="12" y="124" text-anchor="middle" fill="#C9A84C" font-size="9" font-family="serif" opacity="0.8">W</text>
-
-  <!-- Bolt/rivet accents on ring -->
-  <circle cx="120" cy="14" r="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.5"/>
-  <circle cx="120" cy="226" r="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.5"/>
-  <circle cx="14" cy="120" r="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.5"/>
-  <circle cx="226" cy="120" r="3" fill="#8B6914" stroke="#C9A84C" stroke-width="0.5"/>
-
-  <!-- Outer glow ring -->
-  <circle cx="120" cy="120" r="112" fill="none" stroke="#C9A84C" stroke-width="0.5" opacity="0.3"/>
-
-  <!-- Arabic text "البوصلة" -->
-  <text x="120" y="265" text-anchor="middle" fill="#C9A84C" font-size="32" font-family="'Cairo', 'Noto Naskh Arabic', serif" font-weight="bold" letter-spacing="1">البوصلة</text>
-
-  <defs>
-    <radialGradient id="parchment" cx="40%" cy="35%" r="65%">
-      <stop offset="0%" stop-color="#C9A057" stop-opacity="0.25"/>
-      <stop offset="60%" stop-color="#8B6914" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#4a3510" stop-opacity="0.05"/>
-    </radialGradient>
-  </defs>
+  <!-- compass needle: north bright, south muted -->
+  <polygon points="48,17 55,48 41,48" fill="#FBBF24"/>
+  <polygon points="48,79 55,48 41,48" fill="#475569"/>
+  <!-- center hub -->
+  <circle cx="48" cy="48" r="5" fill="#0f172a" stroke="#F59E0B" stroke-width="2.5"/>
 </svg>

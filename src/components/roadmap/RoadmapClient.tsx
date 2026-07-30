@@ -54,6 +54,7 @@ interface Props {
 
 export default function RoadmapClient({ userId, locale, isAdmin = false, targetUserId, clientName }: Props) {
   const isAr = locale === "ar";
+  const regTitle = isAr ? "انضميت للبوصلة" : "Joined The Compass";
 
   // Mentee tasks
   const [menteeTasks, setMenteeTasksState] = useState<Task[]>([REGISTRATION_TASK]);
@@ -178,7 +179,8 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uid]);
 
-  const doneTasks = menteeTasks.filter((t) => t.status === "done");
+  const menteeDisplay = menteeTasks.map((t) => (t.id === "reg-node" ? { ...t, title: regTitle } : t));
+  const doneTasks = menteeDisplay.filter((t) => t.status === "done");
 
   if (!ready) {
     return (
@@ -268,7 +270,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
         {/* Tab content */}
         {activeTab === "mentee" && (
           <KanbanBoard
-            tasks={menteeTasks}
+            tasks={menteeDisplay}
             setTasks={setMenteeTasks}
             userId={userId}
             locale={locale}

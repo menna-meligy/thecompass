@@ -34,7 +34,7 @@ export default function AssessmentCard({ eligibility, locale, lastReadingDate }:
             </div>
             <div>
               <p className="text-white font-semibold text-sm">
-                {isAr ? "اتخذ قراءتك الأولى" : "Take your first reading"}
+                {isAr ? "خُد قراءتك الأولى" : "Take your first reading"}
               </p>
               <p className="text-white/40 text-xs mt-0.5">{msg.body}</p>
             </div>
