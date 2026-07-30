@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const navItems = [
     { href: `/${locale}/dashboard`, icon: LayoutDashboard, labelAr: "الرئيسية", labelEn: "Home", exact: true },
     { href: `/${locale}/dashboard/bookings`, icon: Calendar, labelAr: "حجوزاتي", labelEn: "Bookings", exact: false },
-    { href: `/${locale}/dashboard/roadmap`, icon: Map, labelAr: "الخارطة", labelEn: "Roadmap", exact: false },
+    { href: `/${locale}/dashboard/roadmap`, icon: Map, labelAr: "الخريطة", labelEn: "Roadmap", exact: false },
     { href: `/${locale}/dashboard/materials`, icon: BookOpen, labelAr: "المواد", labelEn: "Materials", exact: false },
     { href: `/${locale}/dashboard/profile`, icon: User, labelAr: "الملف", labelEn: "Profile", exact: false },
   ];

@@ -193,8 +193,8 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
     ? (isAr ? "أهداف العميل" : "Client's Goals")
     : (isAr ? "أهدافي" : "My Goals");
   const tab2Label = isAdmin
-    ? (isAr ? "ملاحظاتي (المدرب)" : "My Notes (Mentor)")
-    : (isAr ? "ملاحظات المدربة" : "Mentor Notes");
+    ? (isAr ? "ملاحظاتي (المنتور)" : "My Notes (Mentor)")
+    : (isAr ? "ملاحظات المنتور" : "Mentor Notes");
 
   return (
     <div className="bg-[#0f172a] min-h-screen flex flex-col">
@@ -291,10 +291,10 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
               }}>
                 <div style={{ fontSize: "2rem", marginBottom: "12px" }}>📝</div>
                 <p style={{ color: "rgba(167,139,250,0.7)", fontSize: "0.9rem", fontWeight: 600 }}>
-                  {isAr ? "لا توجد ملاحظات من المدربة حتى الآن" : "No notes from mentor yet"}
+                  {isAr ? "لسه مفيش ملاحظات من المنتور" : "No notes from mentor yet"}
                 </p>
                 <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.8rem", marginTop: "6px" }}>
-                  {isAr ? "ستظهر هنا ملاحظات المدربة بعد جلستك الأولى" : "Mentor notes will appear here after your first session"}
+                  {isAr ? "ملاحظات المنتور هتظهر هنا بعد أول جلسة ليك" : "Mentor notes will appear here after your first session"}
                 </p>
               </div>
             ) : (
@@ -305,7 +305,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
                 locale={locale}
                 useDB={true}
                 readOnly={!isAdmin}
-                trackLabel={isAdmin ? (isAr ? "ملاحظاتي (المدرب)" : "Mentor Notes") : (isAr ? "ملاحظات المدربة" : "Mentor Notes")}
+                trackLabel={isAdmin ? (isAr ? "ملاحظاتي (المنتور)" : "Mentor Notes") : (isAr ? "ملاحظات المنتور" : "Mentor Notes")}
                 trackColor="#A78BFA"
               />
             )}

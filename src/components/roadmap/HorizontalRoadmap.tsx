@@ -36,11 +36,11 @@ export default function HorizontalRoadmap({ doneTasks, sessions = [], locale }: 
       {/* Label */}
       <div className="flex items-center gap-2 mb-3">
         <span style={{ fontSize: "0.65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(245,158,11,0.5)" }}>
-          {isAr ? "مسار إنجازاتك" : "Your Progress Path"}
+          {isAr ? "مشوار إنجازاتك" : "Your Progress Path"}
         </span>
         <div style={{ flex: 1, height: "1px", background: "rgba(245,158,11,0.08)" }} />
         <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.25)", fontWeight: 600 }}>
-          {doneTasks.length} {isAr ? "منجز" : "completed"}
+          {doneTasks.length} {isAr ? "خلصان" : "completed"}
           {sessions.length > 0 && ` · ${sessions.length} ${isAr ? "جلسة" : "sessions"}`}
         </span>
       </div>
@@ -140,7 +140,7 @@ export default function HorizontalRoadmap({ doneTasks, sessions = [], locale }: 
                         <span style={{ fontSize: "0.85rem" }}>＋</span>
                       </div>
                       <div style={{ marginTop: "6px", fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", textAlign: "center" }}>
-                        {isAr ? "التالي" : "Next"}
+                        {isAr ? "اللي جاي" : "Next"}
                       </div>
                     </div>
                   </>
@@ -227,7 +227,7 @@ export default function HorizontalRoadmap({ doneTasks, sessions = [], locale }: 
                       <span style={{ fontSize: "0.85rem" }}>＋</span>
                     </div>
                     <div style={{ marginTop: "6px", fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", textAlign: "center" }}>
-                      {isAr ? "التالي" : "Next"}
+                      {isAr ? "اللي جاي" : "Next"}
                     </div>
                   </div>
                 </>
@@ -238,7 +238,7 @@ export default function HorizontalRoadmap({ doneTasks, sessions = [], locale }: 
 
         {totalCount === 0 && (
           <div style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.75rem", padding: "8px 0" }}>
-            {isAr ? "أضف مهمة وأكملها لتبدأ مسارك" : "Complete a task to start your journey"}
+            {isAr ? "ضيف مهمة وكمّلها عشان تبدأ مشوارك" : "Complete a task to start your journey"}
           </div>
         )}
       </div>

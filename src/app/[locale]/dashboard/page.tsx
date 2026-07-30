@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           {t("welcome")}, {profile?.full_name?.split(" ")[0] || ""}!
         </h1>
         <p className="text-white/40 mt-2 text-sm">
-          {locale === "ar" ? "مرحباً بك في لوحة التحكم الخاصة بك" : "Welcome back to your dashboard"}
+          {locale === "ar" ? "أهلاً بيك في لوحة التحكم بتاعتك" : "Welcome back to your dashboard"}
         </p>
       </div>
 
@@ -140,7 +140,7 @@ export default async function DashboardPage() {
                     {progress.completed_count}
                   </span>
                   <span className="text-white/50 text-xs mt-1 uppercase tracking-wider">
-                    {locale === "ar" ? "مكتمل" : "Completed"}
+                    {locale === "ar" ? "خلصان" : "Completed"}
                   </span>
                 </div>
               </div>
@@ -182,7 +182,7 @@ export default async function DashboardPage() {
               {t("noUpcoming")}
               <div className="mt-3">
                 <Link href={`/${locale}/workshops`} className="text-[#F59E0B] font-medium text-sm">
-                  {locale === "ar" ? "استكشف الورش" : "Explore workshops"}
+                  {locale === "ar" ? "شوف الورش" : "Explore workshops"}
                 </Link>
               </div>
             </div>
@@ -335,7 +335,7 @@ function CompassHeroCard({
               </div>
               {topLabel && (
                 <p className="text-white/40 text-xs mt-0.5">
-                  {isAr ? `نقطة قوتك: ${topLabel}` : `Top strength: ${topLabel}`}
+                  {isAr ? `أقوى نقطة عندك: ${topLabel}` : `Top strength: ${topLabel}`}
                 </p>
               )}
             </div>
@@ -344,7 +344,7 @@ function CompassHeroCard({
             href={`/${locale}/dashboard/compass`}
             className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors border border-white/10"
           >
-            {isAr ? "القراءة الكاملة" : "Full reading"}
+            {isAr ? "القراية الكاملة" : "Full reading"}
             <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
@@ -371,7 +371,7 @@ function CompassHeroCard({
             </p>
             <p className="text-white/40 text-xs">
               {isAr
-                ? "اكتشف أين أنت الآن: 21 سؤال، 6 محاور"
+                ? "اعرف انت فين دلوقتي: 21 سؤال، 6 محاور"
                 : "Discover where you stand: 21 questions, 6 dimensions"}
             </p>
           </div>
@@ -380,7 +380,7 @@ function CompassHeroCard({
           href={`/${locale}/dashboard/compass`}
           className="flex items-center gap-1 bg-[#F59E0B] hover:bg-[#E88F00] text-[#0f172a] text-sm font-bold px-4 py-2 rounded-xl transition-colors"
         >
-          {isAr ? "ابدأ" : "Start"}
+          {isAr ? "يلا نبدأ" : "Start"}
           <ChevronRight className="h-4 w-4" />
         </Link>
       </div>

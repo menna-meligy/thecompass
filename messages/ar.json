@@ -257,10 +257,10 @@
     "noData": "لا توجد بيانات بعد",
     "assessment": {
       "title": "قراءة بوصلتك",
-      "subtitle": "اكتشف أين أنت الآن",
+      "subtitle": "اعرف انت فين دلوقتي",
       "cardTitle": "البوصلة",
-      "baselineOpen": "ابدأ رحلتك",
-      "baselineBody": "خذ قراءتك الأولى واعرف أين أنت الآن",
+      "baselineOpen": "ابدأ مشوارك",
+      "baselineBody": "خُد قراءتك الأولى واعرف انت فين دلوقتي",
       "lockedNeedsSession": "احضر جلسة لتفتح قراءتك التالية",
       "lockedNeedsSessionBody": "القراءة التالية متاحة بعد حضور جلسة واحدة على الأقل",
       "lockedCooldown": "القراءة التالية قريباً",

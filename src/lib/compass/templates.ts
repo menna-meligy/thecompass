@@ -192,7 +192,7 @@ export const RECOMMENDATION_COPY: Record<
 > = {
   session: {
     title: {
-      ar: "جلسة فردية مع المدربة",
+      ar: "جلسة فردية مع المنتور",
       en: "1:1 Coaching Session",
     },
     why: {

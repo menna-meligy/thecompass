@@ -67,7 +67,7 @@ export default async function MaterialsPage() {
             </p>
             <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.8rem" }}>
               {isAr
-                ? "ستظهر هنا المواد التي يشاركها معك المدرب بعد جلساتك"
+                ? "هتلاقي هنا المواد اللي المنتور بيشاركها معاك بعد جلساتك"
                 : "Materials shared by your coach after sessions will appear here"}
             </p>
           </div>
