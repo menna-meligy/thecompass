@@ -117,7 +117,7 @@ export function VlogCard({ vlog, duration }: VlogCardProps) {
             className="workshop-card-cta"
             style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.83rem", fontWeight: 800, color: "#0f172a", background: "#F59E0B", padding: "8px 16px", borderRadius: "8px" }}
           >
-            {isRtl ? "شاهد الآن" : "Watch Now"}
+            {isRtl ? "اتفرّج دلوقتي" : "Watch Now"}
             <Play style={{ width: "14px", height: "14px" }} className="fill-current" />
           </span>
         </div>
