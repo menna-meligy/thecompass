@@ -184,7 +184,13 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <span className="text-sm text-white/50">{isAr ? "رقم InstaPay" : "InstaPay number"}</span>
               <span className="text-sm font-mono text-white/70 bg-white/5 px-3 py-1 rounded-lg">
-                {process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093036736"}
+                {process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-white/50">{isAr ? "رقم فودافون كاش" : "Vodafone Cash number"}</span>
+              <span className="text-sm font-mono text-white/70 bg-white/5 px-3 py-1 rounded-lg">
+                {process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409"}
               </span>
             </div>
           </div>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createHash } from "crypto";
 
-const TARGET_PHONE = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093036736";
+const TARGET_PHONE = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707";
 // Set this to the account name as it appears (masked) on InstaPay receipts sent to your account
 // e.g. "منة ع**** م****" — leave empty to skip name check
 const TARGET_NAME = process.env.INSTAPAY_ACCOUNT_NAME || "";

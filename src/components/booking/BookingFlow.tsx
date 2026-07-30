@@ -6,7 +6,8 @@ import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin 
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
-const PHONE = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093036736";
+const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707";
+const VODAFONE_NUMBER = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
 
 type Step = "payment" | "proof" | "confirmed";
 
@@ -34,6 +35,7 @@ export default function BookingFlow({
 
   const [step, setStep] = useState<Step>("payment");
   const [selectedMethod, setSelectedMethod] = useState<"instapay" | "vodafone_cash" | null>(null);
+  const PHONE = selectedMethod === "vodafone_cash" ? VODAFONE_NUMBER : INSTAPAY_NUMBER;
   const [copied, setCopied] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
 
@@ -215,7 +217,7 @@ export default function BookingFlow({
                 <div style={{ fontSize: "1.5rem", width: "40px", height: "40px", borderRadius: "8px", background: "rgba(245,158,11,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, color: isSelected ? "#F59E0B" : "rgba(255,255,255,0.85)", fontSize: "0.9rem" }}>{label}</div>
-                  <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", fontFamily: "monospace", marginTop: "2px" }}>{PHONE}</div>
+                  <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", fontFamily: "monospace", marginTop: "2px" }}>{isInstapay ? INSTAPAY_NUMBER : VODAFONE_NUMBER}</div>
                 </div>
                 <div style={{ width: "20px", height: "20px", borderRadius: "50%", border: `2px solid ${isSelected ? "#F59E0B" : "rgba(148,163,184,0.25)"}`, background: isSelected ? "#F59E0B" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   {isSelected && <Check className="h-3 w-3 text-[#0f172a]" strokeWidth={3} />}
@@ -238,7 +240,7 @@ export default function BookingFlow({
               </button>
             </div>
             <a
-              href={selectedMethod === "instapay" ? "https://instapay.com.eg" : "https://vodafone.com.eg/ar/Pages/VFCash.aspx"}
+              href={selectedMethod === "instapay" ? "https://www.instapay.com.eg/" : "https://vodafone.com.eg/ar/Pages/VFCash.aspx"}
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "6px", background: "#F59E0B", color: "#0f172a", fontWeight: 800, fontSize: "0.85rem", textDecoration: "none" }}
