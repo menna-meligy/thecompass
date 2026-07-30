@@ -17,11 +17,12 @@ export function formatDateTime(date: string | Date, locale: string = "ar") {
   return format(d, "PPp", { locale: locale === "ar" ? ar : undefined });
 }
 
-export function formatCurrency(amount: number, locale: string = "ar") {
+export function formatCurrency(amount: number | null | undefined, locale: string = "ar") {
+  const n = amount ?? 0;
   if (locale === "ar") {
-    return `${amount.toLocaleString("ar-EG")} جنيه`;
+    return `${n.toLocaleString("ar-EG")} جنيه`;
   }
-  return `${amount.toLocaleString("en-EG")} EGP`;
+  return `${n.toLocaleString("en-EG")} EGP`;
 }
 
 export function getLocalizedField<T extends Record<string, unknown>>(

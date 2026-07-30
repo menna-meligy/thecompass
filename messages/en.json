@@ -11,7 +11,7 @@
   },
   "home": {
     "heroTitle": "Find Your Direction",
-    "heroSubtitle": "Al-Bosla — A coaching and self-development platform designed to guide you toward your goals",
+    "heroSubtitle": "The Compass: A coaching and self-development platform designed to guide you toward your goals",
     "heroButton": "Start Your Journey",
     "heroSecondaryButton": "Explore Workshops",
     "featuredWorkshops": "Featured Workshops",
@@ -19,7 +19,7 @@
     "latestVlogs": "Latest Content",
     "announcements": "Announcements",
     "testimonials": "What They Said",
-    "testimonialsSubtitle": "Real experiences from the Al-Bosla community"
+    "testimonialsSubtitle": "Real experiences from The Compass community"
   },
   "workshops": {
     "title": "Training Workshops",
@@ -39,7 +39,15 @@
     "full": "Full",
     "draft": "Draft",
     "published": "Published",
-    "completed": "Completed"
+    "completed": "Completed",
+    "tableDay": "Date",
+    "tableTime": "Time",
+    "tableLocation": "Location",
+    "tablePrice": "Price",
+    "tableAction": "Action",
+    "book": "Book",
+    "free": "Free",
+    "fullyBooked": "Fully Booked"
   },
   "booking": {
     "title": "Book Your Session",
@@ -74,7 +82,7 @@
     "proofTitle": "Upload Payment Screenshot",
     "proofInstructions": "Transfer the amount, then upload a clear screenshot of the receipt showing the account number",
     "verifying": "Verifying receipt...",
-    "verifiedOk": "Receipt verified — account number matches",
+    "verifiedOk": "Receipt verified: account number matches",
     "verifiedFail": "Could not verify the number in this screenshot. Please upload a clear image showing the transfer details.",
     "continueToCalendly": "Book Your Timeslot",
     "generalSession": "General Session",
@@ -86,7 +94,16 @@
     "tableTime": "Time",
     "tableLocation": "Location",
     "tablePrice": "Price",
-    "tableAction": "Action"
+    "tableAction": "Action",
+    "stepConfirmed": "Confirmed",
+    "confirmTitle": "Receipt Received!",
+    "confirmDesc": "Your booking is under review. Expect a confirmation message within 24 hours",
+    "appointmentDetails": "Your Appointment",
+    "goToBookings": "View My Bookings",
+    "joinMeeting": "Join Meeting",
+    "onlineMeeting": "Online",
+    "verifiedAmountFail": "The amount in the receipt does not match the booking amount. Please upload the correct transfer receipt.",
+    "verifiedDateFail": "The transfer date in the receipt is too old. Please use a recent transfer receipt."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -209,9 +226,70 @@
     "search": "Search"
   },
   "footer": {
-    "tagline": "Al-Bosla — Your Guide to Success",
+    "tagline": "The Compass: Your Guide to Success",
     "links": "Links",
     "contact": "Contact Us",
     "rights": "All rights reserved"
+  },
+  "skills": {
+    "title": "Skills",
+    "libraryTitle": "Skill Library",
+    "dimensions": {
+      "HAP": "Happiness & Meaning",
+      "DIR": "Clarity & Direction",
+      "PRD": "Productivity & Focus",
+      "CNF": "Confidence & Self-worth",
+      "COM": "Communication & Connection",
+      "NRG": "Energy & Wellbeing"
+    },
+    "levels": {
+      "1": "Emerging",
+      "2": "Developing",
+      "3": "Practising",
+      "4": "Strong",
+      "5": "Mastery"
+    },
+    "selfLevel": "Your self-rating",
+    "mentorLevel": "Mentor rating",
+    "combinedLevel": "Combined level",
+    "gap": "Gap",
+    "lastUpdated": "Last updated",
+    "noData": "No data yet",
+    "assessment": {
+      "title": "Your Compass Reading",
+      "subtitle": "Discover where you are right now",
+      "cardTitle": "Compass",
+      "baselineOpen": "Start your journey",
+      "baselineBody": "Take your first reading and discover where you are right now",
+      "lockedNeedsSession": "Attend a session to unlock your next reading",
+      "lockedNeedsSessionBody": "Your next reading becomes available after attending at least one session",
+      "lockedCooldown": "Next reading coming soon",
+      "eligible": "Your new reading is ready",
+      "eligibleBody": "You have done the work. Time to measure your progress",
+      "startReading": "Start reading",
+      "startNewReading": "Start new reading",
+      "viewLastReading": "View last reading",
+      "exploreSessions": "Explore sessions",
+      "lastReading": "Last reading"
+    },
+    "reflection": {
+      "title": "Session Reflection",
+      "subtitle": "Add your notes after the session",
+      "selectSkills": "Select the skills you worked on",
+      "rateSkills": "Rate the client's level for this skill",
+      "privateNotes": "Private notes (mentor only)",
+      "encouragement": "Encouragement note for the client",
+      "completedMilestones": "Milestones completed in this session",
+      "submit": "Submit session reflection",
+      "success": "Session reflection submitted successfully"
+    },
+    "milestones": {
+      "title": "Roadmap",
+      "active": "Active",
+      "completed": "Completed",
+      "skipped": "Skipped",
+      "targetLevel": "Target level",
+      "recommendedWorkshop": "Recommended workshop"
+    }
   }
 }

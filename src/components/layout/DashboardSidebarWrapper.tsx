@@ -34,9 +34,9 @@ export default function DashboardSidebarWrapper({ children, locale }: Props) {
       <aside className="w-20 md:w-72 flex-shrink-0 flex flex-col bg-[#0d1526] border-e border-[rgba(245,158,11,0.10)]">
         <div className="h-16 flex items-center justify-center md:justify-start md:px-5 border-b border-[rgba(245,158,11,0.08)]">
           <Link href={`/${locale}`} className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="البوصلة" className="h-10 w-auto object-contain" />
+            <img src="/logo.svg" alt="البوصلة" className="h-10 w-auto object-contain" />
             <span className="hidden md:block text-sm font-black text-white tracking-wide">
-              {locale === "ar" ? "البوصلة" : "ElBosla"}
+              {locale === "ar" ? "البوصلة" : "The Compass"}
             </span>
           </Link>
         </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { LayoutDashboard, Calendar, Map, User, LogOut, Compass } from "lucide-react";
+import { LayoutDashboard, Calendar, Map, User, LogOut, Compass, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -16,6 +16,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: `/${locale}/dashboard`, icon: LayoutDashboard, labelAr: "الرئيسية", labelEn: "Home", exact: true },
     { href: `/${locale}/dashboard/bookings`, icon: Calendar, labelAr: "حجوزاتي", labelEn: "Bookings", exact: false },
     { href: `/${locale}/dashboard/roadmap`, icon: Map, labelAr: "الخارطة", labelEn: "Roadmap", exact: false },
+    { href: `/${locale}/dashboard/materials`, icon: BookOpen, labelAr: "المواد", labelEn: "Materials", exact: false },
     { href: `/${locale}/dashboard/profile`, icon: User, labelAr: "الملف", labelEn: "Profile", exact: false },
   ];
 
@@ -40,7 +41,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Compass className="h-4 w-4 text-[#0d1526]" />
             </div>
             <span className="hidden md:block text-sm font-black text-white tracking-wide">
-              {locale === "ar" ? "البوصلة" : "ElBosla"}
+              {locale === "ar" ? "البوصلة" : "The Compass"}
             </span>
           </Link>
         </div>

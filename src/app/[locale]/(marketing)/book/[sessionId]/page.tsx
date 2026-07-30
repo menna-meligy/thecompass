@@ -68,8 +68,10 @@ export default async function BookingPage(props: PageProps<"/[locale]/book/[sess
           sessionId={session.id}
           workshopTitle={workshopTitle}
           price={session.price || 0}
-          isGeneralSession={false}
           userId={user.id}
+          sessionStartsAt={session.starts_at}
+          sessionEndsAt={session.ends_at ?? undefined}
+          sessionLocation={session.location_or_link}
         />
       </div>
     </div>

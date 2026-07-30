@@ -5,7 +5,9 @@ import WorkshopCard from "@/components/workshops/WorkshopCard";
 import VlogCard from "@/components/vlogs/VlogCard";
 import type { Workshop, Vlog, Announcement } from "@/types/index";
 import { getLocalizedField } from "@/lib/utils";
-import { BookOpen, Users, Star, ChevronRight, MapPin, Calendar, Zap, Award } from "lucide-react";
+import { BookOpen, Users, Star, ChevronRight, Award } from "lucide-react";
+import JourneyRoad from "@/components/home/JourneyRoad";
+import CareerCompass from "@/components/home/CareerCompass";
 
 export default async function HomePage() {
   const t = await getTranslations("home");
@@ -47,33 +49,6 @@ export default async function HomePage() {
     },
   ];
 
-  const howItWorks = [
-    {
-      icon: MapPin,
-      step: "١",
-      titleAr: "اكتشف",
-      titleEn: "Explore",
-      descAr: "تصفّح الورش والمحتوى المتاح واختر ما يناسب رحلتك",
-      descEn: "Browse workshops and content, find what fits your journey",
-    },
-    {
-      icon: Calendar,
-      step: "٢",
-      titleAr: "احجز",
-      titleEn: "Book",
-      descAr: "سجّل في الجلسة المناسبة واختر الوقت الذي يلائمك",
-      descEn: "Register for the right session and pick your time",
-    },
-    {
-      icon: Zap,
-      step: "٣",
-      titleAr: "تحوّل",
-      titleEn: "Transform",
-      descAr: "طبّق ما تعلمته وتابع تقدّمك على خارطة الطريق",
-      descEn: "Apply what you learn and track your progress on the roadmap",
-    },
-  ];
-
   const stats = [
     { valueAr: "٥٠٠+", valueEn: "500+", labelAr: "عميل راضٍ", labelEn: "Happy Clients", icon: Users },
     { valueAr: "٢٠+", valueEn: "20+", labelAr: "ورشة متخصصة", labelEn: "Workshops", icon: BookOpen },
@@ -96,7 +71,7 @@ export default async function HomePage() {
       )}
 
       {/* ── Hero Section ── */}
-      <section className="relative overflow-hidden bg-[#0f172a]" style={{ minHeight: "100vh" }}>
+      <section className="relative overflow-hidden bg-[#0f172a] flex items-center" style={{ minHeight: "auto" }}>
         {/* Star dots scattered */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div className="absolute top-[8%] left-[12%] w-1 h-1 rounded-full bg-white/40" />
@@ -140,7 +115,7 @@ export default async function HomePage() {
         {/* Subtle gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#0f172a]/90 to-[#0d1526] pointer-events-none" />
 
-        <div style={{ maxWidth: "56rem", margin: "0 auto", padding: "4rem 1.5rem 5rem", textAlign: "center" }} className="relative w-full">
+        <div style={{ maxWidth: "56rem", margin: "0 auto", padding: "clamp(4rem, 8vw, 6rem) 1.5rem", textAlign: "center" }} className="relative w-full">
 
           {/* Eyebrow — force centered with flex wrapper */}
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
@@ -168,7 +143,7 @@ export default async function HomePage() {
                 backgroundClip: "text",
               }}
             >
-              {isRtl ? "البوصلة" : "Al-Bosla"}
+              {isRtl ? "البوصلة" : "The Compass"}
             </span>
           </h1>
 
@@ -180,18 +155,18 @@ export default async function HomePage() {
           </div>
 
           {/* CTAs */}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", justifyContent: "center" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", justifyContent: "center", marginTop: "0.5rem" }}>
             <Link
               href={`/${locale}/auth`}
-              className="inline-flex items-center justify-center px-10 py-3 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-colors shadow-[0_4px_20px_rgba(245,158,11,0.35)]"
-              style={{ borderRadius: "6px", minWidth: "200px" }}
+              className="inline-flex items-center justify-center px-10 py-4 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-all duration-200 hover:-translate-y-0.5 shadow-[0_8px_24px_rgba(245,158,11,0.30)] hover:shadow-[0_14px_36px_rgba(245,158,11,0.45)]"
+              style={{ borderRadius: "12px", minWidth: "196px" }}
             >
               {t("heroButton")}
             </Link>
             <Link
               href={`/${locale}/workshops`}
-              className="inline-flex items-center justify-center px-10 py-3 text-[#F59E0B] font-semibold text-base hover:bg-[rgba(245,158,11,0.08)] border border-[rgba(245,158,11,0.35)] hover:border-[#F59E0B] transition-all"
-              style={{ borderRadius: "6px", minWidth: "200px" }}
+              className="inline-flex items-center justify-center px-10 py-4 text-[#F59E0B] font-semibold text-base hover:bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.35)] hover:border-[#F59E0B] transition-all duration-200 hover:-translate-y-0.5"
+              style={{ borderRadius: "12px", minWidth: "196px" }}
             >
               {t("heroSecondaryButton")}
             </Link>
@@ -230,14 +205,20 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ── Career Compass self-assessment ── */}
+      <CareerCompass />
+
+      {/* ── How It Works — animated scroll journey ── */}
+      <JourneyRoad isRtl={isRtl} />
+
       {/* ── Featured Workshops ── */}
       {workshops && workshops.length > 0 && (
-        <section className="bg-[#0f172a]" style={{paddingTop:"7rem",paddingBottom:"7rem"}}>
+        <section className="bg-[#0f172a]" style={{paddingTop:"4rem",paddingBottom:"4rem"}}>
           <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
             {/* Centered section header */}
-            <div className="mb-14" style={{ textAlign: "center" }}>
+            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
               <div style={{display:"flex",justifyContent:"center",marginBottom:"1.25rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
-              <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
+              <h2 className="text-3xl md:text-4xl font-black text-white" style={{ marginBottom: "0.85rem" }}>
                 {t("featuredWorkshops")}
               </h2>
               <p className="text-white/45 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
@@ -251,10 +232,10 @@ export default async function HomePage() {
               ))}
             </div>
 
-            <div className="mt-10 flex justify-center">
+            <div className="flex justify-center" style={{ marginTop: "2.5rem" }}>
               <Link
                 href={`/${locale}/workshops`}
-                className="inline-flex items-center justify-center gap-2 font-bold transition-all duration-200 hover:-translate-y-0.5" style={{padding:"12px 36px",borderRadius:"6px",border:"1.5px solid rgba(245,158,11,0.4)",color:"#F59E0B",fontSize:"0.9rem"}}
+                className="inline-flex items-center justify-center gap-2 font-bold transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(245,158,11,0.08)]" style={{padding:"13px 38px",borderRadius:"12px",border:"1.5px solid rgba(245,158,11,0.4)",color:"#F59E0B",fontSize:"0.9rem"}}
               >
                 {t("viewAll")}
                 <ChevronRight className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} />
@@ -264,64 +245,12 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── How It Works ── */}
-      <section className="bg-[#0d1526]" style={{paddingTop:"7rem",paddingBottom:"7rem"}}>
-        <div style={{maxWidth:"64rem",margin:"0 auto",padding:"0 1.5rem"}}>
-          <div className="mb-16" style={{ textAlign: "center" }}>
-            <div style={{display:"flex",justifyContent:"center",marginBottom:"1.5rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
-              {isRtl ? "كيف يعمل؟" : "How It Works"}
-            </h2>
-            <p className="text-white/50 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
-              {isRtl
-                ? "ثلاث خطوات بسيطة لبدء رحلتك مع البوصلة"
-                : "Three simple steps to begin your journey with Al-Bosla"}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-            {/* Connector line (desktop) */}
-            <div className="hidden md:block absolute top-14 start-[16%] end-[16%] h-px bg-gradient-to-r from-[#F59E0B]/10 via-[#F59E0B]/35 to-[#F59E0B]/10 pointer-events-none" />
-
-            {howItWorks.map(({ icon: Icon, step, titleAr, titleEn, descAr, descEn }, i) => (
-              <div
-                key={i}
-                className="relative flex flex-col items-center text-center group rounded-2xl p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_48px_rgba(0,0,0,0.5)]"
-                style={{
-                  background: "rgba(30,41,59,0.6)",
-                  border: "1px solid rgba(245,158,11,0.15)",
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                <div className="relative mb-6">
-                  {/* Gold icon circle — matches design */}
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 relative z-10" style={{ background: "rgba(245,158,11,0.12)", border: "1.5px solid rgba(245,158,11,0.35)" }}>
-                    <Icon className="h-7 w-7 text-[#F59E0B]" />
-                  </div>
-                  {/* Step number badge */}
-                  <div className="absolute -top-2 -end-2 w-6 h-6 flex items-center justify-center text-[#0f172a] text-xs font-black z-20" style={{ background: "#F59E0B", borderRadius: "6px" }}>
-                    {isRtl ? step : String(i + 1)}
-                  </div>
-                </div>
-
-                <h3 className="text-xl font-black text-white mb-3">
-                  {isRtl ? titleAr : titleEn}
-                </h3>
-                <p className="text-white/50 text-sm leading-relaxed max-w-52">
-                  {isRtl ? descAr : descEn}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── Testimonials ── */}
-      <section className="bg-[#0f172a]" style={{paddingTop:"7rem",paddingBottom:"7rem"}}>
+      <section className="bg-[#0f172a]" style={{paddingTop:"4rem",paddingBottom:"4rem"}}>
         <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
-          <div className="mb-16" style={{ textAlign: "center" }}>
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
             <div style={{display:"flex",justifyContent:"center",marginBottom:"1.5rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
+            <h2 className="text-3xl md:text-4xl font-black text-white" style={{ marginBottom: "0.85rem" }}>
               {t("testimonials")}
             </h2>
             <p className="text-white/50 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
@@ -373,12 +302,12 @@ export default async function HomePage() {
 
       {/* ── Latest Vlogs ── */}
       {vlogs && vlogs.length > 0 && (
-        <section className="bg-[#0d1526]" style={{paddingTop:"6rem",paddingBottom:"6rem"}}>
+        <section className="bg-[#0d1526]" style={{paddingTop:"4rem",paddingBottom:"4rem"}}>
           <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
             {/* Centered section header */}
-            <div className="mb-12" style={{ textAlign: "center" }}>
+            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
               <div style={{display:"flex",justifyContent:"center",marginBottom:"1.25rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
-              <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
+              <h2 className="text-3xl md:text-4xl font-black text-white" style={{ marginBottom: "0.85rem" }}>
                 {t("latestVlogs")}
               </h2>
               <p className="text-white/45 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
@@ -392,10 +321,10 @@ export default async function HomePage() {
               ))}
             </div>
 
-            <div className="mt-10 flex justify-center">
+            <div className="flex justify-center" style={{ marginTop: "2.5rem" }}>
               <Link
                 href={`/${locale}/vlogs`}
-                className="inline-flex items-center justify-center gap-2 font-bold transition-all duration-200 hover:-translate-y-0.5" style={{padding:"12px 36px",borderRadius:"6px",border:"1.5px solid rgba(245,158,11,0.4)",color:"#F59E0B",fontSize:"0.9rem"}}
+                className="inline-flex items-center justify-center gap-2 font-bold transition-all duration-200 hover:-translate-y-0.5 hover:bg-[rgba(245,158,11,0.08)]" style={{padding:"13px 38px",borderRadius:"12px",border:"1.5px solid rgba(245,158,11,0.4)",color:"#F59E0B",fontSize:"0.9rem"}}
               >
                 {t("viewAll")}
                 <ChevronRight className={`h-4 w-4 ${isRtl ? "rotate-180" : ""}`} />
@@ -406,7 +335,7 @@ export default async function HomePage() {
       )}
 
       {/* ── CTA Band ── */}
-      <section className="relative bg-[#0f172a] overflow-hidden" style={{paddingTop:"8rem",paddingBottom:"8rem"}}>
+      <section className="relative bg-[#0f172a] overflow-hidden" style={{paddingTop:"4.5rem",paddingBottom:"4.5rem"}}>
         {/* Compass watermark */}
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
@@ -437,33 +366,33 @@ export default async function HomePage() {
         </div>
 
         <div style={{maxWidth:"48rem",margin:"0 auto",padding:"0 1.5rem",textAlign:"center"}} className="relative">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] text-sm font-medium mb-8 border border-[#F59E0B]/20">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#F59E0B]/10 text-[#F59E0B] text-sm font-medium border border-[#F59E0B]/20" style={{ marginBottom: "1.75rem" }}>
             {isRtl ? "ابدأ رحلتك اليوم" : "Start Your Journey Today"}
           </div>
 
           {/* Gold divider */}
           <div style={{display:"flex",justifyContent:"center",marginBottom:"2rem"}}><div style={{width:"48px",height:"3px",background:"#F59E0B",opacity:"0.7"}} /></div>
 
-          <h2 className="text-3xl md:text-5xl font-black text-white mb-5 leading-tight">
+          <h2 className="text-3xl md:text-5xl font-black text-white leading-tight" style={{ marginBottom: "1.15rem" }}>
             {isRtl ? "أنت على بُعد خطوة من التغيير" : "You're One Step From Change"}
           </h2>
-          <p className="text-white/55 text-lg mb-12 max-w-xl mx-auto">
+          <p className="text-white/55 text-lg" style={{ maxWidth: "36rem", margin: "0 auto 2.75rem" }}>
             {isRtl
               ? "انضم لمئات العملاء الذين غيّروا مساراتهم مع البوصلة"
-              : "Join hundreds of clients who transformed their paths with Al-Bosla"}
+              : "Join hundreds of clients who transformed their paths with The Compass"}
           </p>
-          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href={`/${locale}/auth`}
-              className="inline-flex items-center justify-center px-10 py-3 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-colors shadow-[0_4px_20px_rgba(245,158,11,0.35)]"
-              style={{ borderRadius: "6px", minWidth: "200px" }}
+              className="inline-flex items-center justify-center px-10 py-4 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-all duration-200 hover:-translate-y-0.5 shadow-[0_8px_24px_rgba(245,158,11,0.30)] hover:shadow-[0_14px_36px_rgba(245,158,11,0.45)]"
+              style={{ borderRadius: "12px", minWidth: "196px" }}
             >
               {isRtl ? "سجّل الآن مجاناً" : "Sign Up Free"}
             </Link>
             <Link
               href={`/${locale}/workshops`}
-              className="inline-flex items-center justify-center px-10 py-3 text-[#F59E0B] font-semibold text-base hover:bg-[rgba(245,158,11,0.08)] border border-[rgba(245,158,11,0.35)] hover:border-[#F59E0B] transition-all"
-              style={{ borderRadius: "6px", minWidth: "200px" }}
+              className="inline-flex items-center justify-center px-10 py-4 text-[#F59E0B] font-semibold text-base hover:bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.35)] hover:border-[#F59E0B] transition-all duration-200 hover:-translate-y-0.5"
+              style={{ borderRadius: "12px", minWidth: "196px" }}
             >
               {isRtl ? "استعرض الورش" : "Browse Workshops"}
             </Link>

@@ -11,7 +11,7 @@
   },
   "home": {
     "heroTitle": "اكتشف اتجاهك",
-    "heroSubtitle": "البوصلة — منصة تدريب وتطوير ذاتي مصممة لتوجيهك نحو أهدافك",
+    "heroSubtitle": "البوصلة: منصة تدريب وتطوير ذاتي مصممة لتوجيهك نحو أهدافك",
     "heroButton": "ابدأ رحلتك",
     "heroSecondaryButton": "استكشف الورش",
     "featuredWorkshops": "ورش مميزة",
@@ -39,7 +39,15 @@
     "full": "مكتمل",
     "draft": "مسودة",
     "published": "منشور",
-    "completed": "مكتملة"
+    "completed": "مكتملة",
+    "tableDay": "التاريخ",
+    "tableTime": "الوقت",
+    "tableLocation": "الموقع",
+    "tablePrice": "السعر",
+    "tableAction": "الإجراء",
+    "book": "احجز",
+    "free": "مجاني",
+    "fullyBooked": "مكتمل"
   },
   "booking": {
     "title": "احجز جلستك",
@@ -74,7 +82,7 @@
     "proofTitle": "ارفع صورة التحويل",
     "proofInstructions": "حوّل المبلغ ثم ارفع صورة واضحة من إيصال التحويل تظهر فيها رقم الحساب",
     "verifying": "جاري التحقق من الإيصال...",
-    "verifiedOk": "تم التحقق — الرقم مطابق",
+    "verifiedOk": "تم التحقق: الرقم مطابق",
     "verifiedFail": "تعذّر التحقق من الرقم في هذه الصورة. ارفع صورة واضحة تُظهر تفاصيل التحويل.",
     "continueToCalendly": "احجز موعدك",
     "generalSession": "جلسة فردية",
@@ -86,7 +94,16 @@
     "tableTime": "الوقت",
     "tableLocation": "الموقع",
     "tablePrice": "السعر",
-    "tableAction": "الإجراء"
+    "tableAction": "الإجراء",
+    "stepConfirmed": "تأكيد الحجز",
+    "confirmTitle": "تم استلام الإيصال!",
+    "confirmDesc": "حجزك قيد المراجعة. ستصلك رسالة تأكيد خلال 24 ساعة",
+    "appointmentDetails": "تفاصيل موعدك",
+    "goToBookings": "متابعة حجوزاتي",
+    "joinMeeting": "انضم للجلسة",
+    "onlineMeeting": "عبر الإنترنت",
+    "verifiedAmountFail": "المبلغ في الإيصال لا يتطابق مع مبلغ الحجز. تأكد من أن الإيصال لهذا التحويل.",
+    "verifiedDateFail": "تاريخ التحويل في الإيصال قديم. يرجى استخدام إيصال تحويل حديث."
   },
   "dashboard": {
     "title": "لوحة التحكم",
@@ -209,9 +226,70 @@
     "search": "بحث"
   },
   "footer": {
-    "tagline": "البوصلة — دليلك نحو النجاح",
+    "tagline": "البوصلة: دليلك نحو النجاح",
     "links": "روابط",
     "contact": "تواصل معنا",
     "rights": "جميع الحقوق محفوظة"
+  },
+  "skills": {
+    "title": "المهارات",
+    "libraryTitle": "مكتبة المهارات",
+    "dimensions": {
+      "HAP": "السعادة والمعنى",
+      "DIR": "الوضوح والاتجاه",
+      "PRD": "الإنتاجية والتركيز",
+      "CNF": "الثقة والقيمة الذاتية",
+      "COM": "التواصل والتواصل",
+      "NRG": "الطاقة والعافية"
+    },
+    "levels": {
+      "1": "يبدأ",
+      "2": "ينمو",
+      "3": "يتمرّن",
+      "4": "قوي",
+      "5": "إتقان"
+    },
+    "selfLevel": "تقييمك لنفسك",
+    "mentorLevel": "تقييم المرشد",
+    "combinedLevel": "المستوى المجمّع",
+    "gap": "فجوة",
+    "lastUpdated": "آخر تحديث",
+    "noData": "لا توجد بيانات بعد",
+    "assessment": {
+      "title": "قراءة بوصلتك",
+      "subtitle": "اكتشف أين أنت الآن",
+      "cardTitle": "البوصلة",
+      "baselineOpen": "ابدأ رحلتك",
+      "baselineBody": "خذ قراءتك الأولى واعرف أين أنت الآن",
+      "lockedNeedsSession": "احضر جلسة لتفتح قراءتك التالية",
+      "lockedNeedsSessionBody": "القراءة التالية متاحة بعد حضور جلسة واحدة على الأقل",
+      "lockedCooldown": "القراءة التالية قريباً",
+      "eligible": "قراءتك الجديدة جاهزة",
+      "eligibleBody": "حضرت جلسات وحان وقت قياس التقدم",
+      "startReading": "ابدأ القراءة",
+      "startNewReading": "ابدأ القراءة الجديدة",
+      "viewLastReading": "عرض آخر قراءة",
+      "exploreSessions": "استكشف الجلسات",
+      "lastReading": "آخر قراءة"
+    },
+    "reflection": {
+      "title": "تقرير الجلسة",
+      "subtitle": "أضف ملاحظاتك بعد الجلسة",
+      "selectSkills": "اختر المهارات التي عملتم عليها",
+      "rateSkills": "قيّم مستوى العميل في هذه المهارة",
+      "privateNotes": "ملاحظات خاصة (للمرشد فقط)",
+      "encouragement": "رسالة تشجيعية للعميل",
+      "completedMilestones": "المراحل التي اكتملت في هذه الجلسة",
+      "submit": "إرسال تقرير الجلسة",
+      "success": "تم إرسال تقرير الجلسة بنجاح"
+    },
+    "milestones": {
+      "title": "خريطة الطريق",
+      "active": "نشطة",
+      "completed": "مكتملة",
+      "skipped": "متجاوزة",
+      "targetLevel": "المستوى المستهدف",
+      "recommendedWorkshop": "الورشة الموصى بها"
+    }
   }
 }

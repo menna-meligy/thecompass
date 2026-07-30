@@ -2,13 +2,34 @@
 
 import type { Task } from "./RoadmapClient";
 
+export interface SessionMilestone {
+  id: string;
+  title: string;
+  date: string; // ISO string
+  icon?: string;
+}
+
 interface Props {
   doneTasks: Task[];
+  sessions?: SessionMilestone[];
   locale: string;
 }
 
-export default function HorizontalRoadmap({ doneTasks, locale }: Props) {
+type TimelineItem =
+  | { kind: "task"; task: Task; idx: number }
+  | { kind: "session"; session: SessionMilestone };
+
+export default function HorizontalRoadmap({ doneTasks, sessions = [], locale }: Props) {
   const isAr = locale === "ar";
+
+  // Build unified list: tasks in their original order, sessions appended (sorted by date)
+  const taskItems: TimelineItem[] = doneTasks.map((task, idx) => ({ kind: "task", task, idx }));
+  const sessionItems: TimelineItem[] = [...sessions]
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .map((session) => ({ kind: "session", session }));
+
+  const allItems: TimelineItem[] = [...taskItems, ...sessionItems];
+  const totalCount = allItems.length;
 
   return (
     <div style={{ padding: "16px 24px 14px" }}>
@@ -20,6 +41,7 @@ export default function HorizontalRoadmap({ doneTasks, locale }: Props) {
         <div style={{ flex: 1, height: "1px", background: "rgba(245,158,11,0.08)" }} />
         <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.25)", fontWeight: 600 }}>
           {doneTasks.length} {isAr ? "منجز" : "completed"}
+          {sessions.length > 0 && ` · ${sessions.length} ${isAr ? "جلسة" : "sessions"}`}
         </span>
       </div>
 
@@ -28,9 +50,107 @@ export default function HorizontalRoadmap({ doneTasks, locale }: Props) {
         className="flex items-center gap-0 overflow-x-auto"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        {doneTasks.map((task, i) => {
-          const isLast = i === doneTasks.length - 1;
+        {allItems.map((item, i) => {
+          const isLast = i === totalCount - 1;
           const isFirst = i === 0;
+
+          if (item.kind === "session") {
+            const s = item.session;
+            const formattedDate = (() => {
+              try {
+                return new Date(s.date).toLocaleDateString(
+                  isAr ? "ar-EG" : "en-US",
+                  { month: "short", day: "numeric" }
+                );
+              } catch {
+                return "";
+              }
+            })();
+
+            return (
+              <div key={`session-${s.id}`} className="flex items-center flex-shrink-0">
+                {/* Session node */}
+                <div className="flex flex-col items-center" style={{ minWidth: "72px" }}>
+                  <div
+                    style={{
+                      width: "36px",
+                      height: "36px",
+                      borderRadius: "50%",
+                      background: "rgba(139,92,246,0.15)",
+                      border: "2px solid rgba(139,92,246,0.5)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1rem",
+                      boxShadow: "0 0 12px rgba(139,92,246,0.25)",
+                      position: "relative",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {s.icon || "📅"}
+                  </div>
+                  {/* Title */}
+                  <div
+                    style={{
+                      marginTop: "6px",
+                      fontSize: "0.62rem",
+                      fontWeight: 600,
+                      color: "rgba(167,139,250,0.85)",
+                      maxWidth: "68px",
+                      textAlign: "center",
+                      lineHeight: 1.3,
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {s.title}
+                  </div>
+                  {/* Date below label */}
+                  {formattedDate && (
+                    <div
+                      style={{
+                        marginTop: "2px",
+                        fontSize: "0.58rem",
+                        color: "#A78BFA",
+                        textAlign: "center",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {formattedDate}
+                    </div>
+                  )}
+                </div>
+
+                {/* Connector */}
+                {!isLast && (
+                  <div style={{
+                    height: "2px",
+                    width: "32px",
+                    flexShrink: 0,
+                    background: "linear-gradient(to right, rgba(139,92,246,0.4), rgba(139,92,246,0.15))",
+                    marginBottom: "26px",
+                    marginInline: "2px",
+                  }} />
+                )}
+
+                {isLast && (
+                  <>
+                    <div style={{ height: "2px", width: "32px", flexShrink: 0, background: "rgba(148,163,184,0.12)", marginBottom: "26px", marginInline: "2px" }} />
+                    <div className="flex flex-col items-center flex-shrink-0" style={{ minWidth: "64px", opacity: 0.3 }}>
+                      <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px dashed rgba(148,163,184,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <span style={{ fontSize: "0.85rem" }}>＋</span>
+                      </div>
+                      <div style={{ marginTop: "6px", fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", textAlign: "center" }}>
+                        {isAr ? "التالي" : "Next"}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          }
+
+          // task node
+          const task = item.task;
 
           return (
             <div key={task.id} className="flex items-center flex-shrink-0">
@@ -101,12 +221,12 @@ export default function HorizontalRoadmap({ doneTasks, locale }: Props) {
               {/* Future placeholder after last */}
               {isLast && (
                 <>
-                  <div style={{ height:"2px", width:"32px", flexShrink:0, background:"rgba(148,163,184,0.12)", marginBottom:"20px", marginInline:"2px" }} />
-                  <div className="flex flex-col items-center flex-shrink-0" style={{ minWidth:"64px", opacity:0.3 }}>
-                    <div style={{ width:"32px", height:"32px", borderRadius:"50%", border:"1.5px dashed rgba(148,163,184,0.3)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      <span style={{ fontSize:"0.85rem" }}>＋</span>
+                  <div style={{ height: "2px", width: "32px", flexShrink: 0, background: "rgba(148,163,184,0.12)", marginBottom: "20px", marginInline: "2px" }} />
+                  <div className="flex flex-col items-center flex-shrink-0" style={{ minWidth: "64px", opacity: 0.3 }}>
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "1.5px dashed rgba(148,163,184,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <span style={{ fontSize: "0.85rem" }}>＋</span>
                     </div>
-                    <div style={{ marginTop:"6px", fontSize:"0.6rem", color:"rgba(255,255,255,0.3)", textAlign:"center" }}>
+                    <div style={{ marginTop: "6px", fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", textAlign: "center" }}>
                       {isAr ? "التالي" : "Next"}
                     </div>
                   </div>
@@ -116,8 +236,8 @@ export default function HorizontalRoadmap({ doneTasks, locale }: Props) {
           );
         })}
 
-        {doneTasks.length === 0 && (
-          <div style={{ color:"rgba(255,255,255,0.25)", fontSize:"0.75rem", padding:"8px 0" }}>
+        {totalCount === 0 && (
+          <div style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.75rem", padding: "8px 0" }}>
             {isAr ? "أضف مهمة وأكملها لتبدأ مسارك" : "Complete a task to start your journey"}
           </div>
         )}

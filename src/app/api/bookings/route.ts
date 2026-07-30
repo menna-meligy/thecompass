@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Check session exists and is published
+  // Verify session exists and is published
   const { data: session } = await supabase
     .from("sessions")
     .select("*")

@@ -10,5 +10,5 @@ CREATE TABLE IF NOT EXISTS user_tasks (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 ALTER TABLE user_tasks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS tasks_self ON user_tasks
+CREATE POLICY tasks_self ON user_tasks
   USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);

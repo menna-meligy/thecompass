@@ -31,6 +31,10 @@ export async function proxy(request: NextRequest) {
     // Admin check happens in page components
   }
 
+  if (pathname.startsWith("/api/")) {
+    return supabaseResponse;
+  }
+
   const intlResponse = intlMiddleware(request);
   if (intlResponse) {
     // Copy supabase cookies to the intl response

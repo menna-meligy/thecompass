@@ -38,5 +38,40 @@ export async function POST(request: NextRequest) {
     .update({ status: "confirmed" })
     .eq("id", booking_id);
 
+  // Fetch the booking with session info to create roadmap milestone
+  const { data: booking } = await (supabase as any)
+    .from("bookings")
+    .select("*, user_id, session:sessions(*, workshop:workshops(*))")
+    .eq("id", booking_id)
+    .single();
+
+  if (booking) {
+    const workshopTitle =
+      booking.session?.workshop?.title_ar ||
+      booking.session?.workshop?.title_en ||
+      "Session";
+    const sessionDate = booking.session?.starts_at
+      ? new Date(booking.session.starts_at).toLocaleDateString("ar-EG", {
+          month: "short",
+          day: "numeric",
+        })
+      : "";
+
+    await (supabase as any).from("user_tasks").upsert(
+      {
+        id: `session-${booking_id}`,
+        user_id: booking.user_id,
+        title: `${workshopTitle}${sessionDate ? ` - ${sessionDate}` : ""}`,
+        icon: "📅",
+        status: "done",
+        position: 999,
+        pinned: true,
+        track: "session",
+        booking_id: booking_id,
+      },
+      { onConflict: "id" }
+    );
+  }
+
   return NextResponse.json({ ok: true });
 }

@@ -97,7 +97,7 @@ export function Navbar({ user }: NavbarProps) {
               aria-label="البوصلة"
             >
               <img
-                src="/logo.png"
+                src="/logo.svg"
                 alt="البوصلة"
                 className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
               />
@@ -126,8 +126,8 @@ export function Navbar({ user }: NavbarProps) {
               {/* Language pill */}
               <button
                 onClick={switchLocale}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-bold border border-[rgba(245,158,11,0.35)] text-[#F59E0B] hover:bg-[#F59E0B] hover:text-[#0f172a] transition-all duration-200"
-                style={{ borderRadius: "6px", minWidth: "56px" }}
+                className="inline-flex items-center justify-center gap-1.5 text-sm font-bold border border-[rgba(245,158,11,0.35)] text-[#F59E0B] hover:bg-[#F59E0B] hover:text-[#0f172a] transition-all duration-200 whitespace-nowrap"
+                style={{ borderRadius: "6px", padding: "9px 14px" }}
                 aria-label="Switch language"
               >
                 <Globe className="h-3.5 w-3.5" />
@@ -153,7 +153,7 @@ export function Navbar({ user }: NavbarProps) {
                         className="w-7 h-7 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#8B0000] to-[#5a0000] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#d97706] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {initials}
                       </div>
                     )}
@@ -224,8 +224,8 @@ export function Navbar({ user }: NavbarProps) {
               ) : (
                 <Link
                   href={`/${locale}/auth`}
-                  className="inline-flex items-center justify-center px-6 py-2 text-sm font-bold bg-[#F59E0B] text-[#0f172a] hover:bg-[#FBBF24] transition-colors shadow-[0_2px_12px_rgba(245,158,11,0.30)]"
-                  style={{ borderRadius: "6px", minWidth: "80px" }}
+                  className="inline-flex items-center justify-center text-sm font-bold bg-[#F59E0B] text-[#0f172a] hover:bg-[#FBBF24] transition-colors shadow-[0_2px_12px_rgba(245,158,11,0.30)] whitespace-nowrap"
+                  style={{ borderRadius: "6px", padding: "9px 22px" }}
                 >
                   {t("login")}
                 </Link>
@@ -236,7 +236,7 @@ export function Navbar({ user }: NavbarProps) {
           {/* ── Mobile header row (visible only on mobile) ── */}
           <div className="md:hidden flex items-center justify-between h-16">
             <Link href={`/${locale}`} aria-label="البوصلة">
-              <img src="/logo.png" alt="البوصلة" className="h-10 w-auto" />
+              <img src="/logo.svg" alt="البوصلة" className="h-10 w-auto" />
             </Link>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -292,7 +292,7 @@ export function Navbar({ user }: NavbarProps) {
             >
               <X className="h-5 w-5" />
             </button>
-            <img src="/logo.png" alt="البوصلة" className="h-10 w-auto mb-2" />
+            <img src="/logo.svg" alt="البوصلة" className="h-10 w-auto mb-2" />
           </div>
 
           <div className="p-5 overflow-y-auto h-[calc(100vh-10rem)]">
@@ -329,7 +329,7 @@ export function Navbar({ user }: NavbarProps) {
                   className="flex items-center gap-3 px-4 py-3 mb-2 rounded-xl border border-[rgba(245,158,11,0.15)]"
                   style={{ background: "rgba(245,158,11,0.06)" }}
                 >
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#8B0000] to-[#5a0000] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#d97706] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {initials}
                   </div>
                   <div className="min-w-0">
@@ -371,11 +371,12 @@ export function Navbar({ user }: NavbarProps) {
                 href={`/${locale}/auth`}
                 onClick={() => setMobileOpen(false)}
                 className="
-                  flex items-center justify-center gap-2 w-full px-4 py-3 rounded-md
+                  flex items-center justify-center gap-2 w-full rounded-md
                   bg-[#F59E0B] text-[#0f172a] font-bold text-sm
                   hover:bg-[#FBBF24] transition-colors
                   shadow-[0_2px_16px_rgba(245,158,11,0.35)]
                 "
+                style={{ padding: "12px 16px" }}
               >
                 {t("login")}
               </Link>

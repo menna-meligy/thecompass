@@ -72,13 +72,13 @@ export default function ProfilePage() {
         <div className="bg-[rgba(30,41,59,0.6)] border border-[rgba(245,158,11,0.15)] rounded-2xl p-6">
           {/* Avatar with initials */}
           <div className="flex items-center gap-4 mb-6 pb-6 border-b border-[rgba(148,163,184,0.10)]">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#8B0000] to-[#C41E3A] flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F59E0B] to-[#d97706] flex items-center justify-center text-[#0f172a] text-xl font-bold flex-shrink-0">
               {profile?.full_name
                 ? profile.full_name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
                 : "؟"}
             </div>
             <div>
-              <div className="font-semibold text-white">{profile?.full_name || "—"}</div>
+              <div className="font-semibold text-white">{profile?.full_name || "-"}</div>
               <div className="text-sm text-white/50">{profile?.email}</div>
             </div>
           </div>

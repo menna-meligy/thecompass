@@ -30,6 +30,12 @@ export interface Profile {
   created_at: string;
 }
 
+export interface WorkshopOutlineItem {
+  session: string;
+  title: string;
+  bullets: string[];
+}
+
 export interface Workshop {
   id: string;
   title_ar: string;
@@ -38,6 +44,13 @@ export interface Workshop {
   description_en: string;
   topic: string;
   image_url: string | null;
+  outline_en: WorkshopOutlineItem[] | null;
+  outline_ar: WorkshopOutlineItem[] | null;
+  end_goals_en: string[] | null;
+  end_goals_ar: string[] | null;
+  target_audience_en: string | null;
+  target_audience_ar: string | null;
+  spots_available: number | null;
   created_by: string | null;
   created_at: string;
 }
@@ -147,6 +160,9 @@ export interface RoadmapProgress {
   created_at: string;
 }
 
+// ─── Skills Layer types ────────────────────────────────────────────────────────
+export type { Skill, ClientSkill, ClientSkillHistory, RoadmapMilestone, SessionReflection, SessionReflectionSkill, SkillLevel, SkillLevelSource, MilestoneStatus, AssessmentEligibility, EligibilityResult } from "@/lib/skills/types";
+
 // ─── Supabase Database type (must match GenericSchema / GenericTable exactly) ─
 
 export type Database = {
@@ -191,6 +207,13 @@ export type Database = {
           description_en: string;
           topic: string;
           image_url: string | null;
+          outline_en: WorkshopOutlineItem[] | null;
+          outline_ar: WorkshopOutlineItem[] | null;
+          end_goals_en: string[] | null;
+          end_goals_ar: string[] | null;
+          target_audience_en: string | null;
+          target_audience_ar: string | null;
+          spots_available: number | null;
           created_by: string | null;
           created_at: string;
         };
@@ -202,6 +225,13 @@ export type Database = {
           description_en?: string;
           topic: string;
           image_url?: string | null;
+          outline_en?: WorkshopOutlineItem[] | null;
+          outline_ar?: WorkshopOutlineItem[] | null;
+          end_goals_en?: string[] | null;
+          end_goals_ar?: string[] | null;
+          target_audience_en?: string | null;
+          target_audience_ar?: string | null;
+          spots_available?: number | null;
           created_by?: string | null;
           created_at?: string;
         };
@@ -213,6 +243,13 @@ export type Database = {
           description_en?: string;
           topic?: string;
           image_url?: string | null;
+          outline_en?: WorkshopOutlineItem[] | null;
+          outline_ar?: WorkshopOutlineItem[] | null;
+          end_goals_en?: string[] | null;
+          end_goals_ar?: string[] | null;
+          target_audience_en?: string | null;
+          target_audience_ar?: string | null;
+          spots_available?: number | null;
           created_by?: string | null;
           created_at?: string;
         };
@@ -548,6 +585,329 @@ export type Database = {
           completed_count?: number;
           badges?: Badge[];
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      assessments: {
+        Row: {
+          id: string;
+          client_id: string | null;
+          locale: string;
+          completed_at: string | null;
+          dimension_scores: Record<string, number> | null;
+          happiness_score: number | null;
+          recommended_type: string | null;
+          recommended_workshop_id: string | null;
+          result_snapshot: Record<string, unknown> | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id?: string | null;
+          locale?: string;
+          completed_at?: string | null;
+          dimension_scores?: Record<string, number> | null;
+          happiness_score?: number | null;
+          recommended_type?: string | null;
+          recommended_workshop_id?: string | null;
+          result_snapshot?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          client_id?: string | null;
+          locale?: string;
+          completed_at?: string | null;
+          dimension_scores?: Record<string, number> | null;
+          happiness_score?: number | null;
+          recommended_type?: string | null;
+          recommended_workshop_id?: string | null;
+          result_snapshot?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "assessments_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      skills: {
+        Row: {
+          id: string;
+          dimension: string;
+          name_ar: string;
+          name_en: string;
+          description_ar: string;
+          description_en: string;
+          is_active: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          dimension: string;
+          name_ar: string;
+          name_en: string;
+          description_ar?: string;
+          description_en?: string;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          dimension?: string;
+          name_ar?: string;
+          name_en?: string;
+          description_ar?: string;
+          description_en?: string;
+          is_active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      client_skills: {
+        Row: {
+          id: string;
+          client_id: string;
+          skill_id: string;
+          self_level: number | null;
+          mentor_level: number | null;
+          combined_level: number | null;
+          last_self_at: string | null;
+          last_mentor_at: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          skill_id: string;
+          self_level?: number | null;
+          mentor_level?: number | null;
+          combined_level?: number | null;
+          last_self_at?: string | null;
+          last_mentor_at?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          client_id?: string;
+          skill_id?: string;
+          self_level?: number | null;
+          mentor_level?: number | null;
+          combined_level?: number | null;
+          last_self_at?: string | null;
+          last_mentor_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      client_skill_history: {
+        Row: {
+          id: string;
+          client_id: string;
+          skill_id: string;
+          source: string;
+          level_type: string;
+          value: number;
+          assessment_id: string | null;
+          booking_id: string | null;
+          notes: string | null;
+          recorded_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          skill_id: string;
+          source: string;
+          level_type: string;
+          value: number;
+          assessment_id?: string | null;
+          booking_id?: string | null;
+          notes?: string | null;
+          recorded_at?: string;
+        };
+        Update: {
+          id?: string;
+          client_id?: string;
+          skill_id?: string;
+          source?: string;
+          level_type?: string;
+          value?: number;
+          assessment_id?: string | null;
+          booking_id?: string | null;
+          notes?: string | null;
+          recorded_at?: string;
+        };
+        Relationships: [];
+      };
+      workshop_skills: {
+        Row: { workshop_id: string; skill_id: string };
+        Insert: { workshop_id: string; skill_id: string };
+        Update: { workshop_id?: string; skill_id?: string };
+        Relationships: [];
+      };
+      roadmap_milestones: {
+        Row: {
+          id: string;
+          client_id: string;
+          skill_id: string;
+          target_level: number;
+          recommended_workshop_id: string | null;
+          recommended_session_type: string | null;
+          title_ar: string;
+          title_en: string;
+          status: string;
+          sort_order: number;
+          assessment_id: string | null;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          skill_id: string;
+          target_level: number;
+          recommended_workshop_id?: string | null;
+          recommended_session_type?: string | null;
+          title_ar: string;
+          title_en: string;
+          status?: string;
+          sort_order?: number;
+          assessment_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          client_id?: string;
+          skill_id?: string;
+          target_level?: number;
+          recommended_workshop_id?: string | null;
+          recommended_session_type?: string | null;
+          title_ar?: string;
+          title_en?: string;
+          status?: string;
+          sort_order?: number;
+          assessment_id?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      session_reflections: {
+        Row: {
+          id: string;
+          booking_id: string;
+          client_id: string;
+          mentor_id: string;
+          private_notes: string | null;
+          encouragement_ar: string | null;
+          encouragement_en: string | null;
+          submitted_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          client_id: string;
+          mentor_id: string;
+          private_notes?: string | null;
+          encouragement_ar?: string | null;
+          encouragement_en?: string | null;
+          submitted_at?: string;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          client_id?: string;
+          mentor_id?: string;
+          private_notes?: string | null;
+          encouragement_ar?: string | null;
+          encouragement_en?: string | null;
+          submitted_at?: string;
+        };
+        Relationships: [];
+      };
+      session_reflection_skills: {
+        Row: {
+          id: string;
+          reflection_id: string;
+          skill_id: string;
+          mentor_level: number;
+        };
+        Insert: {
+          id?: string;
+          reflection_id: string;
+          skill_id: string;
+          mentor_level: number;
+        };
+        Update: {
+          id?: string;
+          reflection_id?: string;
+          skill_id?: string;
+          mentor_level?: number;
+        };
+        Relationships: [];
+      };
+      session_reflection_milestones: {
+        Row: { reflection_id: string; milestone_id: string };
+        Insert: { reflection_id: string; milestone_id: string };
+        Update: { reflection_id?: string; milestone_id?: string };
+        Relationships: [];
+      };
+      skill_assessments: {
+        Row: {
+          id: string;
+          client_id: string;
+          created_at: string;
+          [key: string]: unknown;
+        };
+        Insert: {
+          id?: string;
+          client_id: string;
+          created_at?: string;
+          [key: string]: unknown;
+        };
+        Update: {
+          id?: string;
+          client_id?: string;
+          [key: string]: unknown;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "skill_assessments_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      skill_assessment_responses: {
+        Row: {
+          id: string;
+          assessment_id: string;
+          skill_id: string;
+          created_at: string;
+          [key: string]: unknown;
+        };
+        Insert: {
+          id?: string;
+          assessment_id: string;
+          skill_id: string;
+          created_at?: string;
+          [key: string]: unknown;
+        };
+        Update: {
+          id?: string;
+          assessment_id?: string;
+          skill_id?: string;
+          [key: string]: unknown;
         };
         Relationships: [];
       };

@@ -6,6 +6,11 @@ import { formatDateTime, formatCurrency, getLocalizedField } from "@/lib/utils";
 import Badge from "@/components/ui/Badge";
 import type { Booking, RoadmapProgress } from "@/types/index";
 import { Calendar, BookOpen, ChevronRight, ClipboardList, Map, User, Compass } from "lucide-react";
+import type { AssessmentResult } from "@/lib/compass/types";
+import { ZONE_LABELS } from "@/lib/compass/templates";
+import { fetchEligibilityData } from "@/lib/skills/operations";
+import { computeEligibility } from "@/lib/skills/eligibility";
+import AssessmentCard from "@/components/compass/AssessmentCard";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
@@ -18,7 +23,7 @@ export default async function DashboardPage() {
 
   if (!user) redirect(`/${locale}/auth`);
 
-  const [{ data: profile }, { data: bookings }, { data: roadmap }] =
+  const [{ data: profile }, { data: bookings }, { data: roadmap }, { data: latestAssessment }, eligibilityData] =
     await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
@@ -32,7 +37,19 @@ export default async function DashboardPage() {
         .select("*")
         .eq("user_id", user.id)
         .single(),
+      supabase
+        .from("assessments")
+        .select("result_snapshot, happiness_score, completed_at")
+        .eq("client_id", user.id)
+        .not("completed_at", "is", null)
+        .order("completed_at", { ascending: false })
+        .limit(1)
+        .single(),
+      fetchEligibilityData(supabase, user.id),
     ]);
+
+  const eligibility = computeEligibility(eligibilityData);
+  const lastReadingDate = eligibilityData.completedAssessments[0]?.completed_at ?? null;
 
   const now = new Date();
   const upcoming = (bookings as Booking[] | null)?.filter(
@@ -139,6 +156,19 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Compass Hero Card */}
+      <CompassHeroCard
+        locale={locale}
+        assessment={latestAssessment as { result_snapshot: AssessmentResult; happiness_score: number; completed_at: string } | null}
+      />
+
+      {/* Assessment eligibility card */}
+      <AssessmentCard
+        eligibility={eligibility}
+        locale={locale as "ar" | "en"}
+        lastReadingDate={lastReadingDate ?? undefined}
+      />
 
       <div className="grid md:grid-cols-2 gap-8">
         {/* Upcoming Sessions */}
@@ -253,6 +283,106 @@ export default async function DashboardPage() {
             </Link>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ── Compass Hero Card ─────────────────────────────────────────────────────────
+
+function CompassHeroCard({
+  locale,
+  assessment,
+}: {
+  locale: string;
+  assessment: { result_snapshot: AssessmentResult; happiness_score: number; completed_at: string } | null;
+}) {
+  const isAr = locale === "ar";
+
+  if (assessment) {
+    const result = assessment.result_snapshot;
+    const zone = result?.happinessZone;
+    const score = assessment.happiness_score;
+    const zoneLabel = zone ? (isAr ? ZONE_LABELS[zone]?.ar : ZONE_LABELS[zone]?.en) : "";
+    const topStrength = result?.topStrength;
+    const topLabel = topStrength
+      ? (isAr
+          ? result.dimensionReads.find((d) => d.dimension === topStrength)?.label_ar
+          : result.dimensionReads.find((d) => d.dimension === topStrength)?.label_en)
+      : null;
+
+    return (
+      <div className="relative rounded-2xl p-6 mb-8 bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.18)] overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-10 -end-10 w-40 h-40 rounded-full opacity-15"
+          style={{ background: "radial-gradient(circle, #F59E0B, transparent 70%)" }}
+        />
+        <div className="relative flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-[rgba(245,158,11,0.12)] border border-[rgba(245,158,11,0.2)] flex items-center justify-center flex-shrink-0">
+              <Compass className="h-6 w-6 text-[#F59E0B]" />
+            </div>
+            <div>
+              <p className="text-white/40 text-xs font-medium mb-0.5">
+                {isAr ? "بوصلتك" : "Your Compass"}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-extrabold text-[#F59E0B]">{score?.toFixed(1)}</span>
+                {zoneLabel && (
+                  <span className="text-white/60 text-xs">{zoneLabel}</span>
+                )}
+              </div>
+              {topLabel && (
+                <p className="text-white/40 text-xs mt-0.5">
+                  {isAr ? `نقطة قوتك: ${topLabel}` : `Top strength: ${topLabel}`}
+                </p>
+              )}
+            </div>
+          </div>
+          <Link
+            href={`/${locale}/dashboard/compass`}
+            className="flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors border border-white/10"
+          >
+            {isAr ? "القراءة الكاملة" : "Full reading"}
+            <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Not started
+  return (
+    <div className="relative rounded-2xl p-6 mb-8 bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-10 -end-10 w-40 h-40 rounded-full opacity-10"
+        style={{ background: "radial-gradient(circle, #F59E0B, transparent 70%)" }}
+      />
+      <div className="relative flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-[rgba(245,158,11,0.08)] border border-[rgba(245,158,11,0.15)] flex items-center justify-center flex-shrink-0">
+            <Compass className="h-6 w-6 text-[#F59E0B]/60" />
+          </div>
+          <div>
+            <p className="text-white font-semibold text-sm mb-0.5">
+              {isAr ? "بوصلتك" : "Your Compass"}
+            </p>
+            <p className="text-white/40 text-xs">
+              {isAr
+                ? "اكتشف أين أنت الآن: 21 سؤال، 6 محاور"
+                : "Discover where you stand: 21 questions, 6 dimensions"}
+            </p>
+          </div>
+        </div>
+        <Link
+          href={`/${locale}/dashboard/compass`}
+          className="flex items-center gap-1 bg-[#F59E0B] hover:bg-[#E88F00] text-[#0f172a] text-sm font-bold px-4 py-2 rounded-xl transition-colors"
+        >
+          {isAr ? "ابدأ" : "Start"}
+          <ChevronRight className="h-4 w-4" />
+        </Link>
       </div>
     </div>
   );

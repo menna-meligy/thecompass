@@ -40,18 +40,19 @@ export function Modal({ isOpen, onClose, title, children, size = "md" }: ModalPr
       />
       <div
         className={cn(
-          "relative w-full bg-white rounded-xl shadow-xl",
+          "relative w-full rounded-2xl shadow-2xl",
+          "bg-[#0d1526] border border-[rgba(245,158,11,0.15)]",
           sizes[size]
         )}
       >
         {title && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
-            <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
+            <h2 className="text-base font-bold text-white">{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/5 transition-all"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
           </div>
         )}

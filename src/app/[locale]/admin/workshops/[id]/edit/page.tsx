@@ -9,8 +9,10 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/client";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-import { Plus, Trash2, Users, User } from "lucide-react";
+import { PageHeader, darkInputClass, darkLabelClass, TOPIC_LABELS } from "@/components/admin/AdminPageWrapper";
+import { Plus, Trash2, Users, User, Calendar, MapPin } from "lucide-react";
 import { formatDateTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const workshopSchema = z.object({
   title_ar: z.string().min(1),
@@ -44,12 +46,10 @@ interface SessionRow {
   status: string;
 }
 
-const textareaClass =
-  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-[#8B0000] focus:outline-none focus:ring-1 focus:ring-[#8B0000]";
-
 export default function WorkshopEditPage() {
   const t = useTranslations("admin");
   const locale = useLocale();
+  const isAr = locale === "ar";
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isNew, setIsNew] = useState(false);
@@ -150,51 +150,121 @@ export default function WorkshopEditPage() {
     if (workshopId) loadSessions(workshopId);
   }
 
+  const topicOptions = Object.entries(TOPIC_LABELS).map(([key, labels]) => ({
+    value: key,
+    label: isAr ? labels.ar : labels.en,
+  }));
+
   return (
-    <div className="max-w-3xl space-y-8">
-      <h1 className="text-2xl font-bold text-gray-900">
-        {isNew ? (locale === "ar" ? "إضافة ورشة جديدة" : "Add New Workshop") : t("edit")}
-      </h1>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <PageHeader
+        supra={isAr ? "البرامج" : "Programs"}
+        title={isNew
+          ? (isAr ? "إضافة ورشة جديدة" : "Add New Workshop")
+          : (isAr ? "تعديل الورشة" : "Edit Workshop")
+        }
+      />
 
       {/* Workshop form */}
-      <form
-        onSubmit={form.handleSubmit(handleSave)}
-        className="bg-white rounded-xl border border-gray-100 p-6 space-y-5"
-      >
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Input label="العنوان (عربي)" error={form.formState.errors.title_ar?.message} {...form.register("title_ar")} />
-          <Input label="Title (English)" error={form.formState.errors.title_en?.message} {...form.register("title_en")} />
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">الوصف (عربي)</label>
-            <textarea className={textareaClass} rows={3} {...form.register("description_ar")} />
+      <form onSubmit={form.handleSubmit(handleSave)}>
+        <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-6 space-y-6">
+          {/* Title row: AR + EN side by side */}
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label className={cn(darkLabelClass, "text-end block")} dir="rtl">العنوان (عربي)</label>
+              <Input
+                {...form.register("title_ar")}
+                error={form.formState.errors.title_ar?.message}
+                dir="rtl"
+              />
+            </div>
+            <div>
+              <label className={darkLabelClass} dir="ltr">Title (English)</label>
+              <Input
+                {...form.register("title_en")}
+                error={form.formState.errors.title_en?.message}
+                dir="ltr"
+              />
+            </div>
           </div>
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">Description (English)</label>
-            <textarea className={textareaClass} rows={3} {...form.register("description_en")} />
+
+          {/* Description row: AR + EN side by side */}
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label className={cn(darkLabelClass, "text-end block")} dir="rtl">الوصف (عربي)</label>
+              <textarea
+                className={darkInputClass}
+                rows={4}
+                dir="rtl"
+                {...form.register("description_ar")}
+              />
+              {form.formState.errors.description_ar && (
+                <p className="text-red-400 text-xs mt-1">{form.formState.errors.description_ar.message}</p>
+              )}
+            </div>
+            <div>
+              <label className={darkLabelClass} dir="ltr">Description (English)</label>
+              <textarea
+                className={darkInputClass}
+                rows={4}
+                dir="ltr"
+                {...form.register("description_en")}
+              />
+              {form.formState.errors.description_en && (
+                <p className="text-red-400 text-xs mt-1">{form.formState.errors.description_en.message}</p>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-4">
-          <Input label="الموضوع / Topic" error={form.formState.errors.topic?.message} {...form.register("topic")} />
-          <Input label="رابط الصورة / Image URL" {...form.register("image_url")} />
-        </div>
-        <div className="flex gap-3">
-          <Button type="submit" loading={loading}>{t("save")}</Button>
-          <Button type="button" variant="outline" onClick={() => router.push(`/${locale}/admin/workshops`)}>{t("cancel")}</Button>
+
+          {/* Topic + Image URL row */}
+          <div className="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label className={darkLabelClass}>{isAr ? "الموضوع" : "Topic"}</label>
+              <select className={darkInputClass} {...form.register("topic")}>
+                <option value="">{isAr ? "اختر الموضوع" : "Select topic"}</option>
+                {topicOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {form.formState.errors.topic && (
+                <p className="text-red-400 text-xs mt-1">{form.formState.errors.topic.message}</p>
+              )}
+            </div>
+            <Input
+              label={isAr ? "رابط الصورة" : "Image URL"}
+              {...form.register("image_url")}
+            />
+          </div>
+
+          {/* Action row */}
+          <div className="flex items-center gap-3 pt-2 border-t border-white/5">
+            <Button type="submit" loading={loading}>{t("save")}</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push(`/${locale}/admin/workshops`)}
+            >
+              {t("cancel")}
+            </Button>
+          </div>
         </div>
       </form>
 
-      {/* Sessions section (only after workshop is saved) */}
+      {/* Sessions section */}
       {workshopId && (
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {locale === "ar" ? "الجلسات" : "Sessions"} ({sessions.length})
-            </h2>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#F59E0B] mb-0.5">
+                {isAr ? "الجلسات" : "Sessions"}
+              </p>
+              <h2 className="text-lg font-bold text-white">
+                {isAr ? `الجلسات (${sessions.length})` : `Sessions (${sessions.length})`}
+              </h2>
+            </div>
             <Button size="sm" onClick={() => setShowSessionForm(!showSessionForm)}>
               <Plus className="h-4 w-4 me-1" />
-              {locale === "ar" ? "إضافة جلسة" : "Add Session"}
+              {isAr ? "إضافة جلسة" : "Add Session"}
             </Button>
           </div>
 
@@ -202,67 +272,124 @@ export default function WorkshopEditPage() {
           {showSessionForm && (
             <form
               onSubmit={sessionForm.handleSubmit(handleAddSession)}
-              className="bg-white rounded-xl border border-[#8B0000]/20 p-5 mb-4 space-y-4"
+              className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.2)] rounded-2xl p-6 space-y-5"
             >
+              <p className="text-sm font-bold text-[#F59E0B]">
+                {isAr ? "بيانات الجلسة الجديدة" : "New Session Details"}
+              </p>
+
+              {/* Type, Price, Capacity */}
               <div className="grid sm:grid-cols-3 gap-4">
-                <div className="space-y-1">
-                  <label className="block text-sm font-medium text-gray-700">{locale === "ar" ? "النوع" : "Type"}</label>
-                  <select className={textareaClass} {...sessionForm.register("type")}>
-                    <option value="group">{locale === "ar" ? "جماعية" : "Group"}</option>
-                    <option value="individual">{locale === "ar" ? "فردية" : "Individual"}</option>
+                <div>
+                  <label className={darkLabelClass}>{isAr ? "النوع" : "Type"}</label>
+                  <select className={darkInputClass} {...sessionForm.register("type")}>
+                    <option value="group">{isAr ? "جماعية" : "Group"}</option>
+                    <option value="individual">{isAr ? "فردية" : "Individual"}</option>
                   </select>
                 </div>
-                <Input label={locale === "ar" ? "السعر (جنيه)" : "Price (EGP)"} type="number" {...sessionForm.register("price")} />
-                <Input label={locale === "ar" ? "الطاقة" : "Capacity"} type="number" {...sessionForm.register("capacity")} />
+                <Input
+                  label={isAr ? "السعر (جنيه)" : "Price (EGP)"}
+                  type="number"
+                  {...sessionForm.register("price")}
+                />
+                <Input
+                  label={isAr ? "الطاقة الاستيعابية" : "Capacity"}
+                  type="number"
+                  {...sessionForm.register("capacity")}
+                />
               </div>
+
+              {/* Start + End */}
               <div className="grid sm:grid-cols-2 gap-4">
-                <Input label={locale === "ar" ? "تاريخ البداية" : "Start"} type="datetime-local" {...sessionForm.register("starts_at")} />
-                <Input label={locale === "ar" ? "تاريخ النهاية" : "End"} type="datetime-local" {...sessionForm.register("ends_at")} />
+                <Input
+                  label={isAr ? "تاريخ ووقت البداية" : "Start Date & Time"}
+                  type="datetime-local"
+                  {...sessionForm.register("starts_at")}
+                />
+                <Input
+                  label={isAr ? "تاريخ ووقت النهاية" : "End Date & Time"}
+                  type="datetime-local"
+                  {...sessionForm.register("ends_at")}
+                />
               </div>
-              <Input label={locale === "ar" ? "الموقع / رابط" : "Location / Link"} {...sessionForm.register("location_or_link")} />
-              <div className="flex gap-3">
+
+              <Input
+                label={isAr ? "الموقع أو رابط الجلسة" : "Location / Meeting Link"}
+                {...sessionForm.register("location_or_link")}
+              />
+
+              <div className="flex items-center gap-3 pt-2 border-t border-white/5">
                 <Button type="submit" size="sm" loading={sessionLoading}>{t("save")}</Button>
-                <Button type="button" size="sm" variant="outline" onClick={() => setShowSessionForm(false)}>{t("cancel")}</Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setShowSessionForm(false)}
+                >
+                  {t("cancel")}
+                </Button>
               </div>
             </form>
           )}
 
           {/* Sessions list */}
-          <div className="space-y-3">
-            {sessions.length === 0 ? (
-              <div className="text-center py-8 text-gray-400 bg-white rounded-xl border border-gray-100 text-sm">
-                {locale === "ar" ? "لا توجد جلسات بعد" : "No sessions yet"}
-              </div>
-            ) : (
-              sessions.map((s) => (
-                <div key={s.id} className="bg-white rounded-xl border border-gray-100 p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${s.type === "group" ? "bg-blue-50" : "bg-purple-50"}`}>
+          {sessions.length === 0 ? (
+            <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-12 text-center">
+              <Calendar className="h-8 w-8 text-white/10 mx-auto mb-2" />
+              <p className="text-white/30 text-sm">
+                {isAr ? "لا توجد جلسات بعد. أضف أول جلسة" : "No sessions yet. Add the first one"}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {sessions.map((s) => (
+                <div
+                  key={s.id}
+                  className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.08)] rounded-xl p-4 flex items-center justify-between gap-4 hover:border-[rgba(245,158,11,0.15)] transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={cn(
+                      "w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0",
+                      s.type === "group"
+                        ? "bg-blue-500/10 border border-blue-500/20 text-blue-400"
+                        : "bg-purple-500/10 border border-purple-500/20 text-purple-400"
+                    )}>
                       {s.type === "group"
-                        ? <Users className="h-4 w-4 text-blue-600" />
-                        : <User className="h-4 w-4 text-purple-600" />
+                        ? <Users className="h-4 w-4" />
+                        : <User className="h-4 w-4" />
                       }
                     </div>
-                    <div>
-                      <div className="font-medium text-sm text-gray-900">
-                        {formatDateTime(s.starts_at, locale)} — {s.price} {locale === "ar" ? "جنيه" : "EGP"}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {locale === "ar" ? `سعة: ${s.capacity}` : `Capacity: ${s.capacity}`}
-                        {s.location_or_link && ` · ${s.location_or_link}`}
+                    <div className="min-w-0">
+                      <p className="text-white text-sm font-semibold">
+                        {formatDateTime(s.starts_at, locale)}
+                        <span className="text-[#F59E0B] ms-2 font-black">
+                          {s.price} {isAr ? "ج" : "EGP"}
+                        </span>
+                      </p>
+                      <div className="flex items-center gap-3 mt-0.5">
+                        <span className="text-white/40 text-xs">
+                          {isAr ? `سعة: ${s.capacity}` : `Capacity: ${s.capacity}`}
+                        </span>
+                        {s.location_or_link && (
+                          <span className="text-white/30 text-xs flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            <span className="truncate max-w-[120px]">{s.location_or_link}</span>
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => handleDeleteSession(s.id)}
-                    className="text-red-400 hover:text-red-600 p-1 rounded transition-colors"
+                    title={t("delete")}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors flex-shrink-0"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

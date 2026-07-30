@@ -82,10 +82,10 @@ export function Footer() {
           <div className="md:col-span-5">
             {/* Logo + name */}
             <div className="flex items-center gap-3 mb-5">
-              <img src="/logo.png" alt="البوصلة" className="h-11 w-auto" loading="lazy" />
+              <img src="/logo.svg" alt="البوصلة" className="h-11 w-auto" loading="lazy" />
               <div>
                 <div className="text-white font-black text-lg leading-none">
-                  {isRtl ? "البوصلة" : "ElBosla"}
+                  {isRtl ? "البوصلة" : "The Compass"}
                 </div>
                 <div className="text-[#F59E0B]/60 text-xs mt-0.5">
                   {isRtl ? "دليلك نحو أهدافك" : "Your compass to your goals"}
@@ -241,7 +241,7 @@ export function Footer() {
           style={{ borderTop: "1px solid rgba(245,158,11,0.10)" }}
         >
           <p className="text-white/25 text-xs">
-            © {year} {isRtl ? "البوصلة" : "ElBosla"} · {t("rights")}
+            © {year} {isRtl ? "البوصلة" : "The Compass"} · {t("rights")}
           </p>
           <div className="flex items-center gap-4 text-[11px] text-white/25">
             <Link href={`/${locale}`} className="hover:text-white/60 transition-colors">

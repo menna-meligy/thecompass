@@ -60,7 +60,6 @@
 /* ============================================================
    RESET
    ============================================================ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
 body {
@@ -93,6 +92,19 @@ body {
   outline-offset: 2px;
   border-radius: var(--r-sm);
 }
+
+/* ============================================================
+   WORKSHOP CARD (whole card clickable + hover)
+   ============================================================ */
+.workshop-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.workshop-card:hover { transform: translateY(-6px); border-color: rgba(245,158,11,0.42) !important; box-shadow: 0 18px 46px rgba(0,0,0,0.55) !important; }
+.workshop-card:hover .workshop-card-title { color: #FCD34D; }
+.workshop-card-cta { transition: background .2s ease, transform .2s ease; }
+.workshop-card:hover .workshop-card-cta { background: #FCD34D !important; transform: translateX(2px); }
+
+/* Career Compass quiz options */
+.cc-option { transition: background .15s ease, border-color .15s ease, transform .15s ease; }
+.cc-option:hover { border-color: rgba(245,158,11,0.6) !important; background: rgba(245,158,11,0.08) !important; transform: translateY(-1px); }
 
 /* ============================================================
    TYPOGRAPHY

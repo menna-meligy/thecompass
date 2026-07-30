@@ -57,11 +57,17 @@ export function AuthForm() {
   async function handleLogin(data: LoginData) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword(data);
+    const { data: authData, error } = await supabase.auth.signInWithPassword(data);
     if (error) {
       setError(error.message);
     } else {
-      router.push(`/${locale}/dashboard`);
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", authData.user.id)
+        .single();
+      const dest = profile?.role === "admin" ? `/${locale}/admin` : `/${locale}/dashboard`;
+      router.push(dest);
       router.refresh();
     }
     setLoading(false);
@@ -70,7 +76,7 @@ export function AuthForm() {
   async function handleRegister(data: RegisterData) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signUp({
+    const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -79,6 +85,10 @@ export function AuthForm() {
     });
     if (error) {
       setError(error.message);
+    } else if (authData.session) {
+      // Email confirmations disabled — session is already active, go straight in.
+      router.push(`/${locale}/dashboard`);
+      router.refresh();
     } else {
       setMessage("تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتفعيل الحساب.");
     }
@@ -106,7 +116,7 @@ export function AuthForm() {
     <div className="w-full" style={{ maxWidth: "440px" }}>
       {/* Logo + title */}
       <div className="text-center mb-8">
-        <img src="/logo.png" alt="البوصلة" className="h-16 w-auto mx-auto mb-4" />
+        <img src="/logo.svg" alt="البوصلة" className="h-16 w-auto mx-auto mb-4" />
         <h1 className="text-xl font-black text-white">البوصلة</h1>
         <p className="text-white/40 text-xs mt-1">منصة التطوير الشخصي والمهني</p>
       </div>
