@@ -44,6 +44,7 @@ export default function BookingFlow({
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "fail" | "duplicate" | "date_fail" | "amount_fail" | "account_mismatch">("idle");
+  const [reference, setReference] = useState("");
   const [uploading, setUploading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -148,7 +149,7 @@ export default function BookingFlow({
 
       const form = new FormData();
       form.append("file", proofFile);
-      form.append("phone", PHONE);
+      form.append("reference", reference.trim());
       form.append("amount", String(price));
       if (selectedMethod) form.append("method", selectedMethod);
       form.append("booking_id", bookingId);
@@ -283,7 +284,7 @@ export default function BookingFlow({
 
   // ── PROOF STEP ───────────────────────────────────────────
   if (step === "proof") {
-    const canSubmit = !!proofFile && !verifying && verifyStatus !== "ok" && verifyStatus !== "duplicate" && verifyStatus !== "account_mismatch";
+    const canSubmit = !!proofFile && reference.trim().length >= 6 && !verifying && verifyStatus !== "ok" && verifyStatus !== "duplicate";
     return (
       <div>
         <StepBar />
@@ -321,6 +322,28 @@ export default function BookingFlow({
           )}
         </div>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
+
+        {/* Transaction / reference number — the unique id printed on the receipt */}
+        <div style={{ marginBottom: "16px" }}>
+          <label style={{ display: "block", color: "rgba(255,255,255,0.55)", fontSize: "0.8rem", marginBottom: "6px" }}>
+            {isAr ? "الرقم المرجعي للتحويل (من الإيصال)" : "Transaction reference number (from the receipt)"}
+          </label>
+          <input
+            value={reference}
+            onChange={(e) => { setReference(e.target.value); if (verifyStatus === "duplicate") setVerifyStatus("idle"); }}
+            inputMode="numeric"
+            dir="ltr"
+            placeholder={isAr ? "مثال: 440780554147" : "e.g. 440780554147"}
+            style={{
+              width: "100%", padding: "12px 14px", borderRadius: "8px", textAlign: "start",
+              background: "rgba(15,23,42,0.6)", border: "1.5px solid rgba(245,158,11,0.18)",
+              color: "white", fontSize: "0.9rem", fontFamily: "monospace",
+            }}
+          />
+          <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.72rem", marginTop: "5px" }}>
+            {isAr ? "هتلاقيه في إيصال التحويل باسم Reference أو الرقم المرجعي." : "Found on your transfer receipt labelled 'Reference'."}
+          </p>
+        </div>
 
         {verifyStatus === "ok" && (
           <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", color: "#86EFAC", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
