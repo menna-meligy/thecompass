@@ -43,7 +43,7 @@ export default function BookingFlow({
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
-  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "fail" | "duplicate" | "date_fail" | "account_mismatch">("idle");
+  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "fail" | "duplicate" | "date_fail" | "amount_fail" | "account_mismatch">("idle");
   const [uploading, setUploading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -149,6 +149,8 @@ export default function BookingFlow({
       const form = new FormData();
       form.append("file", proofFile);
       form.append("phone", PHONE);
+      form.append("amount", String(price));
+      if (selectedMethod) form.append("method", selectedMethod);
       form.append("booking_id", bookingId);
       if (publicUrl) form.append("proof_url", publicUrl);
 
@@ -166,8 +168,10 @@ export default function BookingFlow({
         setTimeout(() => setStep("confirmed"), 1200);
       } else if (result.error === "duplicate_proof") {
         setVerifyStatus("duplicate");
-      } else if (result.error === "date_too_old") {
+      } else if (result.error === "date_too_old" || result.error === "date_future") {
         setVerifyStatus("date_fail");
+      } else if (result.error === "amount_mismatch") {
+        setVerifyStatus("amount_fail");
       } else if (result.error === "account_mismatch") {
         setVerifyStatus("account_mismatch");
       } else {
@@ -240,7 +244,7 @@ export default function BookingFlow({
               </button>
             </div>
             <a
-              href={selectedMethod === "instapay" ? "https://www.instapay.com.eg/" : "https://vodafone.com.eg/ar/Pages/VFCash.aspx"}
+              href={selectedMethod === "instapay" ? "https://ipn.eg" : "https://web.vodafone.com.eg/ar/vodafone-cash"}
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "6px", background: "#F59E0B", color: "#0f172a", fontWeight: 800, fontSize: "0.85rem", textDecoration: "none" }}
@@ -348,6 +352,13 @@ export default function BookingFlow({
             {isAr
               ? "الإيصال لحساب مختلف. تأكد من إن التحويل على الرقم والاسم الصحيحين."
               : "Receipt shows a different account. Make sure you transferred to the correct number and name."}
+          </div>
+        )}
+        {verifyStatus === "amount_fail" && (
+          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
+            {isAr
+              ? `المبلغ في الإيصال مش مطابق للمطلوب (${price.toLocaleString()} جنيه). تأكد إنك حوّلت المبلغ الصح.`
+              : `The amount in the receipt doesn't match the required ${price.toLocaleString()} EGP. Please transfer the exact amount.`}
           </div>
         )}
 

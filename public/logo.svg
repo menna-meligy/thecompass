@@ -8,9 +8,11 @@
     <line x1="7" y1="48" x2="16" y2="48"/>
     <line x1="80" y1="48" x2="89" y2="48"/>
   </g>
-  <!-- compass needle: north bright, south muted -->
-  <polygon points="48,17 55,48 41,48" fill="#FBBF24"/>
-  <polygon points="48,79 55,48 41,48" fill="#475569"/>
+  <!-- compass needle: north bright, south muted (angled toward NE) -->
+  <g transform="rotate(28 48 48)">
+    <polygon points="48,17 55,48 41,48" fill="#FBBF24"/>
+    <polygon points="48,79 55,48 41,48" fill="#475569"/>
+  </g>
   <!-- center hub -->
   <circle cx="48" cy="48" r="5" fill="#0f172a" stroke="#F59E0B" stroke-width="2.5"/>
 </svg>
