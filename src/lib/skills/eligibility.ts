@@ -63,12 +63,12 @@ export function getEligibilityMessage(
 
   if (state === "LOCKED_COOLDOWN") {
     const unlockDate = result.unlockDate ? new Date(result.unlockDate) : null;
-    const timeStr = unlockDate
-      ? unlockDate.toLocaleTimeString(locale === "ar" ? "ar-EG" : "en-GB", { hour: "numeric", minute: "2-digit" })
+    const dateStr = unlockDate
+      ? unlockDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: "numeric", month: "long" })
       : "";
     return locale === "ar"
-      ? { title: "القراءة التالية قريباً", body: `قراءتك التالية هتفتح الساعة ${timeStr}. قراءة واحدة كل 24 ساعة عشان تفضل صادقة مع نفسك.` }
-      : { title: "Next reading coming soon", body: `Your next reading unlocks at ${timeStr}. One reading every 24 hours keeps it honest.` };
+      ? { title: "قراءتك الجاية قريّب", body: `قراءتك الجاية هتفتح يوم ${dateStr}. قراءة واحدة كل شهر عشان التقدم يبان بصدق.` }
+      : { title: "Next reading coming soon", body: `Your next reading unlocks on ${dateStr}. One reading a month so progress shows honestly.` };
   }
 
   // ELIGIBLE

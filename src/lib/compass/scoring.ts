@@ -180,7 +180,7 @@ function buildFallbackOpening(
 
   const openers: Record<Zone, Record<"ar" | "en", string>> = {
     needs_care: {
-      ar: `قراءة بوصلتك دلوقتي بتكشف إن في ضغط حقيقي بتمر بيه، وده يحتاج اهتمام وليس تجاهل. نقطة قوتك الواضحة في **${strengthLabel.ar}**، وأكبر فرصة للنمو قدّامك في **${growthLabel.ar}**، والبداية من هنا هتحدث فرقاً.`,
+      ar: `قراءة بوصلتك دلوقتي بتكشف إن في ضغط حقيقي بتمر بيه، وده محتاج اهتمام مش تجاهل. نقطة قوتك الواضحة في **${strengthLabel.ar}**، وأكبر فرصة للنمو قدّامك في **${growthLabel.ar}**، والبداية من هنا هتعمل فرق حقيقي.`,
       en: `Your compass reading right now reveals real pressure in your life, something worth acknowledging, not ignoring. Your clearest strength shows in **${strengthLabel.en}**, and your biggest growth opportunity lies in **${growthLabel.en}**; starting there will make a real difference.`,
     },
     emerging: {

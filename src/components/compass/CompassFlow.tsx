@@ -127,36 +127,9 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
     intIdx: number | null
   ) => {
     setFlowState("computing");
-    const preliminary = assembleResult(finalAnswers, intIdx ?? undefined);
-    const { topStrength, mainGrowthArea } = preliminary;
-    const Q0 = QUESTIONS.find((q) => q.id === "Q0");
-    const Q22 = QUESTIONS.find((q) => q.id === "Q22");
-    let openingAr = "", openingEn = "";
-    try {
-      const [arRes, enRes] = await Promise.all([
-        fetch("/api/compass/opening", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            topStrength, mainGrowthArea, locale: "ar",
-            contextAnswer: ctxIdx !== null && Q0 ? Q0.options[ctxIdx]?.label_ar : undefined,
-            intentAnswer: intIdx !== null && Q22 ? Q22.options[intIdx]?.label_ar : undefined,
-          }),
-        }).then((r) => r.json()),
-        fetch("/api/compass/opening", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            topStrength, mainGrowthArea, locale: "en",
-            contextAnswer: ctxIdx !== null && Q0 ? Q0.options[ctxIdx]?.label_en : undefined,
-            intentAnswer: intIdx !== null && Q22 ? Q22.options[intIdx]?.label_en : undefined,
-          }),
-        }).then((r) => r.json()),
-      ]);
-      openingAr = arRes.opening ?? "";
-      openingEn = enRes.opening ?? "";
-    } catch {}
-    const finalResult = assembleResult(finalAnswers, intIdx ?? undefined, openingAr, openingEn);
+    // Fully deterministic reading — no AI. The opening is composed from the
+    // computed scores (zone + top strength + growth area) in assembleResult.
+    const finalResult = assembleResult(finalAnswers, intIdx ?? undefined);
     if (userId) {
       try {
         const supabase = createClient();

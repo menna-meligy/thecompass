@@ -3,7 +3,8 @@ import type { Dimension } from "@/lib/compass/types";
 
 /** Config — adjustable without DB migration */
 export const SKILLS_CONFIG = {
-  ASSESSMENT_COOLDOWN_HOURS: 24,
+  ASSESSMENT_COOLDOWN_HOURS: 24 * 30, // one reading per month
+
   MENTOR_WEIGHT: 0.6,
   SELF_WEIGHT: 0.4,
 } as const;
