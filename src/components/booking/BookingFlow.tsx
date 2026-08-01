@@ -11,7 +11,13 @@ const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707"
 const VODAFONE_NUMBER = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
 // Merchant's own InstaPay payment link / Vodafone Cash link (set these to your
 // account's real link so the button + QR open the app addressed to you).
-const INSTAPAY_LINK = process.env.NEXT_PUBLIC_INSTAPAY_LINK || "https://ipn.eg";
+// The merchant's own InstaPay payment link (from the InstaPay app). Only used when
+// it's a real link — the generic ipn.eg is a bot-blocked "Request Rejected" page.
+const rawInstapayLink = process.env.NEXT_PUBLIC_INSTAPAY_LINK || "";
+const MERCHANT_INSTAPAY_LINK = rawInstapayLink && !rawInstapayLink.includes("ipn.eg") ? rawInstapayLink : "";
+// Reliable "open InstaPay" destinations (both verified to load).
+const INSTAPAY_IOS = "https://apps.apple.com/eg/app/instapay-egypt/id1592108795";
+const INSTAPAY_ANDROID = "https://play.google.com/store/search?q=InstaPay%20Egypt&c=apps";
 const VODAFONE_LINK = process.env.NEXT_PUBLIC_VODAFONE_LINK || "https://web.vodafone.com.eg/ar/vodafone-cash";
 
 type Step = "payment" | "proof" | "confirmed";
@@ -41,12 +47,22 @@ export default function BookingFlow({
   const [step, setStep] = useState<Step>("payment");
   const [selectedMethod, setSelectedMethod] = useState<"instapay" | "vodafone_cash" | null>(null);
   const PHONE = selectedMethod === "vodafone_cash" ? VODAFONE_NUMBER : INSTAPAY_NUMBER;
-  const payLink = selectedMethod === "vodafone_cash" ? VODAFONE_LINK : INSTAPAY_LINK;
 
-  // Pre-render the InstaPay QR (encodes the merchant's InstaPay payment link).
+  // "Open InstaPay": use the merchant's real payment link if set, else the app store
+  // (platform-aware) so the button always opens something that loads.
+  const [instapayStore, setInstapayStore] = useState(INSTAPAY_IOS);
+  useEffect(() => {
+    const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
+    setInstapayStore(/android/i.test(ua) ? INSTAPAY_ANDROID : INSTAPAY_IOS);
+  }, []);
+  const instapayHref = MERCHANT_INSTAPAY_LINK || instapayStore;
+  const payLink = selectedMethod === "vodafone_cash" ? VODAFONE_LINK : instapayHref;
+
+  // QR only makes sense for a real InstaPay payment link (a QR of the store page is useless).
   const [instapayQr, setInstapayQr] = useState<string>("");
   useEffect(() => {
-    QRCode.toDataURL(INSTAPAY_LINK, { width: 220, margin: 1, color: { dark: "#0f172a", light: "#ffffff" } })
+    if (!MERCHANT_INSTAPAY_LINK) { setInstapayQr(""); return; }
+    QRCode.toDataURL(MERCHANT_INSTAPAY_LINK, { width: 220, margin: 1, color: { dark: "#0f172a", light: "#ffffff" } })
       .then(setInstapayQr)
       .catch(() => setInstapayQr(""));
   }, []);
