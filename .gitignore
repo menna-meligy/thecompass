@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code agent worktrees (ephemeral)
+.claude/worktrees/
+
+# local scratch / auth state / test scripts
+scratchpad-auth-state.json
+scratchpad*.json
+test-receipt.mjs
+
+# design explorations & vision decks (non-code, kept locally only)
+lantern-design/
+mishwar-design/
+mishwar-final/
+safar-design/
+Mishwar-Build-Prompt.md
+*.pptx
+*.docx
