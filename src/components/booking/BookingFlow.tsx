@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin } from "lucide-react";
+import QRCode from "qrcode";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
 const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707";
 const VODAFONE_NUMBER = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
+// Merchant's own InstaPay payment link / Vodafone Cash link (set these to your
+// account's real link so the button + QR open the app addressed to you).
+const INSTAPAY_LINK = process.env.NEXT_PUBLIC_INSTAPAY_LINK || "https://ipn.eg";
+const VODAFONE_LINK = process.env.NEXT_PUBLIC_VODAFONE_LINK || "https://web.vodafone.com.eg/ar/vodafone-cash";
 
 type Step = "payment" | "proof" | "confirmed";
 
@@ -36,6 +41,15 @@ export default function BookingFlow({
   const [step, setStep] = useState<Step>("payment");
   const [selectedMethod, setSelectedMethod] = useState<"instapay" | "vodafone_cash" | null>(null);
   const PHONE = selectedMethod === "vodafone_cash" ? VODAFONE_NUMBER : INSTAPAY_NUMBER;
+  const payLink = selectedMethod === "vodafone_cash" ? VODAFONE_LINK : INSTAPAY_LINK;
+
+  // Pre-render the InstaPay QR (encodes the merchant's InstaPay payment link).
+  const [instapayQr, setInstapayQr] = useState<string>("");
+  useEffect(() => {
+    QRCode.toDataURL(INSTAPAY_LINK, { width: 220, margin: 1, color: { dark: "#0f172a", light: "#ffffff" } })
+      .then(setInstapayQr)
+      .catch(() => setInstapayQr(""));
+  }, []);
   const [copied, setCopied] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
 
@@ -235,7 +249,9 @@ export default function BookingFlow({
         {selectedMethod && (
           <div style={{ padding: "18px", borderRadius: "10px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.20)", marginBottom: "20px" }}>
             <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.8rem", marginBottom: "10px" }}>
-              {isAr ? "رقم التحويل:" : "Transfer to:"}
+              {isAr ? "حوّل بالظبط " : "Transfer exactly "}
+              <span style={{ color: "#F59E0B", fontWeight: 800 }}>{price.toLocaleString()} {isAr ? "جنيه" : "EGP"}</span>
+              {isAr ? " على الرقم ده:" : " to this number:"}
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
               <span style={{ fontFamily: "monospace", fontWeight: 900, fontSize: "1.4rem", color: "#F59E0B", letterSpacing: "0.05em" }}>{PHONE}</span>
@@ -244,8 +260,18 @@ export default function BookingFlow({
                 {copied ? t("copied") : t("copyNumber")}
               </button>
             </div>
+
+            {selectedMethod === "instapay" && instapayQr && (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px", marginBottom: "14px" }}>
+                <img src={instapayQr} alt={isAr ? "كود QR للدفع بإنستاباي" : "InstaPay payment QR"} width={140} height={140} style={{ borderRadius: "8px" }} />
+                <span style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem" }}>
+                  {isAr ? "امسح الكود من تطبيق إنستاباي" : "Scan with the InstaPay app"}
+                </span>
+              </div>
+            )}
+
             <a
-              href={selectedMethod === "instapay" ? "https://ipn.eg" : "https://web.vodafone.com.eg/ar/vodafone-cash"}
+              href={payLink}
               target="_blank"
               rel="noopener noreferrer"
               style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "6px", background: "#F59E0B", color: "#0f172a", fontWeight: 800, fontSize: "0.85rem", textDecoration: "none" }}
