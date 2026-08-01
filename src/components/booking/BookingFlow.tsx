@@ -51,9 +51,11 @@ export default function BookingFlow({
   // "Open InstaPay": use the merchant's real payment link if set, else the app store
   // (platform-aware) so the button always opens something that loads.
   const [instapayStore, setInstapayStore] = useState(INSTAPAY_IOS);
+  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
     setInstapayStore(/android/i.test(ua) ? INSTAPAY_ANDROID : INSTAPAY_IOS);
+    setIsMobile(/android|iphone|ipad|ipod|mobile/i.test(ua));
   }, []);
   const instapayHref = MERCHANT_INSTAPAY_LINK || instapayStore;
   const payLink = selectedMethod === "vodafone_cash" ? VODAFONE_LINK : instapayHref;
@@ -284,15 +286,23 @@ export default function BookingFlow({
               </div>
             )}
 
-            <a
-              href={payLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "6px", background: "#F59E0B", color: "#0f172a", fontWeight: 800, fontSize: "0.85rem", textDecoration: "none" }}
-            >
-              <ExternalLink className="h-4 w-4" />
-              {t("openApp")} {selectedMethod === "instapay" ? "InstaPay" : "Vodafone Cash"}
-            </a>
+            {isMobile ? (
+              <a
+                href={payLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "10px 18px", borderRadius: "6px", background: "#F59E0B", color: "#0f172a", fontWeight: 800, fontSize: "0.85rem", textDecoration: "none" }}
+              >
+                <ExternalLink className="h-4 w-4" />
+                {t("openApp")} {selectedMethod === "instapay" ? "InstaPay" : "Vodafone Cash"}
+              </a>
+            ) : (
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.8rem", lineHeight: 1.7 }}>
+                {isAr
+                  ? `افتح تطبيق ${selectedMethod === "instapay" ? "إنستاباي" : "فودافون كاش"} من موبايلك وحوّل المبلغ على الرقم اللي فوق${selectedMethod === "instapay" && instapayQr ? "، أو امسح الكود" : ""}، وبعدين ارفع صورة التحويل هنا.`
+                  : `Open ${selectedMethod === "instapay" ? "InstaPay" : "Vodafone Cash"} on your phone and transfer to the number above${selectedMethod === "instapay" && instapayQr ? ", or scan the QR" : ""}, then upload the receipt here.`}
+              </p>
+            )}
           </div>
         )}
 
