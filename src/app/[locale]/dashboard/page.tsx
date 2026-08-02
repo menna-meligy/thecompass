@@ -11,6 +11,7 @@ import { ZONE_LABELS } from "@/lib/compass/templates";
 import { fetchEligibilityData } from "@/lib/skills/operations";
 import { computeEligibility } from "@/lib/skills/eligibility";
 import AssessmentCard from "@/components/compass/AssessmentCard";
+import NextSessionCountdown from "@/components/dashboard/NextSessionCountdown";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
@@ -59,6 +60,10 @@ export default async function DashboardPage() {
     (b) => b.session?.starts_at && new Date(b.session.starts_at) <= now
   ) || [];
 
+  const nextSession = [...upcoming].sort(
+    (a, b) => new Date(a.session!.starts_at!).getTime() - new Date(b.session!.starts_at!).getTime()
+  )[0] || null;
+
   const quickLinks = [
     { href: `/${locale}/dashboard/bookings`, label: t("bookings"), icon: ClipboardList },
     { href: `/${locale}/dashboard/roadmap`, label: t("roadmapPreview"), icon: Map },
@@ -85,6 +90,22 @@ export default async function DashboardPage() {
           {locale === "ar" ? "أهلاً بيك في لوحة التحكم بتاعتك" : "Welcome back to your dashboard"}
         </p>
       </div>
+
+      {/* Next session countdown */}
+      {nextSession?.session?.starts_at && (
+        <NextSessionCountdown
+          startsAt={nextSession.session.starts_at}
+          title={
+            getLocalizedField(
+              (nextSession.session.workshop as unknown as Record<string, unknown>) || {},
+              "title",
+              locale
+            ) || (locale === "ar" ? "جلسة" : "Session")
+          }
+          locationOrLink={nextSession.session.location_or_link}
+          locale={locale}
+        />
+      )}
 
       {/* Roadmap preview */}
       {progress && (
