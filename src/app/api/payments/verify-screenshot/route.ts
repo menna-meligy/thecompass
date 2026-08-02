@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { createHash } from "crypto";
 
 // Deterministic manual-payment check — NO AI, no user-typed reference.
-// The customer just uploads the transfer screenshot. We enforce what a machine
-// can prove: it's a real image AND the exact same screenshot hasn't already been
-// used for another booking (blocks recurring clients reusing an old receipt).
-// The admin confirms the amount / date / recipient on the screenshot at approval.
+// The customer uploads the transfer screenshot; we store it on the payment (so
+// the admin can review the amount/date), and block the exact same screenshot from
+// being reused for another booking. Writes go through the service-role client
+// because RLS only lets admins UPDATE payments — a user cannot update their own.
 
 export async function POST(req: NextRequest) {
   try {
     const form = await req.formData();
     const file = form.get("file") as File | null;
     const bookingId = (form.get("booking_id") as string) || null;
+    const proofUrl = (form.get("proof_url") as string) || null;
 
     if (!file || !file.type.startsWith("image/")) {
       return NextResponse.json({ verified: false, error: "no_image" });
@@ -21,12 +22,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ verified: false, error: "fail" });
     }
 
+    // Identify the caller.
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ verified: false, error: "unauthorized" }, { status: 401 });
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const imageHash = createHash("sha256").update(buffer).digest("hex");
-    const supabase = await createClient();
+    const admin = await createAdminClient();
+
+    // Ownership: the booking must belong to the caller.
+    if (bookingId) {
+      const { data: bk } = await admin.from("bookings").select("user_id").eq("id", bookingId).single();
+      if (!bk || bk.user_id !== user.id) {
+        return NextResponse.json({ verified: false, error: "forbidden" }, { status: 403 });
+      }
+    }
 
     // Anti-reuse: the exact same screenshot can't be used for another booking.
-    let q = supabase
+    let q = admin
       .from("payments")
       .select("booking_id")
       .eq("gateway_txn_id", `proof_hash:${imageHash}`)
@@ -38,11 +54,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ verified: false, error: "duplicate_proof" });
     }
 
-    // Record the image hash on the pending payment (enforces future uniqueness).
+    // Attach the proof + hash to the pending payment (service role bypasses RLS).
     if (bookingId) {
-      await supabase
+      await admin
         .from("payments")
-        .update({ gateway_txn_id: `proof_hash:${imageHash}` })
+        .update({
+          gateway_txn_id: `proof_hash:${imageHash}`,
+          status: "proof_submitted",
+          ...(proofUrl ? { proof_url: proofUrl } : {}),
+        })
         .eq("booking_id", bookingId)
         .eq("status", "pending");
     }

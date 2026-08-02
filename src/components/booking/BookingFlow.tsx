@@ -171,8 +171,8 @@ export default function BookingFlow({
         const path = `payments/${bookingId}-${proofFile.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
         const { error: uploadErr } = await supabase.storage.from("payment-proofs").upload(path, proofFile);
         if (!uploadErr) {
+          // proof_url is saved server-side in verify-screenshot (RLS blocks user updates).
           publicUrl = supabase.storage.from("payment-proofs").getPublicUrl(path).data.publicUrl;
-          await supabase.from("payments").update({ proof_url: publicUrl }).eq("booking_id", bookingId);
         }
       } catch {
         // Storage unavailable — continue without stored URL, admin reviews manually
