@@ -76,7 +76,9 @@ export default function BookingFlow({
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
-  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "fail" | "duplicate" | "date_fail" | "amount_fail" | "account_mismatch" | "unreadable">("idle");
+  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "invalid" | "fail">("idle");
+  const [verifyErrors, setVerifyErrors] = useState<string[]>([]);
+  const SUPPORT_PHONE = "01093026726";
   const [uploading, setUploading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -209,18 +211,16 @@ export default function BookingFlow({
           body: JSON.stringify({ type: "admin_new_payment", booking_id: bookingId }),
         }).catch(() => {});
         setTimeout(() => setStep("confirmed"), 1200);
-      } else if (result.error === "duplicate_proof" || result.error === "duplicate_reference") {
-        setVerifyStatus("duplicate");
-      } else if (result.error === "date_too_old" || result.error === "date_future") {
-        setVerifyStatus("date_fail");
-      } else if (result.error === "amount_mismatch") {
-        setVerifyStatus("amount_fail");
-      } else if (result.error === "amount_unreadable" || result.error === "date_unreadable" || result.error === "reference_missing") {
-        setVerifyStatus("unreadable");
-      } else if (result.error === "account_mismatch") {
-        setVerifyStatus("account_mismatch");
       } else {
-        setVerifyStatus("fail");
+        // Collect every failing check so we can tell the client exactly what's wrong.
+        const KNOWN = ["amount_mismatch", "date_too_old", "date_future", "amount_unreadable", "date_unreadable", "reference_missing", "duplicate_reference", "duplicate_proof"];
+        const errs: string[] = (Array.isArray(result.errors) ? result.errors : [result.error]).filter((e: string) => KNOWN.includes(e));
+        if (errs.length > 0) {
+          setVerifyErrors(errs);
+          setVerifyStatus("invalid");
+        } else {
+          setVerifyStatus("fail");
+        }
       }
     } catch {
       setVerifyStatus("fail");
@@ -348,7 +348,7 @@ export default function BookingFlow({
 
   // ── PROOF STEP ───────────────────────────────────────────
   if (step === "proof") {
-    const canSubmit = !!proofFile && !verifying && verifyStatus !== "ok" && verifyStatus !== "duplicate";
+    const canSubmit = !!proofFile && !verifying && verifyStatus !== "ok";
     return (
       <div>
         <StepBar />
@@ -392,45 +392,44 @@ export default function BookingFlow({
             <Check className="h-4 w-4 flex-shrink-0" />{t("verifiedOk")}
           </div>
         )}
+        {verifyStatus === "invalid" && (() => {
+          const M: Record<string, { ar: string; en: string }> = {
+            amount_mismatch: { ar: `المبلغ غلط — المطلوب ${price.toLocaleString()} جنيه بالظبط.`, en: `Wrong amount — the exact price is ${price.toLocaleString()} EGP.` },
+            date_too_old: { ar: "تاريخ التحويل مش تاريخ النهاردة — حوّل وارفع الإيصال في نفس اليوم.", en: "The transfer date isn't today — transfer and upload on the same day." },
+            date_future: { ar: "تاريخ التحويل في الإيصال مش مظبوط.", en: "The transfer date on the receipt is invalid." },
+            duplicate_reference: { ar: "رقم العملية ده مستخدم قبل كده — ارفع إيصال التحويل الخاص بالحجز ده.", en: "This transaction reference was already used — upload the receipt for this booking." },
+            duplicate_proof: { ar: "الإيصال ده مستخدم قبل كده — ارفع إيصال التحويل الخاص بالحجز ده.", en: "This receipt was already used — upload the receipt for this booking." },
+            amount_unreadable: { ar: "مقدرناش نقرا المبلغ من الصورة.", en: "We couldn't read the amount from the image." },
+            date_unreadable: { ar: "مقدرناش نقرا التاريخ من الصورة.", en: "We couldn't read the date from the image." },
+            reference_missing: { ar: "مقدرناش نلاقي رقم العملية في الصورة.", en: "We couldn't find the transaction reference in the image." },
+          };
+          const hasUnreadable = verifyErrors.some((e) => e.endsWith("unreadable") || e === "reference_missing");
+          return (
+            <div style={{ padding: "14px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
+              <p style={{ fontWeight: 800, marginBottom: "8px", color: "#F87171" }}>
+                {isAr ? "الدفع مترفض — لازم تصلّح ده:" : "Payment rejected — you must fix this:"}
+              </p>
+              <ul style={{ margin: 0, paddingInlineStart: "18px", listStyle: "disc", display: "flex", flexDirection: "column", gap: "4px" }}>
+                {verifyErrors.map((e) => (
+                  <li key={e}>{M[e] ? (isAr ? M[e].ar : M[e].en) : e}</li>
+                ))}
+              </ul>
+              {hasUnreadable && (
+                <p style={{ marginTop: "8px", color: "rgba(255,255,255,0.5)" }}>
+                  {isAr ? "ارفع صورة أوضح للإيصال كامل." : "Upload a clearer screenshot of the full receipt."}
+                </p>
+              )}
+              <p style={{ marginTop: "10px", color: "rgba(255,255,255,0.6)" }}>
+                {isAr ? `لو محتاج مساعدة كلّمنا على ${SUPPORT_PHONE}.` : `Need help? Call us on ${SUPPORT_PHONE}.`}
+              </p>
+            </div>
+          );
+        })()}
         {verifyStatus === "fail" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
+          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
             {isAr
-              ? "معرفناش نتأكد من رقم الحساب في الصورة دي. اتأكد إن الصورة واضحة وبتبيّن تفاصيل التحويل."
-              : "Could not verify the account number in this image. Make sure the screenshot is clear and shows transfer details."}
-          </div>
-        )}
-        {verifyStatus === "duplicate" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5, display: "flex", gap: "8px" }}>
-            <span style={{ flexShrink: 0 }}>⚠️</span>
-            {isAr
-              ? "رقم العملية ده اتستخدم قبل كده في حجز تاني. من فضلك ارفع إيصال التحويل الخاص بالحجز ده."
-              : "This transaction reference was already used for another booking. Please upload the receipt for this transfer."}
-          </div>
-        )}
-        {verifyStatus === "unreadable" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
-            {isAr
-              ? "مقدرناش نقرا تفاصيل الإيصال (المبلغ/التاريخ/رقم العملية). ارفع صورة أوضح للإيصال كامل."
-              : "We couldn't read the receipt details (amount/date/reference). Please upload a clearer screenshot of the full receipt."}
-          </div>
-        )}
-        {verifyStatus === "date_fail" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
-            {t("verifiedDateFail")}
-          </div>
-        )}
-        {verifyStatus === "account_mismatch" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
-            {isAr
-              ? "الإيصال لحساب مختلف. تأكد من إن التحويل على الرقم والاسم الصحيحين."
-              : "Receipt shows a different account. Make sure you transferred to the correct number and name."}
-          </div>
-        )}
-        {verifyStatus === "amount_fail" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
-            {isAr
-              ? `المبلغ في الإيصال مش مطابق للمطلوب (${price.toLocaleString()} جنيه). تأكد إنك حوّلت المبلغ الصح.`
-              : `The amount in the receipt doesn't match the required ${price.toLocaleString()} EGP. Please transfer the exact amount.`}
+              ? `حصلت مشكلة وإحنا بنأكد الإيصال. جرّب تاني، ولو المشكلة فضلت كلّمنا على ${SUPPORT_PHONE}.`
+              : `Something went wrong verifying the receipt. Please try again — if it persists, call us on ${SUPPORT_PHONE}.`}
           </div>
         )}
 
