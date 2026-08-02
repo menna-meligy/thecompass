@@ -7,6 +7,11 @@ import type { SessionMilestone } from "./HorizontalRoadmap";
 import KanbanBoard from "./KanbanBoard";
 
 export type Status = "todo" | "in_progress" | "done";
+export interface TaskStep {
+  id: string;
+  title: string;
+  done: boolean;
+}
 export interface Task {
   id: string;
   title: string;
@@ -14,6 +19,7 @@ export interface Task {
   status: Status;
   position: number;
   pinned?: boolean; // registration node — can't be deleted/moved
+  steps?: TaskStep[]; // this task's own mini-roadmap
 }
 
 const STORAGE_KEY = "albosla_kanban_v2";
@@ -144,10 +150,28 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
   const setMenteeTasks = useCallback((updated: (prev: Task[]) => Task[]) => {
     setMenteeTasksState((prev) => {
       const next = updated(prev);
-      if (!menteeUseDB) saveLocal(next);
+      if (menteeUseDB) {
+        (async () => {
+          for (const task of next) {
+            if (task.id === "reg-node") continue;
+            await (supabase as any).from("user_tasks").upsert({
+              id: task.id, user_id: uid, title: task.title, icon: task.icon,
+              status: task.status, position: task.position, pinned: task.pinned || false,
+              track: "mentee", steps: task.steps ?? [],
+            }, { onConflict: "id" });
+          }
+          const nextIds = next.map((t) => t.id);
+          for (const task of prev.filter((t) => t.id !== "reg-node" && !nextIds.includes(t.id))) {
+            await (supabase as any).from("user_tasks").delete().eq("id", task.id);
+          }
+        })();
+      } else {
+        saveLocal(next);
+      }
       return next;
     });
-  }, [menteeUseDB]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menteeUseDB, uid]);
 
   // Mentor tasks setter — saves with track='mentor', user_id=uid
   const setMentorTasks = useCallback((updated: (prev: Task[]) => Task[]) => {
@@ -165,6 +189,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
             position: task.position,
             pinned: task.pinned || false,
             track: "mentor",
+            steps: task.steps ?? [],
           }, { onConflict: "id" });
         }
         // Remove deleted tasks
