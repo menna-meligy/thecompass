@@ -122,12 +122,12 @@ export default async function CompassPage() {
         <div className="mb-4 inline-flex items-center gap-2 bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-lg px-3 py-1.5">
           <span className="text-white/40 text-xs">
             {isAr
-              ? `آخر قراءة: ${new Date(previousAssessmentAt).toLocaleDateString("ar-EG", {
+              ? `آخر تقييم: ${new Date(previousAssessmentAt).toLocaleDateString("ar-EG", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
                 })}`
-              : `Last reading: ${new Date(previousAssessmentAt).toLocaleDateString("en-GB", {
+              : `Last assessment: ${new Date(previousAssessmentAt).toLocaleDateString("en-GB", {
                   day: "numeric",
                   month: "long",
                   year: "numeric",

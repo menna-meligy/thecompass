@@ -170,7 +170,7 @@ export default async function DashboardPage() {
         lastReadingDate={lastReadingDate ?? undefined}
       />
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid md:grid-cols-2 gap-8 mt-10">
         {/* Upcoming Sessions */}
         <div>
           <h2 className="font-bold text-white mb-4 flex items-center gap-2 text-base">

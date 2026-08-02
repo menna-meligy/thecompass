@@ -196,7 +196,7 @@ export const RECOMMENDATION_COPY: Record<
       en: "1:1 Coaching Session",
     },
     why: {
-      ar: "قراءتك بتقول إن الخطوة الأقوى ليك دلوقتي هي محادثة مباشرة، مكان تقدر فيه تفكّر بصوت عالٍ وتوصل للوضوح اللي بتبحث عنه.",
+      ar: "تقييمك بيقول إن الخطوة الأقوى ليك دلوقتي هي محادثة مباشرة، مكان تقدر فيه تفكّر بصوت عالٍ وتوصل للوضوح اللي بتبحث عنه.",
       en: "Your reading suggests the most powerful next step for you is a direct conversation; a place to think out loud and reach the clarity you're looking for.",
     },
   },
@@ -216,7 +216,7 @@ export const RECOMMENDATION_COPY: Record<
       en: "Building Self-Confidence Workshop",
     },
     why: {
-      ar: "قراءتك بتكشف إن الثقة بالنفس هي المنطقة اللي فيها أكبر تأثير على بقية حياتك دلوقتي، هذه الورشة بتبني ثقة من مكان حقيقي وليس من الشكل الخارجي.",
+      ar: "تقييمك بيكشف إن الثقة بالنفس هي المنطقة اللي فيها أكبر تأثير على بقية حياتك دلوقتي، هذه الورشة بتبني ثقة من مكان حقيقي وليس من الشكل الخارجي.",
       en: "Your reading reveals that self-confidence is the area with the greatest impact on the rest of your life right now; this workshop builds confidence from a real inner place, not just surface performance.",
     },
   },

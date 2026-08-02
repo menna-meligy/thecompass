@@ -189,7 +189,7 @@ export default function CareerCompass() {
                   {isRtl ? "بنحلّل إجاباتك…" : "Reading your answers…"}
                 </p>
                 <p className="text-white/40" style={{ fontSize: "0.85rem" }}>
-                  {isRtl ? "بنجهّز قراءتك المخصّصة" : "Preparing your personalized reading"}
+                  {isRtl ? "بنجهّز تقييمك المخصّص" : "Preparing your personalized assessment"}
                 </p>
               </motion.div>
             )}

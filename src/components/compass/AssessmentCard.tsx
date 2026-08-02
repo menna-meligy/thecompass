@@ -34,7 +34,7 @@ export default function AssessmentCard({ eligibility, locale, lastReadingDate }:
             </div>
             <div>
               <p className="text-white font-semibold text-sm">
-                {isAr ? "خُد قراءتك الأولى" : "Take your first reading"}
+                {isAr ? "ابدأ تقييمك الأول" : "Start your first assessment"}
               </p>
               <p className="text-white/40 text-xs mt-0.5">{msg.body}</p>
             </div>
@@ -64,7 +64,7 @@ export default function AssessmentCard({ eligibility, locale, lastReadingDate }:
             <p className="text-white/40 text-xs mt-0.5">{msg.body}</p>
             {formattedLastReading && (
               <p className="text-white/30 text-xs mt-1">
-                {isAr ? `آخر قراءة: ${formattedLastReading}` : `Last reading: ${formattedLastReading}`}
+                {isAr ? `آخر تقييم: ${formattedLastReading}` : `Last assessment: ${formattedLastReading}`}
               </p>
             )}
           </div>
@@ -85,12 +85,12 @@ export default function AssessmentCard({ eligibility, locale, lastReadingDate }:
           </div>
           <div>
             <p className="text-white font-semibold text-sm">
-              {isAr ? "قراءتك الجديدة جاهزة" : "Your new reading is ready"}
+              {isAr ? "تقييمك الجديد جاهز" : "Your new assessment is ready"}
             </p>
             <p className="text-white/40 text-xs mt-0.5">{msg.body}</p>
             {formattedLastReading && (
               <p className="text-white/30 text-xs mt-1">
-                {isAr ? `آخر قراءة: ${formattedLastReading}` : `Last reading: ${formattedLastReading}`}
+                {isAr ? `آخر تقييم: ${formattedLastReading}` : `Last assessment: ${formattedLastReading}`}
               </p>
             )}
           </div>

@@ -57,8 +57,8 @@ export function getEligibilityMessage(
 
   if (state === "BASELINE_OPEN") {
     return locale === "ar"
-      ? { title: "ابدأ رحلتك", body: "خُد قراءتك الأولى واعرف انت فين دلوقتي.", cta: "ابدأ القراءة" }
-      : { title: "Start your journey", body: "Take your first reading and discover where you are right now.", cta: "Start reading" };
+      ? { title: "ابدأ رحلتك", body: "ابدأ تقييمك الأول واعرف انت فين دلوقتي.", cta: "ابدأ التقييم" }
+      : { title: "Start your journey", body: "Take your first reading and discover where you are right now.", cta: "Start assessment" };
   }
 
   if (state === "LOCKED_COOLDOWN") {
@@ -67,12 +67,12 @@ export function getEligibilityMessage(
       ? unlockDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", { day: "numeric", month: "long" })
       : "";
     return locale === "ar"
-      ? { title: "قراءتك الجاية قريّب", body: `قراءتك الجاية هتفتح يوم ${dateStr}. قراءة واحدة كل شهر عشان التقدم يبان بصدق.` }
-      : { title: "Next reading coming soon", body: `Your next reading unlocks on ${dateStr}. One reading a month so progress shows honestly.` };
+      ? { title: "تقييمك الجاي قريّب", body: `تقييمك الجاي هيفتح يوم ${dateStr}. تقييم واحد كل شهر عشان التقدم يبان بصدق.` }
+      : { title: "Next reading coming soon", body: `Your next assessment unlocks on ${dateStr}. One assessment a month so progress shows honestly.` };
   }
 
   // ELIGIBLE
   return locale === "ar"
-    ? { title: "قراءتك الجديدة جاهزة", body: "حان وقت قياس التقدم.", cta: "ابدأ القراءة الجديدة" }
-    : { title: "Your new reading is ready", body: "Time to measure your progress.", cta: "Start new reading" };
+    ? { title: "تقييمك الجديد جاهز", body: "حان وقت قياس التقدم.", cta: "ابدأ التقييم الجديد" }
+    : { title: "Your new reading is ready", body: "Time to measure your progress.", cta: "Start new assessment" };
 }

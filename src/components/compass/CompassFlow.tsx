@@ -327,7 +327,7 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
             </div>
           </div>
           <p className="text-white font-semibold text-lg mb-2">
-            {isAr ? "جاري قراءة بوصلتك..." : "Reading your compass..."}
+            {isAr ? "جاري تجهيز تقييمك..." : "Preparing your assessment..."}
           </p>
           <p className="text-white/35 text-sm">
             {isAr ? "بنحسب نقاط قوتك ومجالات النمو" : "Calculating your strengths and growth areas"}
@@ -365,7 +365,7 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
             {isAr ? "بوصلتك" : "Your Compass"}
           </h1>
           <p className="text-white/40 text-sm">
-            {isAr ? "قراءتك الشخصية" : "Your personal reading"}
+            {isAr ? "تقييمك الشخصي" : "Your personal assessment"}
           </p>
         </div>
 
