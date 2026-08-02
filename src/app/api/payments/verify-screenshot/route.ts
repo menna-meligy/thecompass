@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
         .from("payments")
         .update({
           gateway_txn_id: `proof_hash:${imageHash}`,
-          status: "proof_submitted",
+          status: "pending_verification",
           ...(proofUrl ? { proof_url: proofUrl } : {}),
         })
         .eq("booking_id", bookingId)
