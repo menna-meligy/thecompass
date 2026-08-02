@@ -78,6 +78,7 @@ export default function BookingFlow({
   const [verifying, setVerifying] = useState(false);
   const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "invalid" | "fail">("idle");
   const [verifyErrors, setVerifyErrors] = useState<string[]>([]);
+  const [ocrAmount, setOcrAmount] = useState<number | null>(null);
   const SUPPORT_PHONE = "01093026726";
   const [uploading, setUploading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
@@ -190,6 +191,7 @@ export default function BookingFlow({
       } catch {
         // OCR failed → server sees missing values and returns "unreadable".
       }
+      setOcrAmount(ocr.amount);
 
       const form = new FormData();
       form.append("file", proofFile);
@@ -393,32 +395,27 @@ export default function BookingFlow({
           </div>
         )}
         {verifyStatus === "invalid" && (() => {
+          const amt = ocrAmount != null ? ocrAmount.toLocaleString() : "؟";
           const M: Record<string, { ar: string; en: string }> = {
-            amount_mismatch: { ar: `المبلغ غلط — المطلوب ${price.toLocaleString()} جنيه بالظبط.`, en: `Wrong amount — the exact price is ${price.toLocaleString()} EGP.` },
-            date_too_old: { ar: "تاريخ التحويل مش تاريخ النهاردة — حوّل وارفع الإيصال في نفس اليوم.", en: "The transfer date isn't today — transfer and upload on the same day." },
+            amount_mismatch: { ar: `المبلغ في الإيصال (${amt} جنيه) مش مطابق لسعر الجلسة (${price.toLocaleString()} جنيه).`, en: `The receipt amount (${amt} EGP) doesn't match the session price (${price.toLocaleString()} EGP).` },
+            amount_unreadable: { ar: `المبلغ في الإيصال مش مطابق لسعر الجلسة (${price.toLocaleString()} جنيه).`, en: `The receipt amount doesn't match the session price (${price.toLocaleString()} EGP).` },
+            date_too_old: { ar: "تاريخ التحويل مش تاريخ النهاردة.", en: "The transfer date isn't today." },
             date_future: { ar: "تاريخ التحويل في الإيصال مش مظبوط.", en: "The transfer date on the receipt is invalid." },
-            duplicate_reference: { ar: "رقم العملية ده مستخدم قبل كده — ارفع إيصال التحويل الخاص بالحجز ده.", en: "This transaction reference was already used — upload the receipt for this booking." },
-            duplicate_proof: { ar: "الإيصال ده مستخدم قبل كده — ارفع إيصال التحويل الخاص بالحجز ده.", en: "This receipt was already used — upload the receipt for this booking." },
-            amount_unreadable: { ar: "مقدرناش نقرا المبلغ من الصورة.", en: "We couldn't read the amount from the image." },
-            date_unreadable: { ar: "مقدرناش نقرا التاريخ من الصورة.", en: "We couldn't read the date from the image." },
-            reference_missing: { ar: "مقدرناش نلاقي رقم العملية في الصورة.", en: "We couldn't find the transaction reference in the image." },
+            date_unreadable: { ar: "تاريخ التحويل مش تاريخ النهاردة.", en: "The transfer date isn't today." },
+            duplicate_reference: { ar: "رقم العملية ده مستخدم قبل كده.", en: "This transaction reference was already used." },
+            duplicate_proof: { ar: "الإيصال ده مستخدم قبل كده.", en: "This receipt was already used." },
+            reference_missing: { ar: "مقدرناش نلاقي رقم العملية في الإيصال.", en: "We couldn't find the transaction reference in the receipt." },
           };
-          const hasUnreadable = verifyErrors.some((e) => e.endsWith("unreadable") || e === "reference_missing");
           return (
             <div style={{ padding: "14px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
               <p style={{ fontWeight: 800, marginBottom: "8px", color: "#F87171" }}>
-                {isAr ? "الدفع مترفض — لازم تصلّح ده:" : "Payment rejected — you must fix this:"}
+                {isAr ? "الدفع مترفض:" : "Payment rejected:"}
               </p>
               <ul style={{ margin: 0, paddingInlineStart: "18px", listStyle: "disc", display: "flex", flexDirection: "column", gap: "4px" }}>
                 {verifyErrors.map((e) => (
                   <li key={e}>{M[e] ? (isAr ? M[e].ar : M[e].en) : e}</li>
                 ))}
               </ul>
-              {hasUnreadable && (
-                <p style={{ marginTop: "8px", color: "rgba(255,255,255,0.5)" }}>
-                  {isAr ? "ارفع صورة أوضح للإيصال كامل." : "Upload a clearer screenshot of the full receipt."}
-                </p>
-              )}
               <p style={{ marginTop: "10px", color: "rgba(255,255,255,0.6)" }}>
                 {isAr ? `لو محتاج مساعدة كلّمنا على ${SUPPORT_PHONE}.` : `Need help? Call us on ${SUPPORT_PHONE}.`}
               </p>
