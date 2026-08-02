@@ -417,7 +417,7 @@ export default function BookingFlow({
                 ))}
               </ul>
               <p style={{ marginTop: "10px", color: "rgba(255,255,255,0.6)" }}>
-                {isAr ? `لو محتاج مساعدة كلّمنا على ${SUPPORT_PHONE}.` : `Need help? Call us on ${SUPPORT_PHONE}.`}
+                {isAr ? `لو محتاج مساعدة لتأكيد الحجز كلّمنا على ${SUPPORT_PHONE}.` : `Need help confirming your booking? Call us on ${SUPPORT_PHONE}.`}
               </p>
             </div>
           );
@@ -425,8 +425,8 @@ export default function BookingFlow({
         {verifyStatus === "fail" && (
           <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
             {isAr
-              ? `حصلت مشكلة وإحنا بنأكد الإيصال. جرّب تاني، ولو المشكلة فضلت كلّمنا على ${SUPPORT_PHONE}.`
-              : `Something went wrong verifying the receipt. Please try again — if it persists, call us on ${SUPPORT_PHONE}.`}
+              ? `حصلت مشكلة وإحنا بنأكد الإيصال. جرّب تاني، ولو محتاج مساعدة لتأكيد الحجز كلّمنا على ${SUPPORT_PHONE}.`
+              : `Something went wrong verifying the receipt. Please try again — need help confirming your booking? Call us on ${SUPPORT_PHONE}.`}
           </div>
         )}
 
