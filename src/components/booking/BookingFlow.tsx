@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin } from "lucide-react";
 import QRCode from "qrcode";
+import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
@@ -178,12 +179,23 @@ export default function BookingFlow({
         // Storage unavailable — continue without stored URL, admin reviews manually
       }
 
+      // OCR the receipt in the browser and extract amount / date / reference.
+      let ocr: { amount: number | null; date: Date | null; reference: string | null } = {
+        amount: null, date: null, reference: null,
+      };
+      try {
+        ocr = parseReceipt(await ocrReceipt(proofFile));
+      } catch {
+        // OCR failed → server sees missing values and returns "unreadable".
+      }
+
       const form = new FormData();
       form.append("file", proofFile);
-      form.append("amount", String(price));
-      if (selectedMethod) form.append("method", selectedMethod);
       form.append("booking_id", bookingId);
       if (publicUrl) form.append("proof_url", publicUrl);
+      if (ocr.amount != null) form.append("ocr_amount", String(ocr.amount));
+      if (ocr.date) form.append("ocr_date", ocr.date.toISOString());
+      if (ocr.reference) form.append("ocr_reference", ocr.reference);
 
       const res = await fetch("/api/payments/verify-screenshot", { method: "POST", body: form });
       const result = await res.json();

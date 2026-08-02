@@ -66,19 +66,19 @@ export function validateReceipt(
   return errors;
 }
 
-/** Run OCR on an image buffer (server-side). Reads with two page-seg modes for coverage. */
-export async function ocrReceipt(buffer: Buffer, mimeType: string): Promise<string> {
+/** Run OCR in the BROWSER (tesseract.js is too heavy for serverless). Reads with
+ * two page-seg modes for coverage. Uses the smaller/faster tessdata model. */
+export async function ocrReceipt(image: Blob | string): Promise<string> {
   const { createWorker } = await import("tesseract.js");
-  const dataUrl = `data:${mimeType};base64,${buffer.toString("base64")}`;
-  // On Vercel only /tmp is writable — cache the language data there.
-  const cachePath = "/tmp";
+  const worker = await createWorker("eng", 1, {
+    langPath: "https://tessdata.projectnaptha.com/4.0.0_fast",
+  });
   let out = "";
   for (const psm of ["3", "11"]) {
-    const worker = await createWorker("eng", 1, { cachePath });
     await worker.setParameters({ tessedit_pageseg_mode: psm as never });
-    const { data: { text } } = await worker.recognize(dataUrl);
-    await worker.terminate();
+    const { data: { text } } = await worker.recognize(image);
     out += "\n" + text;
   }
+  await worker.terminate();
   return out;
 }

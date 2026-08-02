@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { ocrReceipt, parseReceipt, validateReceipt } from "@/lib/payments/receipt";
-
-export const runtime = "nodejs";
-export const maxDuration = 60;
+import { validateReceipt, type ParsedReceipt } from "@/lib/payments/receipt";
 
 // Manual InstaPay / Vodafone Cash verification (no external AI / gateway).
-// Reads the uploaded screenshot with OCR and checks:
-//   1) amount matches the booking price
-//   2) date is recent (today / within a couple of days)
-//   3) a transaction reference is present AND not reused on another booking
-// The reference is stored on the payment; the admin still confirms on approval.
+// The receipt is OCR'd in the browser; here we validate the extracted values
+// against the booking's trusted price + today, and enforce that the transaction
+// reference hasn't been reused. The admin still confirms on approval.
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,23 +13,19 @@ export async function POST(req: NextRequest) {
     const file = form.get("file") as File | null;
     const bookingId = (form.get("booking_id") as string) || null;
     const proofUrl = (form.get("proof_url") as string) || null;
+    const ocrAmount = form.get("ocr_amount") ? Number(form.get("ocr_amount")) : null;
+    const ocrDate = (form.get("ocr_date") as string) || null;
+    const ocrReference = ((form.get("ocr_reference") as string) || "").replace(/\D/g, "") || null;
 
     if (!file || !file.type.startsWith("image/")) {
       return NextResponse.json({ verified: false, error: "no_image" });
     }
-    if (file.size < 20 * 1024) {
-      return NextResponse.json({ verified: false, error: "fail" });
-    }
-    if (!bookingId) {
-      return NextResponse.json({ verified: false, error: "fail" });
-    }
+    if (file.size < 20 * 1024) return NextResponse.json({ verified: false, error: "fail" });
+    if (!bookingId) return NextResponse.json({ verified: false, error: "fail" });
 
-    // Identify caller.
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ verified: false, error: "unauthorized" }, { status: 401 });
-    }
+    if (!user) return NextResponse.json({ verified: false, error: "unauthorized" }, { status: 401 });
 
     const admin = await createAdminClient();
 
@@ -50,32 +41,29 @@ export async function POST(req: NextRequest) {
     }
     const expectedAmount = Number(payment.amount);
 
-    // OCR + parse + validate (amount / date / reference).
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const text = await ocrReceipt(buffer, file.type);
-    const parsed = parseReceipt(text);
+    // Validate the OCR'd values: amount matches, date recent, reference present.
+    const parsed: ParsedReceipt = {
+      amount: ocrAmount != null && !Number.isNaN(ocrAmount) ? ocrAmount : null,
+      date: ocrDate ? new Date(ocrDate) : null,
+      reference: ocrReference,
+    };
     const errors = validateReceipt(parsed, { expectedAmount, now: new Date() });
 
     // Reference must be unique across bookings.
     if (parsed.reference) {
-      let dq = admin
+      const { data: dup } = await admin
         .from("payments")
         .select("booking_id")
         .eq("gateway_txn_id", `ref:${parsed.reference}`)
-        .not("status", "eq", "failed");
-      dq = dq.neq("booking_id", bookingId);
-      const { data: dup } = await dq.limit(1).maybeSingle();
+        .not("status", "eq", "failed")
+        .neq("booking_id", bookingId)
+        .limit(1)
+        .maybeSingle();
       if (dup) errors.push("duplicate_reference");
     }
 
     if (errors.length > 0) {
-      return NextResponse.json({
-        verified: false,
-        error: errors[0],
-        errors,
-        parsed: { amount: parsed.amount, reference: parsed.reference, date: parsed.date?.toISOString() ?? null },
-        expected: expectedAmount,
-      });
+      return NextResponse.json({ verified: false, error: errors[0], errors, expected: expectedAmount });
     }
 
     // Passed — store reference + proof + mark awaiting admin.
@@ -89,11 +77,7 @@ export async function POST(req: NextRequest) {
       .eq("booking_id", bookingId)
       .eq("status", "pending");
 
-    return NextResponse.json({
-      verified: true,
-      reference: parsed.reference,
-      amount: parsed.amount,
-    });
+    return NextResponse.json({ verified: true, reference: parsed.reference });
   } catch {
     return NextResponse.json({ verified: false, error: "fail" });
   }
