@@ -75,7 +75,7 @@ export default function BookingFlow({
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
-  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "fail" | "duplicate" | "date_fail" | "amount_fail" | "account_mismatch">("idle");
+  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "fail" | "duplicate" | "date_fail" | "amount_fail" | "account_mismatch" | "unreadable">("idle");
   const [uploading, setUploading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -197,12 +197,14 @@ export default function BookingFlow({
           body: JSON.stringify({ type: "admin_new_payment", booking_id: bookingId }),
         }).catch(() => {});
         setTimeout(() => setStep("confirmed"), 1200);
-      } else if (result.error === "duplicate_proof") {
+      } else if (result.error === "duplicate_proof" || result.error === "duplicate_reference") {
         setVerifyStatus("duplicate");
       } else if (result.error === "date_too_old" || result.error === "date_future") {
         setVerifyStatus("date_fail");
       } else if (result.error === "amount_mismatch") {
         setVerifyStatus("amount_fail");
+      } else if (result.error === "amount_unreadable" || result.error === "date_unreadable" || result.error === "reference_missing") {
+        setVerifyStatus("unreadable");
       } else if (result.error === "account_mismatch") {
         setVerifyStatus("account_mismatch");
       } else {
@@ -389,8 +391,15 @@ export default function BookingFlow({
           <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5, display: "flex", gap: "8px" }}>
             <span style={{ flexShrink: 0 }}>⚠️</span>
             {isAr
-              ? "الإيصال ده اتستخدم قبل كده في حجز تاني. من فضلك ارفع صورة جديدة خاصة بالتحويل ده."
-              : "This receipt was already used for another booking. Please upload a fresh screenshot for this transfer."}
+              ? "رقم العملية ده اتستخدم قبل كده في حجز تاني. من فضلك ارفع إيصال التحويل الخاص بالحجز ده."
+              : "This transaction reference was already used for another booking. Please upload the receipt for this transfer."}
+          </div>
+        )}
+        {verifyStatus === "unreadable" && (
+          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.5 }}>
+            {isAr
+              ? "مقدرناش نقرا تفاصيل الإيصال (المبلغ/التاريخ/رقم العملية). ارفع صورة أوضح للإيصال كامل."
+              : "We couldn't read the receipt details (amount/date/reference). Please upload a clearer screenshot of the full receipt."}
           </div>
         )}
         {verifyStatus === "date_fail" && (

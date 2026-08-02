@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { createHash } from "crypto";
+import { ocrReceipt, parseReceipt, validateReceipt } from "@/lib/payments/receipt";
 
-// Deterministic manual-payment check — NO AI, no user-typed reference.
-// The customer uploads the transfer screenshot; we store it on the payment (so
-// the admin can review the amount/date), and block the exact same screenshot from
-// being reused for another booking. Writes go through the service-role client
-// because RLS only lets admins UPDATE payments — a user cannot update their own.
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+// Manual InstaPay / Vodafone Cash verification (no external AI / gateway).
+// Reads the uploaded screenshot with OCR and checks:
+//   1) amount matches the booking price
+//   2) date is recent (today / within a couple of days)
+//   3) a transaction reference is present AND not reused on another booking
+// The reference is stored on the payment; the admin still confirms on approval.
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,54 +25,75 @@ export async function POST(req: NextRequest) {
     if (file.size < 20 * 1024) {
       return NextResponse.json({ verified: false, error: "fail" });
     }
+    if (!bookingId) {
+      return NextResponse.json({ verified: false, error: "fail" });
+    }
 
-    // Identify the caller.
+    // Identify caller.
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.json({ verified: false, error: "unauthorized" }, { status: 401 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const imageHash = createHash("sha256").update(buffer).digest("hex");
     const admin = await createAdminClient();
 
-    // Ownership: the booking must belong to the caller.
-    if (bookingId) {
-      const { data: bk } = await admin.from("bookings").select("user_id").eq("id", bookingId).single();
-      if (!bk || bk.user_id !== user.id) {
-        return NextResponse.json({ verified: false, error: "forbidden" }, { status: 403 });
-      }
+    // Ownership + trusted expected amount (server-created, not from the client).
+    const { data: booking } = await admin
+      .from("bookings")
+      .select("user_id, payment:payments(id, amount)")
+      .eq("id", bookingId)
+      .single();
+    const payment = Array.isArray(booking?.payment) ? booking?.payment[0] : booking?.payment;
+    if (!booking || booking.user_id !== user.id || !payment) {
+      return NextResponse.json({ verified: false, error: "forbidden" }, { status: 403 });
     }
+    const expectedAmount = Number(payment.amount);
 
-    // Anti-reuse: the exact same screenshot can't be used for another booking.
-    let q = admin
-      .from("payments")
-      .select("booking_id")
-      .eq("gateway_txn_id", `proof_hash:${imageHash}`)
-      .not("status", "eq", "failed");
-    if (bookingId) q = q.neq("booking_id", bookingId);
-    const { data: existing } = await q.limit(1).maybeSingle();
+    // OCR + parse + validate (amount / date / reference).
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const text = await ocrReceipt(buffer, file.type);
+    const parsed = parseReceipt(text);
+    const errors = validateReceipt(parsed, { expectedAmount, now: new Date() });
 
-    if (existing) {
-      return NextResponse.json({ verified: false, error: "duplicate_proof" });
-    }
-
-    // Attach the proof + hash to the pending payment (service role bypasses RLS).
-    if (bookingId) {
-      await admin
+    // Reference must be unique across bookings.
+    if (parsed.reference) {
+      let dq = admin
         .from("payments")
-        .update({
-          gateway_txn_id: `proof_hash:${imageHash}`,
-          status: "pending_verification",
-          ...(proofUrl ? { proof_url: proofUrl } : {}),
-        })
-        .eq("booking_id", bookingId)
-        .eq("status", "pending");
+        .select("booking_id")
+        .eq("gateway_txn_id", `ref:${parsed.reference}`)
+        .not("status", "eq", "failed");
+      dq = dq.neq("booking_id", bookingId);
+      const { data: dup } = await dq.limit(1).maybeSingle();
+      if (dup) errors.push("duplicate_reference");
     }
 
-    // Accepted for admin review (admin confirms amount/recipient/date on approval).
-    return NextResponse.json({ verified: true, pendingReview: true });
+    if (errors.length > 0) {
+      return NextResponse.json({
+        verified: false,
+        error: errors[0],
+        errors,
+        parsed: { amount: parsed.amount, reference: parsed.reference, date: parsed.date?.toISOString() ?? null },
+        expected: expectedAmount,
+      });
+    }
+
+    // Passed — store reference + proof + mark awaiting admin.
+    await admin
+      .from("payments")
+      .update({
+        gateway_txn_id: `ref:${parsed.reference}`,
+        status: "pending_verification",
+        ...(proofUrl ? { proof_url: proofUrl } : {}),
+      })
+      .eq("booking_id", bookingId)
+      .eq("status", "pending");
+
+    return NextResponse.json({
+      verified: true,
+      reference: parsed.reference,
+      amount: parsed.amount,
+    });
   } catch {
     return NextResponse.json({ verified: false, error: "fail" });
   }
