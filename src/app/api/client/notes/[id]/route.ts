@@ -11,9 +11,10 @@ interface UpdateNoteBody {
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Auth check
     const userClient = await createClient();
     const { data: { user }, error: authError } = await userClient.auth.getUser();
@@ -22,7 +23,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const noteId = params.id;
+    const noteId = id;
 
     // Parse and validate body
     const body = await req.json() as UpdateNoteBody;
@@ -83,9 +84,10 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Auth check
     const userClient = await createClient();
     const { data: { user }, error: authError } = await userClient.auth.getUser();
@@ -94,7 +96,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const noteId = params.id;
+    const noteId = id;
 
     // Verify note exists and belongs to client
     const { data: note, error: fetchError } = await userClient

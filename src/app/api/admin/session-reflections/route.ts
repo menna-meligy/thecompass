@@ -10,7 +10,9 @@ interface CreateReflectionBody {
   encouragement_en?: string | null;
   mentor_notes_ar?: string | null;
   mentor_notes_en?: string | null;
+  private_notes?: string | null;
   is_public?: boolean;
+  status?: "draft" | "published";
 }
 
 export async function POST(req: NextRequest) {
@@ -43,7 +45,9 @@ export async function POST(req: NextRequest) {
       encouragement_en,
       mentor_notes_ar,
       mentor_notes_en,
-      is_public = false,
+      private_notes,
+      is_public = true,
+      status = "published",
     } = body;
 
     if (!bookingId || !clientId) {
@@ -67,32 +71,67 @@ export async function POST(req: NextRequest) {
     // Use admin client for write
     const db = await createAdminClient();
 
-    // Create or update reflection
-    const result = await createOrUpdateReflection(
-      db,
-      bookingId,
-      clientId,
-      user.id,
-      encouragement_ar ?? null,
-      encouragement_en ?? null,
-      mentor_notes_ar ?? null,
-      mentor_notes_en ?? null,
-      is_public
-    );
+    // Check if reflection exists
+    const { data: existing, error: checkError } = await db
+      .from("session_reflections")
+      .select("id")
+      .eq("booking_id", bookingId)
+      .maybeSingle();
+
+    let result;
+    if (existing) {
+      // Update existing reflection
+      result = await updateSessionReflection(
+        db,
+        existing.id,
+        {
+          encouragement_ar: encouragement_ar ?? undefined,
+          encouragement_en: encouragement_en ?? undefined,
+          mentor_notes_ar: mentor_notes_ar ?? undefined,
+          mentor_notes_en: mentor_notes_en ?? undefined,
+          private_notes: private_notes ?? undefined,
+          is_public,
+          status,
+        },
+        user.id
+      );
+    } else {
+      // Create new reflection
+      result = await createSessionReflection(
+        db,
+        bookingId,
+        user.id,
+        clientId,
+        {
+          encouragement_ar: encouragement_ar ?? undefined,
+          encouragement_en: encouragement_en ?? undefined,
+          private_notes: private_notes ?? undefined,
+          is_public,
+          status,
+        }
+      );
+    }
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.message },
+        { status: result.error.code === "REFLECTION_EXISTS" ? 409 : 400 }
+      );
+    }
 
     return NextResponse.json(
       {
-        id: result.id,
+        id: result.data.id,
         booking_id: bookingId,
-        status: result.status,
-        created_at: result.created_at,
+        status: result.data.status,
+        created_at: result.data.submitted_at,
       },
-      { status: 201 }
+      { status: existing ? 200 : 201 }
     );
   } catch (err) {
     logError(err, {
       where: "api/admin/session-reflections:POST",
-      op: "createReflection",
+      op: "createOrUpdateReflection",
     });
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

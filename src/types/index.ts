@@ -887,7 +887,7 @@ export type Database = {
         Update: { reflection_id?: string; milestone_id?: string };
         Relationships: [];
       };
-      session_notes: {
+      client_notes: {
         Row: {
           id: string;
           booking_id: string;
@@ -895,8 +895,6 @@ export type Database = {
           content_ar: string;
           content_en: string;
           is_public: boolean;
-          version: number;
-          created_by: string;
           created_at: string;
           updated_at: string;
         };
@@ -907,8 +905,6 @@ export type Database = {
           content_ar: string;
           content_en: string;
           is_public?: boolean;
-          version?: number;
-          created_by: string;
           created_at?: string;
           updated_at?: string;
         };
@@ -919,8 +915,6 @@ export type Database = {
           content_ar?: string;
           content_en?: string;
           is_public?: boolean;
-          version?: number;
-          created_by?: string;
           created_at?: string;
           updated_at?: string;
         };

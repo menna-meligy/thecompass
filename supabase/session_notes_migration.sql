@@ -3,62 +3,61 @@
 -- Run after skills_migration.sql
 -- ============================================================
 
--- ── 1. Session notes (client public and private notes) ──────────────────────
+-- ── 1. Client notes (client public and private notes) ──────────────────────
+-- This table stores session notes that clients attach to their bookings
 
-CREATE TABLE IF NOT EXISTS public.session_notes (
+CREATE TABLE IF NOT EXISTS public.client_notes (
   id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   booking_id        UUID NOT NULL REFERENCES public.bookings(id) ON DELETE CASCADE,
   client_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   content_ar        TEXT NOT NULL,
   content_en        TEXT NOT NULL,
   is_public         BOOLEAN NOT NULL DEFAULT false,  -- true = visible to mentor/admin, false = private
-  version           INTEGER NOT NULL DEFAULT 1,      -- for concurrent edit detection
-  created_by        UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CONSTRAINT session_notes_belongs_to_client CHECK (client_id = (SELECT user_id FROM public.bookings WHERE id = booking_id))
+  CONSTRAINT client_notes_belongs_to_client CHECK (client_id = (SELECT user_id FROM public.bookings WHERE id = booking_id))
 );
 
--- ── 2. Update session_reflections to include mentor notes ──────────────────
+-- ── 2. Update session_reflections to include mentor notes and status ──────────
 
 ALTER TABLE public.session_reflections
   ADD COLUMN IF NOT EXISTS mentor_notes_ar TEXT,
   ADD COLUMN IF NOT EXISTS mentor_notes_en TEXT,
   ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'submitted', 'published')),
-  ADD COLUMN IF NOT EXISTS version INTEGER NOT NULL DEFAULT 1,
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW(),
+  ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL;
 
 -- ── 3. Indexes ───────────────────────────────────────────────────────────────
 
-CREATE INDEX IF NOT EXISTS idx_session_notes_booking ON public.session_notes (booking_id);
-CREATE INDEX IF NOT EXISTS idx_session_notes_client ON public.session_notes (client_id);
-CREATE INDEX IF NOT EXISTS idx_session_notes_created_at ON public.session_notes (created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_session_notes_is_public ON public.session_notes (is_public);
+CREATE INDEX IF NOT EXISTS idx_client_notes_booking ON public.client_notes (booking_id);
+CREATE INDEX IF NOT EXISTS idx_client_notes_client ON public.client_notes (client_id);
+CREATE INDEX IF NOT EXISTS idx_client_notes_created_at ON public.client_notes (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_client_notes_is_public ON public.client_notes (is_public);
 CREATE INDEX IF NOT EXISTS idx_session_reflections_booking ON public.session_reflections (booking_id);
 CREATE INDEX IF NOT EXISTS idx_session_reflections_client ON public.session_reflections (client_id);
+CREATE INDEX IF NOT EXISTS idx_session_reflections_status ON public.session_reflections (status);
 
 -- ── 4. RLS ───────────────────────────────────────────────────────────────────
 
-ALTER TABLE public.session_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.client_notes ENABLE ROW LEVEL SECURITY;
 
--- session_notes: clients can read their own (both public and private),
---                admins can read all public notes and notes for their sessions
-CREATE POLICY "Clients can read their own notes" ON public.session_notes
+-- client_notes: clients can read/write their own (both public and private),
+--               admins can read all public notes and manage all notes
+CREATE POLICY "Clients can read their own notes" ON public.client_notes
   FOR SELECT USING (auth.uid() = client_id);
 
-CREATE POLICY "Admins can read public notes" ON public.session_notes
+CREATE POLICY "Admins can read all notes" ON public.client_notes
   FOR SELECT USING (
-    is_public = true AND
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
-CREATE POLICY "Clients can create notes" ON public.session_notes
-  FOR INSERT WITH CHECK (auth.uid() = client_id AND auth.uid() = created_by);
+CREATE POLICY "Clients can create notes" ON public.client_notes
+  FOR INSERT WITH CHECK (auth.uid() = client_id);
 
-CREATE POLICY "Clients can update their own notes" ON public.session_notes
+CREATE POLICY "Clients can update their own notes" ON public.client_notes
   FOR UPDATE USING (auth.uid() = client_id);
 
-CREATE POLICY "Clients can delete their own notes" ON public.session_notes
+CREATE POLICY "Clients can delete their own notes" ON public.client_notes
   FOR DELETE USING (auth.uid() = client_id);
 
 -- session_reflections: clients can read their encouragement (public fields),

@@ -5,9 +5,10 @@ import { logError } from "@/lib/observability/logger";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     // Auth check via user client (reads session cookie)
     const userClient = await createClient();
     const { data: { user }, error: authError } = await userClient.auth.getUser();
@@ -27,7 +28,7 @@ export async function GET(
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const bookingId = params.id;
+    const bookingId = id;
 
     // Verify booking exists
     const { data: booking, error: bookingError } = await userClient
@@ -40,13 +41,24 @@ export async function GET(
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
 
-    // Fetch admin view of notes
-    const data = await fetchAdminBookingNotes(userClient, bookingId);
+    // Fetch admin view of notes using admin role
+    const result = await getReflectionWithNotes(userClient, bookingId, "admin", user.id);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.message },
+        { status: result.error.code === "NOT_FOUND" ? 404 : 403 }
+      );
+    }
 
     return NextResponse.json({
-      reflection: data.reflection,
-      clientPublicNotes: data.clientPublicNotes,
-      metadata: data.metadata,
+      reflection: result.data.reflection,
+      clientNotes: result.data.clientNotes,
+      auditTrail: result.data.auditTrail,
+      metadata: {
+        lastSync: new Date().toISOString(),
+        syncStatus: "synced",
+      },
     });
   } catch (err) {
     logError(err, {
