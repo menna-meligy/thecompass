@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useLocale } from 'next/navigation';
+import { useRouter, useLocale } from 'next-intl'';
 import SessionBrowser from '@/components/booking/SessionBrowser';
 
 interface TimeSlot {
