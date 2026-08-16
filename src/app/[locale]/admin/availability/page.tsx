@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocale } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import AdminPageWrapper from '@/components/admin/AdminPageWrapper';
 import AvailabilityManager from '@/components/admin/AvailabilityManager';
 

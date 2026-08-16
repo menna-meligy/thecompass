@@ -203,6 +203,7 @@ export default function SessionBrowser({
           occupiedDates={workshopOccupiedDates}
           onDateSelect={setWorkshopSelectedDate}
           selectedDate={workshopSelectedDate}
+          isArabic={isArabic}
         />
       </div>
 
@@ -239,6 +240,7 @@ export default function SessionBrowser({
           occupiedDates={individualOccupiedDates}
           onDateSelect={setIndividualSelectedDate}
           selectedDate={individualSelectedDate}
+          isArabic={isArabic}
         />
       </div>
 

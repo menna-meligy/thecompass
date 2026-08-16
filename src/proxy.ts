@@ -18,8 +18,14 @@ function isAdminPath(pathname: string): boolean {
 }
 
 export async function proxy(request: NextRequest) {
-  const { supabaseResponse, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
+
+  // Explicitly skip middleware for API routes to allow route handlers to work
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.next();
+  }
+
+  const { supabaseResponse, user } = await updateSession(request);
 
   if (isProtectedPath(pathname) && !user) {
     const locale = pathname.startsWith("/en") ? "en" : "ar";
@@ -29,10 +35,6 @@ export async function proxy(request: NextRequest) {
 
   if (isAdminPath(pathname) && user) {
     // Admin check happens in page components
-  }
-
-  if (pathname.startsWith("/api/")) {
-    return supabaseResponse;
   }
 
   const intlResponse = intlMiddleware(request);

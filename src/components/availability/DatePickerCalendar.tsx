@@ -30,7 +30,11 @@ export default function DatePickerCalendar({
     return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
   };
 
-  const monthName = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(currentDate);
+  const monthName = new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en-US", { month: "long", year: "numeric" }).format(currentDate);
+
+  const dayNames = isArabic
+    ? ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]
+    : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const days = useMemo(() => {
     const result = [];
@@ -99,14 +103,13 @@ export default function DatePickerCalendar({
     }
   };
 
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
   return (
-    <div style={{ background: "#0f172a", padding: "24px", borderRadius: "12px", color: "white" }}>
+    <div style={{ background: "#0f172a", padding: "24px", borderRadius: "12px", color: "white", direction: isArabic ? "rtl" : "ltr" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <button
           onClick={handlePrevMonth}
+          aria-label={isArabic ? "الشهر السابق" : "Previous month"}
           style={{
             background: "rgba(245,158,11,0.1)",
             border: "1px solid rgba(245,158,11,0.25)",
@@ -121,6 +124,7 @@ export default function DatePickerCalendar({
         <h3 style={{ fontWeight: "bold", fontSize: "1.1rem" }}>{monthName}</h3>
         <button
           onClick={handleNextMonth}
+          aria-label={isArabic ? "الشهر القادم" : "Next month"}
           style={{
             background: "rgba(245,158,11,0.1)",
             border: "1px solid rgba(245,158,11,0.25)",
@@ -210,11 +214,11 @@ export default function DatePickerCalendar({
               width: "12px",
               height: "12px",
               borderRadius: "3px",
-              background: "rgba(34,197,94,0.3)",
+              background: "rgba(34,197,94,0.1)",
               border: "1px solid rgba(34,197,94,0.4)",
             }}
           />
-          <span style={{ color: "rgba(255,255,255,0.6)" }}>Available</span>
+          <span style={{ color: "rgba(255,255,255,0.6)" }}>{isArabic ? "متاح" : "Available"}</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <div
@@ -226,7 +230,7 @@ export default function DatePickerCalendar({
               border: "1px solid rgba(239,68,68,0.3)",
             }}
           />
-          <span style={{ color: "rgba(255,255,255,0.6)" }}>Full</span>
+          <span style={{ color: "rgba(255,255,255,0.6)" }}>{isArabic ? "ممتلئ" : "Full"}</span>
         </div>
       </div>
     </div>
