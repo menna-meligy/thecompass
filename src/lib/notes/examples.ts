@@ -3,7 +3,7 @@
  * Copy-paste ready code snippets for common workflows
  */
 
-import { createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import {
   createSessionReflection,
   updateSessionReflection,
@@ -28,7 +28,7 @@ export async function workflowMentorCreatesReflection(
   mentorId: string,
   clientId: string
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   // Step 1: Create reflection (initially as draft)
   const createResult = await createSessionReflection(db, bookingId, mentorId, clientId, {
@@ -90,7 +90,7 @@ export async function workflowClientViewsAndResponds(
   bookingId: string,
   clientId: string
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   // Step 1: Client fetches their reflections
   const reflectionsResult = await getClientReflections(db, clientId);
@@ -159,7 +159,7 @@ export async function workflowClientViewsAndResponds(
  * ──────────────────────────────────────────────────
  */
 export async function workflowAdminReviewsSession(bookingId: string, adminId: string) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   // Step 1: Get complete reflection with notes
   const viewResult = await getReflectionWithNotes(db, bookingId, "admin", adminId);
@@ -234,7 +234,7 @@ export async function workflowBulkCreateReflections(
   clientIds: string[],
   encouragement: { ar: string; en: string }
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   const results: Array<{
     bookingId: string;
@@ -286,7 +286,7 @@ export async function workflowClientUpdatesNotes(
   clientId: string,
   updatedContent: { ar?: string; en?: string }
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   const result = await updateClientNote(db, noteId, updatedContent);
 
@@ -308,7 +308,7 @@ export async function workflowArchiveReflections(
   reflectionIds: string[],
   adminId: string
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   const results = await Promise.all(
     reflectionIds.map((id) => archiveReflection(db, id, adminId))
@@ -328,7 +328,7 @@ export async function workflowGenerateAuditReport(
   reflectionId: string,
   adminId: string
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   const auditResult = await getNotesAuditTrail(db, reflectionId);
 
@@ -377,7 +377,7 @@ export async function workflowSyncReflectionToClient(
   clientId: string,
   adminId: string
 ) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   const syncResult = await syncNotesToClient(db, reflectionId, clientId);
 
@@ -397,7 +397,7 @@ export async function workflowSyncReflectionToClient(
  * ─────────────────────────
  */
 export async function templateErrorHandling(bookingId: string) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   const result = await getReflectionWithNotes(db, bookingId, "client", "user-123");
 
@@ -432,7 +432,7 @@ export async function templateErrorHandling(bookingId: string) {
  * ─────────────────────
  */
 export async function templateTypeScriptUsage(bookingId: string) {
-  const db = await createServerClient();
+  const db = await createClient();
 
   // Typed result handling
   const result: Result<SessionReflectionData> = await getReflectionWithNotes(
