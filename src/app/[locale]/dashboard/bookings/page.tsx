@@ -312,7 +312,6 @@ export default async function BookingsPage() {
                       {/* Reflection card */}
                       <ClientReflectionsCard
                         bookingId={booking.id}
-                        clientId={user.id}
                         locale={locale as "ar" | "en"}
                       />
 
