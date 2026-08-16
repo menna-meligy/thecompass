@@ -59,13 +59,6 @@ export default function AdminReflectionDetailPage() {
             user:profiles!client_id(full_name, email),
             booking:bookings(
               session:sessions(starts_at, workshop:workshops(title_ar, title_en))
-            ),
-            skills:session_reflection_skills(
-              id,
-              reflection_id,
-              skill_id,
-              mentor_level,
-              skill:skills(id, dimension, name_ar, name_en, description_ar, description_en)
             )
           `
           )
