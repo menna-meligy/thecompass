@@ -217,50 +217,6 @@ export default function AdminReflectionDetailPage() {
             </section>
           )}
 
-          {/* Skills assessed */}
-          {reflection.skills && reflection.skills.length > 0 && (
-            <section>
-              <h2 className="text-sm font-bold uppercase tracking-wider text-white/70 mb-3">
-                {isAr ? "المهارات المقيّمة" : "Skills Assessed"}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {reflection.skills.map((skill) => (
-                  <div
-                    key={skill.id}
-                    className="bg-white/2 border border-white/5 rounded-xl p-4"
-                  >
-                    <p className="font-semibold text-white">
-                      {skill.skill
-                        ? getLocalizedField(
-                            skill.skill as Record<string, unknown>,
-                            "name",
-                            locale
-                          )
-                        : "Unknown"}
-                    </p>
-                    <p className="text-xs text-white/40 mt-1">
-                      {skill.skill
-                        ? getLocalizedField(
-                            skill.skill as Record<string, unknown>,
-                            "description",
-                            locale
-                          )
-                        : ""}
-                    </p>
-                    <div className="mt-3 flex items-center justify-between">
-                      <span className="text-xs text-white/50">
-                        {isAr ? "المستوى:" : "Level:"}
-                      </span>
-                      <span className="text-sm font-bold text-[#F59E0B]">
-                        {skill.mentor_level}/5
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
           {/* Private notes */}
           {reflection.private_notes && (
             <section>
@@ -277,19 +233,6 @@ export default function AdminReflectionDetailPage() {
               </div>
             </section>
           )}
-
-          {/* Mentor info */}
-          <section>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-white/70 mb-3">
-              {isAr ? "بيانات المرشد" : "Mentor Information"}
-            </h2>
-            <div className="bg-white/2 border border-white/5 rounded-xl p-4">
-              <p className="text-sm text-white/60">
-                {reflection.mentor?.full_name || "Unknown"}
-                {reflection.mentor?.email && ` (${reflection.mentor.email})`}
-              </p>
-            </div>
-          </section>
         </div>
       </div>
     </div>
