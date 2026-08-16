@@ -1,5 +1,9 @@
 import { type ReactNode } from "react";
 
+export default function AdminPageWrapper({ children }: { children: ReactNode }) {
+  return <>{children}</>;
+}
+
 export function PageHeader({
   supra,
   title,

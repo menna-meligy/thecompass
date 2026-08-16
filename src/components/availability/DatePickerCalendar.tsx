@@ -9,6 +9,7 @@ interface DatePickerCalendarProps {
   onDateSelect: (date: string) => void;
   selectedDate?: string;
   minDate?: string;
+  isArabic?: boolean;
 }
 
 export default function DatePickerCalendar({
@@ -17,9 +18,9 @@ export default function DatePickerCalendar({
   onDateSelect,
   selectedDate,
   minDate,
+  isArabic = false,
 }: DatePickerCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const isArabic = false; // Could be made dynamic
 
   const daysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -49,15 +50,22 @@ export default function DatePickerCalendar({
     return result;
   }, [currentDate]);
 
+  const formatDateToISO = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const isDateAvailable = (day: number): boolean => {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const dateString = date.toISOString().split("T")[0];
+    const dateString = formatDateToISO(date);
     return availableDates.includes(dateString);
   };
 
   const isDateOccupied = (day: number): boolean => {
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const dateString = date.toISOString().split("T")[0];
+    const dateString = formatDateToISO(date);
     return occupiedDates.includes(dateString);
   };
 
@@ -71,7 +79,7 @@ export default function DatePickerCalendar({
   const isDateSelected = (day: number): boolean => {
     if (!selectedDate) return false;
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    const dateString = date.toISOString().split("T")[0];
+    const dateString = formatDateToISO(date);
     return dateString === selectedDate;
   };
 
@@ -84,9 +92,9 @@ export default function DatePickerCalendar({
   };
 
   const handleDateClick = (day: number) => {
-    if (isDateAvailable(day) && !isDateInPast(day)) {
+    if (!isDateInPast(day) && !isDateOccupied(day)) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-      const dateString = date.toISOString().split("T")[0];
+      const dateString = formatDateToISO(date);
       onDateSelect(dateString);
     }
   };

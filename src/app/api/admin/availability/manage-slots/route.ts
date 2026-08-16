@@ -30,6 +30,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    // Validate that end time is after start time
+    if (endTime <= startTime) {
+      return NextResponse.json(
+        { error: "End time must be after start time" },
+        { status: 400 }
+      );
+    }
+
     const startsAt = `${date}T${startTime}:00+02:00`;
     const endsAt = `${date}T${endTime}:00+02:00`;
 

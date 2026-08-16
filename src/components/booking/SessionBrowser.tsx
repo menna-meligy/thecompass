@@ -195,9 +195,9 @@ export default function SessionBrowser({
   };
 
   const workshopContent = (
-    <div style={{ display: "flex", gap: "24px" }}>
+    <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
       {/* Calendar */}
-      <div style={{ flex: "0 0 340px" }}>
+      <div style={{ flex: "1 1 340px", minWidth: "280px" }}>
         <DatePickerCalendar
           availableDates={workshopAvailableDates}
           occupiedDates={workshopOccupiedDates}
@@ -207,7 +207,7 @@ export default function SessionBrowser({
       </div>
 
       {/* Sessions */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: "2 1 300px", minWidth: "280px" }}>
         {workshopSelectedDate ? (
           <div style={{ display: "grid", gap: "24px" }}>
             {workshops.map((workshop) => (
@@ -231,9 +231,9 @@ export default function SessionBrowser({
   );
 
   const individualContent = (
-    <div style={{ display: "flex", gap: "24px" }}>
+    <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
       {/* Calendar */}
-      <div style={{ flex: "0 0 340px" }}>
+      <div style={{ flex: "1 1 340px", minWidth: "280px" }}>
         <DatePickerCalendar
           availableDates={individualAvailableDates}
           occupiedDates={individualOccupiedDates}
@@ -243,7 +243,7 @@ export default function SessionBrowser({
       </div>
 
       {/* Sessions */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: "2 1 300px", minWidth: "280px" }}>
         <SessionGrid
           sessions={individualSessions}
           selectedDate={individualSelectedDate}
