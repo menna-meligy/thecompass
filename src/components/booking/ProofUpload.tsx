@@ -63,7 +63,7 @@ export function ProofUpload({ bookingId, onUpload }: ProofUploadProps) {
           <img src={preview} alt="proof" className="h-24 rounded-lg object-cover border border-green-200" />
         )}
         <p className="text-xs text-green-600">
-          {locale === "ar" ? "الآن اضغط تأكيد لإكمال الحجز" : "Now click Confirm to complete your booking"}
+          {locale === "ar" ? "دلوقتي اضغط تأكيد لإكمال الحجز" : "Now click Confirm to complete your booking"}
         </p>
       </div>
     );

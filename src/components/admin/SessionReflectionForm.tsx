@@ -111,7 +111,7 @@ export default function SessionReflectionForm({
     if (!isSelectionValid) {
       setErrorMessage(
         isAr
-          ? "اختر من 2 إلى 4 مهارات تم العمل عليها في هذه الجلسة"
+          ? "اختر من 2 لـ 4 مهارات اتشتغل عليها في الجلسة دي"
           : "Select 2–4 skills worked on in this session"
       );
       return;
@@ -186,7 +186,7 @@ export default function SessionReflectionForm({
       {/* Header */}
       <div>
         <p className="text-xs font-bold uppercase tracking-widest text-[#F59E0B] mb-1">
-          {isAr ? "تقرير المرشد" : "Mentor Reflection"}
+          {isAr ? "تقرير المنتور" : "Mentor Reflection"}
         </p>
         <h2 className="text-xl font-black text-white">
           {isAr ? `جلسة ${clientName}` : `${clientName}'s Session`}
@@ -405,7 +405,7 @@ export default function SessionReflectionForm({
             </h3>
             <p className="text-xs text-white/40">
               {isAr
-                ? "حدّد الأهداف التي أكملها العميل في هذه الجلسة"
+                ? "حدّد الأهداف اللي خلّصها العميل في الجلسة دي"
                 : "Mark milestones the client completed in this session"}
             </p>
           </div>

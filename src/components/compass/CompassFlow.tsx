@@ -479,7 +479,7 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
         {/* Micro-action */}
         <div className="bg-[rgba(255,255,255,0.03)] border border-white/8 rounded-2xl p-5">
           <p className="text-white/40 text-xs font-semibold uppercase tracking-widest mb-2">
-            {isAr ? "خطوة الآن" : "One step now"}
+            {isAr ? "خطوة دلوقتي" : "One step now"}
           </p>
           <p className="text-white/75 text-sm leading-6">
             {isAr ? r.microAction_ar : r.microAction_en}

@@ -542,18 +542,18 @@ VALUES
     'c1b2c3d4-0001-0001-0001-000000000001',
     '3 تقنيات لتحسين إنتاجيتك اليومية',
     '3 Techniques to Improve Your Daily Productivity',
-    'في هذا الفيديو نتحدث عن 3 تقنيات بسيطة وفعالة لتحسين إنتاجيتك اليومية',
+    'في الفيديو ده بنشرح 3 تقنيات بسيطة وفعالة لتحسين إنتاجيتك اليومية وبتخليك تنجز أكتر في وقت أقل',
     'In this video we discuss 3 simple and effective techniques to improve your daily productivity',
-    'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    NULL,
     'https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=800'
   ),
   (
     'c1b2c3d4-0002-0002-0002-000000000002',
     'كيف تبني عادات صحية تدوم',
     'How to Build Lasting Healthy Habits',
-    'تعلم العلم وراء بناء العادات وكيف تجعلها تدوم مدى الحياة',
+    'اتعرّف على العلم وراء بناء العادات وإزاي تخليها تدوم طول عمرك، مش بس شهر أو اتنين',
     'Learn the science behind habit building and how to make them last a lifetime',
-    'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    NULL,
     'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800'
   )
 ON CONFLICT (id) DO NOTHING;

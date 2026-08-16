@@ -93,7 +93,7 @@ export default async function AdminClientsPage() {
               {rows.length === 0 ? (
                 <tr>
                   <td colSpan={5} style={{ padding: "48px 24px", textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: "0.9rem" }}>
-                    {isAr ? "لا يوجد عملاء بعد" : "No clients yet"}
+                    {isAr ? "مفيش عملاء بعد" : "No clients yet"}
                   </td>
                 </tr>
               ) : (

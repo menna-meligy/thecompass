@@ -122,7 +122,7 @@ function DimensionGroup({
           <div className="text-center py-8">
             <BookOpen className="h-7 w-7 text-white/8 mx-auto mb-2" />
             <p className="text-white/20 text-sm">
-              {isAr ? "لا توجد مهارات في هذا البُعد بعد" : "No skills in this dimension yet"}
+              {isAr ? "مفيش مهارات في البُعد ده بعد" : "No skills in this dimension yet"}
             </p>
           </div>
         ) : (

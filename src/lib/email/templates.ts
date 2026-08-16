@@ -119,9 +119,9 @@ export function activationEmail(d: ActivationEmailData): { subject: string; html
       <p style="line-height:1.7; margin:0 0 12px;">أهلاً ${d.userName}،</p>
       <p style="line-height:1.7; margin:0 0 12px;">شكراً على التسجيل معنا! عشان نتأكد إن البريد الإلكتروني بتاعك صحيح، لازم تضغط على الزرار تحت وتفعّل حسابك.</p>
       <div style="text-align: center; margin: 20px 0;">
-        ${ctaButton(d.activationLink, "فعّل الحساب الآن")}
+        ${ctaButton(d.activationLink, "فعّل الحساب دلوقتي")}
       </div>
-      <p style="line-height:1.7; margin:0; font-size:13px; color:rgba(255,255,255,0.6);">اللينك صالح لمدة ٢٤ ساعة بس. لو لم تتسجل أنت بتاعك، متقلقش ولا حتحصل حاجة.</p>
+      <p style="line-height:1.7; margin:0; font-size:13px; color:rgba(255,255,255,0.6);">اللينك صالح لمدة ٢٤ ساعة بس. لو ما سجلتش أنت بتاعك، متقلقش ولا حتحصل حاجة.</p>
     `),
   };
 }

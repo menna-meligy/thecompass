@@ -106,7 +106,7 @@ export default async function AdminDashboardPage() {
           {!todayAgenda || todayAgenda.length === 0 ? (
             <div className="text-center py-8">
               <Calendar className="h-8 w-8 text-white/10 mx-auto mb-2" />
-              <p className="text-white/30 text-sm">{isAr ? "لا توجد جلسات اليوم" : "No sessions today"}</p>
+              <p className="text-white/30 text-sm">{isAr ? "مفيش جلسات النهاردة" : "No sessions today"}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -157,7 +157,7 @@ export default async function AdminDashboardPage() {
           {!pendingList || pendingList.length === 0 ? (
             <div className="text-center py-8">
               <CheckCircle2 className="h-8 w-8 text-emerald-500/30 mx-auto mb-2" />
-              <p className="text-white/30 text-sm">{isAr ? "لا يوجد شيء معلق" : "All clear!"}</p>
+              <p className="text-white/30 text-sm">{isAr ? "كل حاجة تمام تمام" : "All clear!"}</p>
             </div>
           ) : (
             <div className="space-y-2">

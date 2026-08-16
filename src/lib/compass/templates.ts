@@ -159,7 +159,7 @@ export const NARRATIVES: Record<Zone, BilingualString> = {
 
 export const MICRO_ACTIONS: Record<string, BilingualString> = {
   session: {
-    ar: "اكتب 3 أشياء تريد أن تكون قد تحققت لك بعد 6 أشهر من الآن، أي أشياء، ما يخطر في بالك بصدق.",
+    ar: "اكتب 3 حاجات بتمنى تحصل ليك بعد 6 شهور من دلوقتي، أي حاجة، أي حاجة بتخطر في بالك بصدق.",
     en: "Write down 3 things you want to have happened in your life 6 months from now; anything that comes to mind honestly.",
   },
   PRD: {

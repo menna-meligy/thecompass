@@ -142,7 +142,7 @@ export default async function BookingsPage() {
           }}>
             <div style={{ fontSize: "2.5rem", marginBottom: "14px" }}>📋</div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.95rem", marginBottom: "8px", fontWeight: 600 }}>
-              {isAr ? "لا توجد حجوزات حتى الآن" : "No bookings yet"}
+              {isAr ? "مفيش حجوزات لحد دلوقتي" : "No bookings yet"}
             </p>
             <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.8rem", marginBottom: "20px" }}>
               {isAr ? "ابدأ رحلتك بحجز جلسة أو ورشة عمل" : "Start your journey by booking a session or workshop"}
