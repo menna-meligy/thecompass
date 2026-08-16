@@ -54,19 +54,14 @@ export default function AdminReflectionDetailPage() {
             private_notes,
             encouragement_ar,
             encouragement_en,
-            submitted_at,
-            mentor:profiles(full_name, email),
-            user:profiles!client_id(full_name, email),
-            booking:bookings(
-              session:sessions(starts_at, workshop:workshops(title_ar, title_en))
-            )
+            submitted_at
           `
           )
           .eq("id", reflectionId)
           .single();
 
         if (fetchError) throw fetchError;
-        setReflection(data as ReflectionDetail);
+        setReflection(data as unknown as ReflectionDetail);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : (isAr ? "خطأ في التحميل" : "Failed to load")
