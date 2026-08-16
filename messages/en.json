@@ -11,7 +11,7 @@
   },
   "home": {
     "heroTitle": "Find Your Direction",
-    "heroSubtitle": "The Compass: A coaching and self-development platform designed to guide you toward your goals",
+    "heroSubtitle": "A path that looks like you — one made just for you",
     "heroButton": "Start Your Journey",
     "heroSecondaryButton": "Explore Workshops",
     "featuredWorkshops": "Featured Workshops",
@@ -139,7 +139,7 @@
   },
   "vlogs": {
     "title": "Educational Content",
-    "subtitle": "Videos and diverse content to support your journey",
+    "subtitle": "Science-backed articles, told simply, to support your career journey",
     "watch": "Watch",
     "empty": "No content yet",
     "error": "Error loading content"

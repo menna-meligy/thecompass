@@ -223,6 +223,9 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
+# Set true (here for local, and in the hosted dashboard for prod) to send the
+# البوصلة account-activation email on signup. The app already shows a
+# "check your email" state (AuthForm.handleRegister).
 enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
@@ -232,6 +235,12 @@ max_frequency = "1s"
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
 otp_expiry = 3600
+
+# Branded البوصلة account-activation email. Applies when enable_confirmations = true.
+# (Sender name: SMTP sender_name for local; Auth → Emails in the hosted dashboard for prod.)
+[auth.email.template.confirmation]
+subject = "تفعيل حساب البوصلة | The Compass — Account Activation"
+content_path = "./supabase/templates/confirmation.html"
 
 # Use a production-ready SMTP server
 # [auth.email.smtp]

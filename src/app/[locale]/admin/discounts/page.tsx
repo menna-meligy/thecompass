@@ -86,7 +86,7 @@ export default function AdminDiscountsPage() {
         }
       />
 
-      <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl overflow-hidden">
+      <div className="hidden sm:block bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[600px]">
             <thead>
@@ -175,6 +175,27 @@ export default function AdminDiscountsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {codes.length === 0 ? (
+          <div className="py-12 text-center text-white/25 text-sm">{isAr ? "لا توجد أكواد" : "No codes"}</div>
+        ) : codes.map((code) => (
+          <div key={code.id} className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-mono text-sm font-bold text-[#F59E0B] tracking-wider">{code.code}</span>
+              <span className={cn("inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold", code.is_active ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-white/30")}>{code.is_active ? (isAr ? "نشط" : "Active") : (isAr ? "معطل" : "Inactive")}</span>
+            </div>
+            <div className="flex items-center justify-between text-xs text-white/50 mb-3">
+              <span>{code.type === "percent" ? (isAr ? "نسبة" : "Percent") : (isAr ? "ثابت" : "Fixed")}: <span className="text-white font-semibold">{code.type === "percent" ? `${code.value}%` : `${code.value} ${isAr ? "ج" : "EGP"}`}</span></span>
+              <span>{isAr ? "الاستخدام" : "Uses"}: {code.used_count}/{code.max_uses ?? "∞"}</span>
+            </div>
+            <button onClick={() => handleToggle(code.id, code.is_active)} disabled={toggling === code.id} className={cn("w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all border disabled:opacity-40", code.is_active ? "bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20" : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20")}>
+              {code.is_active ? <><ToggleRight className="h-3.5 w-3.5" />{isAr ? "تعطيل" : "Disable"}</> : <><ToggleLeft className="h-3.5 w-3.5" />{isAr ? "تفعيل" : "Enable"}</>}
+            </button>
+          </div>
+        ))}
       </div>
 
       <Modal

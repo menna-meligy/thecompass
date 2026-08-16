@@ -81,6 +81,8 @@ export function AuthForm() {
       password: data.password,
       options: {
         data: { full_name: data.full_name },
+        // Where the activation link lands after the user confirms their email.
+        emailRedirectTo: `${window.location.origin}/${locale}/dashboard`,
       },
     });
     if (error) {
@@ -90,7 +92,7 @@ export function AuthForm() {
       router.push(`/${locale}/dashboard`);
       router.refresh();
     } else {
-      setMessage("تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتفعيل الحساب.");
+      setMessage("تم إنشاء حسابك في البوصلة 🧭 — بعتنالك إيميل التفعيل، افتحه واضغط \"تفعيل الحساب\" عشان تبدأ رحلتك.");
     }
     setLoading(false);
   }

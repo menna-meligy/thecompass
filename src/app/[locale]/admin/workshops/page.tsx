@@ -43,7 +43,7 @@ export default async function AdminWorkshopsPage() {
         }
       />
 
-      <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl overflow-hidden">
+      <div className="hidden sm:block bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[480px]">
             <thead>
@@ -91,6 +91,28 @@ export default async function AdminWorkshopsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {(!workshops || workshops.length === 0) ? (
+          <div className="py-12 text-center text-white/25 text-sm">{t("noData")}</div>
+        ) : (workshops as Workshop[]).map((workshop) => (
+          <div key={workshop.id} className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-4">
+            <p className="text-white text-sm font-semibold mb-3">
+              {getLocalizedField(workshop as unknown as Record<string, unknown>, "title", locale)}
+            </p>
+            <div className="flex items-center justify-between gap-2">
+              <TopicBadge topic={workshop.topic} locale={locale} />
+              <Link href={`/${locale}/admin/workshops/${workshop.id}/edit`}>
+                <Button size="sm" variant="outline">
+                  <Edit className="h-3 w-3 me-1" />
+                  {t("edit")}
+                </Button>
+              </Link>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -37,6 +37,18 @@ export default async function BookingsPage() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  // bookings→payments is one-to-many, so PostgREST returns `payment` as an array.
+  // Collapse it to the most-recent single payment so the UI reads it as an object.
+  const rows = ((bookings as unknown as Booking[]) ?? []).map((b) => {
+    const pay = (b as unknown as { payment?: unknown }).payment;
+    const single = Array.isArray(pay)
+      ? [...(pay as { created_at?: string }[])].sort(
+          (a, z) => new Date(z.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
+        )[0]
+      : pay;
+    return { ...b, payment: (single ?? undefined) as Booking["payment"] };
+  });
+
   const isAr = locale === "ar";
 
   return (
@@ -122,7 +134,7 @@ export default async function BookingsPage() {
           </h2>
         </div>
 
-        {!bookings || bookings.length === 0 ? (
+        {rows.length === 0 ? (
           <div style={{
             background: "rgba(30,41,59,0.4)", border: "1px solid rgba(245,158,11,0.10)",
             borderRadius: "12px", textAlign: "center", padding: "56px 24px",
@@ -164,7 +176,7 @@ export default async function BookingsPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {(bookings as unknown as Booking[]).map((booking) => {
+            {rows.map((booking) => {
               const workshopTitle = getLocalizedField(
                 (booking.session?.workshop as unknown as Record<string, unknown>) || {},
                 "title", locale

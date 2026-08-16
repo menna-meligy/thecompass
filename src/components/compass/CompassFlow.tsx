@@ -486,15 +486,13 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
           </p>
         </div>
 
-        {/* Retake */}
+        {/* Once-a-month rule — the next reading unlocks after the cooldown, not now */}
         <div className="text-center pt-2 pb-8">
-          <button
-            onClick={handleRetake}
-            className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-sm transition-colors"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-            {isAr ? "إعادة التقييم" : "Retake assessment"}
-          </button>
+          <p className="text-white/30 text-xs max-w-sm mx-auto leading-relaxed">
+            {isAr
+              ? "تقييم واحد كل شهر — تقييمك الجاي هيفتح الشهر الجاي عشان التقدم يبان بصدق."
+              : "One assessment a month — your next reading unlocks next month so progress shows honestly."}
+          </p>
         </div>
       </div>
     );

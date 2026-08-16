@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useTranslations, useLocale } from "next-intl";
 import { getLocalizedField } from "@/lib/utils";
+import { topicLabel } from "@/lib/topics";
 import type { Workshop } from "@/types/index";
 import { ArrowRight, ArrowLeft, Users, Compass } from "lucide-react";
 import WorkshopGraphic from "./WorkshopGraphic";
@@ -44,8 +45,8 @@ export function WorkshopCard({ workshop }: WorkshopCardProps) {
         {/* Topic tag */}
         {workshop.topic && (
           <div style={{ position: "absolute", top: "14px", insetInlineStart: "14px" }}>
-            <span style={{ background: "rgba(15,23,42,0.72)", border: "1px solid rgba(245,158,11,0.3)", color: "#FCD34D", fontSize: "0.62rem", fontWeight: 800, padding: "4px 10px", borderRadius: "6px", textTransform: "uppercase", letterSpacing: "0.08em", backdropFilter: "blur(4px)" }}>
-              {workshop.topic.replace("-", " ")}
+            <span style={{ background: "rgba(15,23,42,0.72)", border: "1px solid rgba(245,158,11,0.3)", color: "#FCD34D", fontSize: "0.62rem", fontWeight: 800, padding: "4px 10px", borderRadius: "6px", letterSpacing: "0.04em", backdropFilter: "blur(4px)" }}>
+              {topicLabel(workshop.topic, locale)}
             </span>
           </div>
         )}

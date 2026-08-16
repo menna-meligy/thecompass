@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getLocalizedField } from "@/lib/utils";
+import { topicLabel } from "@/lib/topics";
 import { CheckCircle2, Users, Target, Compass, ArrowRight, ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
 import type { Session, WorkshopOutlineItem } from "@/types/index";
 import WorkshopGraphic from "@/components/workshops/WorkshopGraphic";
@@ -57,9 +58,9 @@ export default async function WorkshopDetailPage(props: PageProps<"/[locale]/wor
             >
               {workshop.topic && (
                 <span
-                  style={{ alignSelf: isRtl ? "flex-end" : "flex-start", marginBottom: "1.15rem", fontSize: "0.68rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.16em", padding: "5px 14px", borderRadius: "999px", background: `${accentColor}1f`, border: `1px solid ${accentColor}4d`, color: accentColor }}
+                  style={{ alignSelf: isRtl ? "flex-end" : "flex-start", marginBottom: "1.15rem", fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.08em", padding: "5px 14px", borderRadius: "999px", background: `${accentColor}1f`, border: `1px solid ${accentColor}4d`, color: accentColor }}
                 >
-                  {workshop.topic.replace("-", " ")}
+                  {topicLabel(workshop.topic, locale)}
                 </span>
               )}
               <h1 style={{ fontSize: "clamp(2rem, 4vw, 2.9rem)", fontWeight: 900, color: "#fff", lineHeight: 1.2, marginBottom: "1rem" }}>

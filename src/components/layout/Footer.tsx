@@ -88,7 +88,7 @@ export function Footer() {
                   {isRtl ? "البوصلة" : "The Compass"}
                 </div>
                 <div className="text-[#F59E0B]/60 text-xs mt-0.5">
-                  {isRtl ? "دليلك نحو أهدافك" : "Your compass to your goals"}
+                  {isRtl ? "ليك طريق شبهك.. طريق مخصوص ليك" : "A Path That's Yours"}
                 </div>
               </div>
             </div>
@@ -164,7 +164,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="tel:+201027857707"
+                  href="tel:+201093026726"
                   className="flex items-center gap-3 text-sm text-white/45 hover:text-white transition-colors group"
                 >
                   <div
@@ -173,7 +173,7 @@ export function Footer() {
                   >
                     <Phone className="h-3.5 w-3.5 text-[#F59E0B]/60" />
                   </div>
-                  01027857707
+                  01093026726
                 </a>
               </li>
             </ul>

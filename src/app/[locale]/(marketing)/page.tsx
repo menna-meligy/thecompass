@@ -2,8 +2,9 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import WorkshopCard from "@/components/workshops/WorkshopCard";
-import VlogCard from "@/components/vlogs/VlogCard";
-import type { Workshop, Vlog, Announcement } from "@/types/index";
+import ArticleCard from "@/components/content/ArticleCard";
+import { getAllArticles } from "@/content/articles";
+import type { Workshop, Announcement } from "@/types/index";
 import { getLocalizedField } from "@/lib/utils";
 import { BookOpen, Users, Star, ChevronRight, Award } from "lucide-react";
 import JourneyRoad from "@/components/home/JourneyRoad";
@@ -14,46 +15,46 @@ export default async function HomePage() {
   const locale = await getLocale();
   const supabase = await createClient();
 
-  const [{ data: workshops }, { data: vlogs }, { data: announcements }] =
+  const [{ data: workshops }, { data: announcements }] =
     await Promise.all([
       supabase.from("workshops").select("*").limit(3),
-      supabase.from("vlogs").select("*").order("created_at", { ascending: false }).limit(3),
       supabase
         .from("announcements")
         .select("*")
         .eq("is_active", true)
         .order("created_at", { ascending: false }),
     ]);
+  const articles = getAllArticles().slice(0, 3);
 
   const testimonials = [
     {
       name: "سارة أحمد",
       role: "مطورة برمجيات",
-      text: "البوصلة غيّرت مسار حياتي المهنية بالكامل. الورش عملية ومفيدة جداً وأحسست إن عندي اتجاه واضح للأول مرة.",
+      text: "البوصلة غيّرت مسار حياتي المهنية بالكامل. الورش عملية ومفيدة جداً و7aset إن عندي اتجاه واضح للأول مرة.",
       stars: 5,
       avatar: "سأ",
     },
     {
       name: "محمد علي",
       role: "رائد أعمال",
-      text: "أحسن استثمار لنفسي. المنتور محترف جداً وبيفهم احتياجات كل شخص. ورشة بناء هوية العمل غيّرت كل حاجة.",
+      text: "أحسن استثمار لنفسي. المنتور محترف جداً وبيفهم احتياجات كل شخص. اكسر الدايرة غيّرت كل حاجة.",
       stars: 5,
       avatar: "مع",
     },
     {
       name: "نور حسن",
       role: "مديرة مشاريع",
-      text: "تجربة جامدة! اتعلمت إزاي أحط أهداف واقعية وأحققها خطوة بخطوة. دلوقتي عندي خارطة طريق واضحة.",
+      text: "تجربة جامدة! اتعلمت إزاي أحط أهداف واقعية وأحققها خطوة بخطوة. دلوقتي عندي خريطة واضحة وواثقة بنفسي.",
       stars: 5,
       avatar: "نح",
     },
   ];
 
   const stats = [
-    { valueAr: "٥٠٠+", valueEn: "500+", labelAr: "عميل راضٍ", labelEn: "Happy Clients", icon: Users },
-    { valueAr: "٢٠+", valueEn: "20+", labelAr: "ورشة متخصصة", labelEn: "Workshops", icon: BookOpen },
-    { valueAr: "٩٨٪", valueEn: "98%", labelAr: "نسبة الرضا", labelEn: "Satisfaction", icon: Star },
-    { valueAr: "٥+", valueEn: "5+", labelAr: "سنوات خبرة", labelEn: "Years of Experience", icon: Award },
+    { valueAr: "50", valueEn: "50", labelAr: "حصلوا على منح", labelEn: "Got Scholarships", icon: Award },
+    { valueAr: "123", valueEn: "123", labelAr: "في وظايف أحلامهم", labelEn: "Found Dream Jobs", icon: Users },
+    { valueAr: "+800", valueEn: "+800", labelAr: "في الكليات اللي حابينها", labelEn: "In Dream Colleges", icon: BookOpen },
+    { valueAr: "+3", valueEn: "+3", labelAr: "سنين خبرة وتطور", labelEn: "Years of Growth", icon: Star },
   ];
 
   const isRtl = locale === "ar";
@@ -121,7 +122,7 @@ export default async function HomePage() {
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B", fontSize: "0.8rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", borderRadius: "6px" }}>
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#F59E0B", animation: "pulse 2s infinite", flexShrink: 0 }} />
-              {isRtl ? "منصة التطوير الشخصي والمهني" : "Personal & Professional Development"}
+              {isRtl ? "ليك طريق شبهك.. طريق مخصوص ليك" : "A Path That's Yours"}
             </div>
           </div>
 
@@ -132,7 +133,6 @@ export default async function HomePage() {
 
           {/* Headline */}
           <h1 style={{ fontSize: "clamp(2.8rem, 7vw, 5rem)", fontWeight: 900, lineHeight: 1.05, color: "white", marginBottom: "1.5rem" }}>
-            {t("heroTitle")}
             <span
               style={{
                 display: "block",
@@ -300,8 +300,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── Latest Vlogs ── */}
-      {vlogs && vlogs.length > 0 && (
+      {/* ── Latest Content ── */}
+      {articles.length > 0 && (
         <section className="bg-[#0d1526]" style={{paddingTop:"4rem",paddingBottom:"4rem"}}>
           <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
             {/* Centered section header */}
@@ -311,13 +311,13 @@ export default async function HomePage() {
                 {t("latestVlogs")}
               </h2>
               <p className="text-white/45 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
-                {isRtl ? "محتوى مرئي لإلهامك وتوجيهك" : "Video content to inspire and guide you"}
+                {isRtl ? "مقالات علمية بأسلوب بسيط لإلهامك وتوجيهك" : "Science-backed articles to inspire and guide you"}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-              {(vlogs as Vlog[]).map((vlog) => (
-                <VlogCard key={vlog.id} vlog={vlog} />
+              {articles.map((article) => (
+                <ArticleCard key={article.slug} article={article} locale={locale} />
               ))}
             </div>
 
@@ -333,6 +333,48 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* ── CEO Inspiration ── */}
+      <section className="bg-[#0d1526]" style={{paddingTop:"4rem",paddingBottom:"4rem"}}>
+        <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:"1.5rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
+            <h2 className="text-3xl md:text-4xl font-black text-white" style={{ marginBottom: "0.85rem" }}>
+              {isRtl ? "كلمة من مؤسسة البوصلة" : "A Message from Menna"}
+            </h2>
+            <p className="text-white/45 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
+              {isRtl ? "اتعرّف على الرؤية ورا البوصلة والحكاية اللي شجعتنا نبني ده" : "Get inspired by the vision behind البوصلة"}
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            {/* Video/Image placeholder */}
+            <div className="rounded-2xl overflow-hidden" style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.15)",aspectRatio:"16/9",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <div style={{textAlign:"center",color:"rgba(245,158,11,0.4)",fontSize:"0.9rem"}}>
+                {isRtl ? "الفيديو هنا" : "Video placeholder"}
+              </div>
+            </div>
+            {/* Text content */}
+            <div>
+              <p className="text-white/70 text-base leading-relaxed mb-4" style={{lineHeight:1.8}}>
+                {isRtl
+                  ? "البوصلة نشأت من إحساس بسيط: كل شخص يستحق طريق واضح ومخصوص بيه. أنا عرفت إن التوجيه والتدريب الشخصي يمكن يغيّر حياة كاملة، وفكرت: ليه محدش خلق منصة تجمع التقييم الصادق والتطوير الحقيقي والجلسات الفردية في مكان واحد؟"
+                  : "The Compass was born from a simple feeling: everyone deserves a clear, personalized path. I knew that real guidance and personal coaching could change entire lives, and I thought: why hasn't someone created a platform that combines honest assessment, genuine development, and 1-on-1 coaching in one place?"}
+              </p>
+              <p className="text-white/70 text-base leading-relaxed mb-6" style={{lineHeight:1.8}}>
+                {isRtl
+                  ? "رحلتك مهمة، وأنت مهم. وأنا هنا عشان أساعدك تصير النسخة الأفضل من نفسك."
+                  : "Your journey matters. You matter. And I'm here to help you become the best version of yourself."}
+              </p>
+              <div style={{display:"flex",gap:"1rem"}}>
+                <div style={{fontSize:"0.9rem"}}>
+                  <div style={{color:"#F59E0B",fontWeight:700,marginBottom:"0.25rem"}}>Menna Elmelegy</div>
+                  <div style={{color:"rgba(255,255,255,0.45)",fontSize:"0.85rem"}}>Founder & Career Coach</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* ── CTA Band ── */}
       <section className="relative bg-[#0f172a] overflow-hidden" style={{paddingTop:"4.5rem",paddingBottom:"4.5rem"}}>

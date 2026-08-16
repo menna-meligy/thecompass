@@ -8,7 +8,7 @@ import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 
-const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707";
+const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093026726";
 const VODAFONE_NUMBER = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
 // Merchant's own InstaPay payment link / Vodafone Cash link (set these to your
 // account's real link so the button + QR open the app addressed to you).
@@ -215,7 +215,7 @@ export default function BookingFlow({
         setTimeout(() => setStep("confirmed"), 1200);
       } else {
         // Collect every failing check so we can tell the client exactly what's wrong.
-        const KNOWN = ["amount_mismatch", "date_too_old", "date_future", "amount_unreadable", "date_unreadable", "reference_missing", "duplicate_reference", "duplicate_proof"];
+        const KNOWN = ["amount_mismatch", "date_too_old", "date_future", "amount_unreadable", "date_unreadable", "reference_missing", "duplicate_reference", "duplicate_proof", "upload_failed"];
         const errs: string[] = (Array.isArray(result.errors) ? result.errors : [result.error]).filter((e: string) => KNOWN.includes(e));
         if (errs.length > 0) {
           setVerifyErrors(errs);
@@ -405,11 +405,12 @@ export default function BookingFlow({
             duplicate_reference: { ar: "رقم العملية ده مستخدم قبل كده.", en: "This transaction reference was already used." },
             duplicate_proof: { ar: "الإيصال ده مستخدم قبل كده.", en: "This receipt was already used." },
             reference_missing: { ar: "مقدرناش نلاقي رقم العملية في الإيصال.", en: "We couldn't find the transaction reference in the receipt." },
+            upload_failed: { ar: "حصلت مشكلة في رفع صورة الإيصال، جرّب تاني.", en: "There was a problem uploading the receipt image, please try again." },
           };
           return (
             <div style={{ padding: "14px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
               <p style={{ fontWeight: 800, marginBottom: "8px", color: "#F87171" }}>
-                {isAr ? "الدفع مترفض:" : "Payment rejected:"}
+                {isAr ? "الدفع مرفوض:" : "Payment rejected:"}
               </p>
               <ul style={{ margin: 0, paddingInlineStart: "18px", listStyle: "disc", display: "flex", flexDirection: "column", gap: "4px" }}>
                 {verifyErrors.map((e) => (

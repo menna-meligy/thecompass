@@ -10,30 +10,41 @@ interface VlogCardProps {
   duration?: string; // e.g. "12:35"
 }
 
+/**
+ * A link is only "playable" if it's a real http(s) URL and not one of the known
+ * placeholders (seed `REPLACE_ME_n` links or the rick-roll demo id). Unplayable
+ * cards render as a non-clickable "coming soon" tile instead of a dead link.
+ */
+function isPlayable(url?: string | null): boolean {
+  if (!url) return false;
+  const u = url.trim();
+  if (!/^https?:\/\//i.test(u)) return false;
+  if (/REPLACE_ME/i.test(u)) return false;
+  if (/dQw4w9WgXcQ/.test(u)) return false;
+  return true;
+}
+
 export function VlogCard({ vlog, duration }: VlogCardProps) {
   const locale = useLocale();
   const isRtl = locale === "ar";
   const title = getLocalizedField(vlog as unknown as Record<string, unknown>, "title", locale);
   const description = getLocalizedField(vlog as unknown as Record<string, unknown>, "description", locale);
+  const playable = isPlayable(vlog.video_url);
 
-  return (
-    <a
-      href={vlog.video_url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group workshop-card"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        background: "rgba(15,23,42,0.7)",
-        border: "1px solid rgba(245,158,11,0.14)",
-        borderRadius: "16px",
-        boxShadow: "0 4px 28px rgba(0,0,0,0.45)",
-        textDecoration: "none",
-        height: "100%",
-      }}
-    >
+  const cardStyle = {
+    display: "flex",
+    flexDirection: "column" as const,
+    overflow: "hidden",
+    background: "rgba(15,23,42,0.7)",
+    border: "1px solid rgba(245,158,11,0.14)",
+    borderRadius: "16px",
+    boxShadow: "0 4px 28px rgba(0,0,0,0.45)",
+    textDecoration: "none",
+    height: "100%",
+  };
+
+  const inner = (
+    <>
       {/* Thumbnail (or branded graphic when none is set) */}
       <div style={{ position: "relative", height: "180px", flexShrink: 0 }}>
         {vlog.thumbnail_url ? (
@@ -49,15 +60,17 @@ export function VlogCard({ vlog, duration }: VlogCardProps) {
         {/* Bottom fade into the body */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(15,23,42,0.9) 2%, transparent 42%)" }} />
 
-        {/* Play button — appears on hover */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div
-            className="flex items-center justify-center"
-            style={{ width: "56px", height: "56px", borderRadius: "50%", background: "#F59E0B", boxShadow: "0 4px 20px rgba(245,158,11,0.4)" }}
-          >
-            <Play className="h-6 w-6 text-[#0f172a] ms-0.5 fill-[#0f172a]" />
+        {/* Play button — appears on hover (only for playable videos) */}
+        {playable && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div
+              className="flex items-center justify-center"
+              style={{ width: "56px", height: "56px", borderRadius: "50%", background: "#F59E0B", boxShadow: "0 4px 20px rgba(245,158,11,0.4)" }}
+            >
+              <Play className="h-6 w-6 text-[#0f172a] ms-0.5 fill-[#0f172a]" />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Content tag */}
         <div style={{ position: "absolute", top: "14px", insetInlineStart: "14px" }}>
@@ -113,16 +126,38 @@ export function VlogCard({ vlog, duration }: VlogCardProps) {
             )}
           </span>
 
-          <span
-            className="workshop-card-cta"
-            style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.83rem", fontWeight: 800, color: "#0f172a", background: "#F59E0B", padding: "8px 16px", borderRadius: "8px" }}
-          >
-            {isRtl ? "اتفرّج دلوقتي" : "Watch Now"}
-            <Play style={{ width: "14px", height: "14px" }} className="fill-current" />
-          </span>
+          {playable ? (
+            <span
+              className="workshop-card-cta"
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.83rem", fontWeight: 800, color: "#0f172a", background: "#F59E0B", padding: "8px 16px", borderRadius: "8px" }}
+            >
+              {isRtl ? "اتفرّج دلوقتي" : "Watch Now"}
+              <Play style={{ width: "14px", height: "14px" }} className="fill-current" />
+            </span>
+          ) : (
+            <span
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "0.83rem", fontWeight: 800, color: "rgba(255,255,255,0.55)", background: "rgba(148,163,184,0.12)", border: "1px solid rgba(148,163,184,0.25)", padding: "8px 16px", borderRadius: "8px" }}
+            >
+              {isRtl ? "قريبًا" : "Coming soon"}
+            </span>
+          )}
         </div>
       </div>
-    </a>
+    </>
+  );
+
+  // Playable → a real link that opens the video; otherwise a non-clickable tile.
+  if (playable) {
+    return (
+      <a href={vlog.video_url} target="_blank" rel="noopener noreferrer" className="group workshop-card" style={cardStyle}>
+        {inner}
+      </a>
+    );
+  }
+  return (
+    <div className="workshop-card" style={{ ...cardStyle, cursor: "default" }} aria-disabled="true">
+      {inner}
+    </div>
   );
 }
 

@@ -16,6 +16,8 @@ import {
   Clock,
   ExternalLink,
   ChevronDown,
+  Menu,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -121,6 +123,7 @@ function NavGroupSection({ group, locale, defaultOpen = true }: { group: NavGrou
 
 export function AdminSidebar() {
   const locale = useLocale();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const groups: NavGroup[] = [
     {
@@ -178,7 +181,32 @@ export function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-64 min-h-screen flex-shrink-0 flex flex-col relative overflow-hidden bg-gradient-to-b from-[#0a0f1a] to-[#0d1526] border-e border-[rgba(245,158,11,0.08)]">
+    <>
+      {/* Mobile hamburger — opens the drawer */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        aria-label={locale === "ar" ? "افتح القائمة" : "Open menu"}
+        className="md:hidden fixed top-3 z-[60] flex items-center justify-center w-10 h-10 rounded-lg bg-[#0d1526] border border-[rgba(245,158,11,0.25)] text-[#F59E0B] shadow-lg"
+        style={{ insetInlineStart: "12px" }}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/60 z-40"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+    <aside
+      style={{ insetInlineStart: 0 }}
+      className={cn(
+        "w-64 min-h-screen flex-shrink-0 flex-col relative overflow-hidden bg-gradient-to-b from-[#0a0f1a] to-[#0d1526] border-e border-[rgba(245,158,11,0.08)] md:flex md:static",
+        mobileOpen ? "flex fixed inset-y-0 z-50" : "hidden",
+      )}>
       {/* Star dots */}
       <svg viewBox="0 0 256 768" xmlns="http://www.w3.org/2000/svg"
         className="absolute inset-0 w-full h-full pointer-events-none select-none"
@@ -206,14 +234,21 @@ export function AdminSidebar() {
               <div className="font-black text-white text-base leading-tight tracking-wide">البوصلة</div>
               <div className="flex items-center gap-1 text-white/40 text-[0.65rem] font-semibold tracking-widest uppercase">
                 <GoldCompassIcon className="h-3 w-3" />
-                <span>Console</span>
+                <span>{locale === "ar" ? "الإدارة" : "Console"}</span>
               </div>
             </div>
+            <button
+              onClick={() => setMobileOpen(false)}
+              aria-label={locale === "ar" ? "إغلاق" : "Close"}
+              className="md:hidden ms-auto text-white/40 hover:text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
           </div>
         </div>
 
         {/* Nav groups */}
-        <nav className="flex-1 p-3 overflow-y-auto space-y-1" style={{ scrollbarWidth: "none" }}>
+        <nav className="flex-1 p-3 overflow-y-auto space-y-1" style={{ scrollbarWidth: "none" }} onClick={() => setMobileOpen(false)}>
           {groups.map((group) => (
             <NavGroupSection key={group.groupEn} group={group} locale={locale} defaultOpen />
           ))}
@@ -233,6 +268,7 @@ export function AdminSidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
 

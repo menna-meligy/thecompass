@@ -1,0 +1,726 @@
+{
+  "find-your-compass": {
+    "slug": "find-your-compass",
+    "readMinutes": 6,
+    "hook_ar": [
+      "هاجر قاعدة على مكتبها الساعة 11 بالليل، بتترجم عقد قانوني للمرة التالتة. المرتب حلو، والناس بتقولها إنها محظوظة. بس هي حاسة إن كل يوم بيعدي منها زي ما هو، وفي وسط جواها صوت بيسألها: هو أنا رايحة فين أصلاً؟",
+      "لو الإحساس ده عدى عليك، إنت مش لوحدك ومفيش حاجة غلط فيك. مش كل حد لازم يكون عارف طريقه من الأول. البوصلة مش حاجة بتيجي جاهزة في إيدك، دي حاجة بتتبني بأسئلة صح. تعالى نتعلم إزاي تسأل."
+    ],
+    "hook_en": [
+      "Hager is at her desk at 11 p.m., translating a legal contract for the third time. The pay is good, and everyone tells her she's lucky. But every day feels identical, and a quiet voice keeps asking: where am I actually headed?",
+      "If that feeling is familiar, you're not alone and nothing is wrong with you. Not everyone has it figured out from day one. A compass isn't something handed to you ready-made; it's something you build by asking the right questions. Let's learn how to ask."
+    ],
+    "sections": [
+      {
+        "heading_ar": "ابدأ من الأسئلة، مش من الإجابات",
+        "heading_en": "Start With Questions, Not Answers",
+        "paras_ar": [
+          "أغلبنا اتربى على سؤال واحد: 'عايز تبقى إيه لما تكبر؟' وكإن فيه إجابة واحدة صح مستنياك. المشكلة إن السؤال ده بيدور على وجهة نهائية، والحقيقة إن الاتجاه بيتكشف وإنت ماشي، مش قبل ما تتحرك.",
+          "بدل ما تسأل 'إيه الشغلانة الصح؟'، اسأل أسئلة أدق: إمتى آخر مرة نسيت الوقت وإنت شغال؟ أنهي مهمة الناس دايماً بتيجي لك فيها؟ إيه اللي لو اتشال من يومك هتحس إنك خسرت حاجة؟ الأسئلة دي بتطلّع بيانات حقيقية عنك، مش أمنيات."
+        ],
+        "paras_en": [
+          "Most of us grew up with one question: 'What do you want to be when you grow up?' As if a single right answer is out there waiting. The trouble is that question hunts for a final destination, when direction is actually revealed as you move, not before you take a step.",
+          "Instead of asking 'What's the right job?', ask sharper questions: When did you last lose track of time while working? Which task do people always come to you for? What, if removed from your day, would feel like a real loss? These questions surface real data about you, not wishful thinking."
+        ],
+        "science_ar": "الفكرة دي مبنية على مفهوم Ikigai الياباني: نقطة التقاطع بين اللي بتحبه، واللي شاطر فيه، واللي العالم محتاجه، واللي ممكن تتدفع عليه.",
+        "science_en": "This draws on the Japanese concept of Ikigai: the overlap between what you love, what you're good at, what the world needs, and what you can be paid for.",
+        "stat": {
+          "value": "44",
+          "unit_ar": "%",
+          "unit_en": "%",
+          "label_ar": "من الموظفين حوالين العالم بيقولوا إنهم مش مرتبطين بشغلهم ذهنياً، حسب مسح Gallup السنوي",
+          "label_en": "of employees worldwide report low engagement at work, per Gallup's annual survey"
+        }
+      },
+      {
+        "heading_ar": "فرّق بين اللي بتحبه واللي بتقدّره",
+        "heading_en": "Separate What You Enjoy From What You Value",
+        "paras_ar": [
+          "في فرق كبير بين الاهتمامات والقيم. الاهتمام هو حاجة بتشدك دلوقتي: التصميم، الأرقام، الكتابة. القيمة هي حاجة أعمق: الاستقلالية، مساعدة الناس، التعلم المستمر، الأمان. الاهتمامات بتتغير مع الوقت، بس القيم بتفضل هي البوصلة اللي بترجعلها.",
+          "هاجر ممكن تكون مش بتكره الترجمة، بس اللي بيوجعها إنها مش شايفة أثر لشغلها على حد. لو قيمتها الأساسية هي 'الأثر'، يبقى القرار مش إنها تسيب الترجمة، لكن إنها تدور على نوع ترجمة بتوصّل لناس محتاجاها فعلاً. لما تعرف قيمك، القرارات بتبقى أوضح."
+        ],
+        "paras_en": [
+          "There's a big difference between interests and values. An interest is something that pulls you now: design, numbers, writing. A value is deeper: autonomy, helping people, constant learning, security. Interests shift over time, but values stay the compass you keep returning to.",
+          "Hager may not hate translation; what stings is that she can't see her work landing on anyone. If her core value is 'impact', the move isn't to quit translating, but to find a kind of translation that reaches people who genuinely need it. Once you know your values, decisions get clearer."
+        ],
+        "science_ar": "ده جوهر الاختيار المهني المبني على القيم (values-based career choice): إن قراراتك تتبني على مبادئك الثابتة مش على اهتماماتك المتغيرة.",
+        "science_en": "This is the heart of values-based career choice: building decisions on your stable principles rather than your shifting interests."
+      },
+      {
+        "heading_ar": "دوّر على دوافعك الداخلية، مش بس المكافأة",
+        "heading_en": "Chase Intrinsic Drive, Not Just Reward",
+        "paras_ar": [
+          "فيه نوعين من الدافع: دافع خارجي زي الفلوس والمناصب وكلام الناس، ودافع داخلي بييجي من إنك حاسس إنك بتتطور، وليك اختيار، ومرتبط بناس بتفرق معاك. الدافع الخارجي بيشغّلك فترة، لكنه بيخلص. الداخلي هو اللي بيخليك تكمل حتى في الأيام الصعبة.",
+          "جرّب تعمل تشريح لأي يوم شغل عدى عليك حلو: كنت بتاخد قرارات بنفسك ولا بتنفّذ أوامر؟ حسّيت إنك اتقنت حاجة ولا لأ؟ كنت مع ناس بتحترمك؟ التلات حاجات دول لو موجودين، إنت قريب من طريقك. لو ناقصين، دي مش علامة فشل، دي خريطة بتقولك تعدّل فين."
+        ],
+        "paras_en": [
+          "There are two kinds of motivation: extrinsic, like money, titles, and other people's approval, and intrinsic, which comes from feeling you're growing, that you have a choice, and that you're connected to people who matter. Extrinsic drive runs you for a while, then burns out. Intrinsic drive is what keeps you going on the hard days.",
+          "Try dissecting any workday that felt good: were you making decisions or just following orders? Did you feel you mastered something? Were you around people who respect you? When those three show up, you're close to your path. When they're missing, that's not failure, it's a map telling you where to adjust."
+        ],
+        "science_ar": "ده لبّ نظرية تقرير المصير (Self-Determination Theory) لديسي وريان: الدافع الداخلي بيتغذى على تلات حاجات، الاستقلالية والكفاءة والارتباط بالناس.",
+        "science_en": "This is the core of Self-Determination Theory (Deci and Ryan): intrinsic motivation feeds on three needs, autonomy, competence, and relatedness.",
+        "stat": {
+          "value": "3",
+          "unit_ar": "احتياجات",
+          "unit_en": "needs",
+          "label_ar": "الاستقلالية والكفاءة والارتباط: التلات ركائز اللي عليهم بيتبني الدافع الداخلي حسب نظرية تقرير المصير",
+          "label_en": "autonomy, competence, and relatedness: the three pillars of intrinsic motivation in Self-Determination Theory"
+        }
+      },
+      {
+        "heading_ar": "ابنِ على قوتك، وسيبك من صوت الناس",
+        "heading_en": "Build on Your Strengths, Tune Out the Noise",
+        "paras_ar": [
+          "الناس حوالينك هيدّوك اتجاهات كتير، وكل واحد بيتكلم من تجربته هو مش تجربتك إنت. عمك بيقولك 'الطب أضمن'، صاحبتك بتقولك 'الـ freelance هو المستقبل'. النصايح دي مش وحشة، بس هي بوصلة الناس التانية، مش بوصلتك. اللي ماشي معاهم مش شرط يمشي معاك.",
+          "بدل ما تركّز على اللي إنت ضعيف فيه وتحاول تصلّحه طول الوقت، اسأل نفسك: أنا شاطر في إيه لدرجة إني بستهون بيه وأفكر إنه سهل على الكل؟ ده غالباً بيبقى نقطة قوتك الحقيقية. الطريق اللي بيتبني على قوتك بيتحمل تعب أطول من الطريق اللي بتحارب فيه نفسك."
+        ],
+        "paras_en": [
+          "The people around you will hand you plenty of directions, and each one speaks from their own experience, not yours. Your uncle says 'medicine is safer', your friend says 'freelancing is the future'. The advice isn't bad, but it's other people's compass, not yours. What works for them won't necessarily work for you.",
+          "Instead of fixating on your weaknesses and trying to patch them forever, ask: what am I so good at that I underrate it and assume it's easy for everyone? That's usually your real strength. A path built on your strengths sustains far more effort than one where you're constantly fighting yourself."
+        ],
+        "science_ar": "ده مبدأ الاختيار المهني المبني على نقاط القوة (strengths-based career choice): إنك تبني اتجاهك على اللي بتتفوق فيه طبيعياً بدل ما تصرف طاقتك في ترقيع نقاط ضعفك.",
+        "science_en": "This is strengths-based career choice: building your direction on what you naturally excel at, rather than draining energy patching your weaknesses."
+      }
+    ],
+    "takeaway_ar": [
+      "بدل سؤال 'عايز تبقى إيه؟'، اسأل 'إمتى بنسى الوقت وأنا شغال؟' وسجّل الإجابات أسبوع كامل، دي بياناتك الحقيقية.",
+      "اكتب أهم 3 قيم عندك (زي الاستقلالية أو الأثر أو الأمان)، وقيس أي فرصة جاية عليها، مش على رأي الناس.",
+      "شرّح آخر يوم شغل حسّيت فيه بالرضا: دوّر على الاستقلالية والكفاءة والارتباط، وامشي في الاتجاه اللي بيديك التلاتة."
+    ],
+    "takeaway_en": [
+      "Swap 'what do you want to be?' for 'when do I lose track of time while working?' and log the answers for a full week; that's your real data.",
+      "Write your top 3 values (like autonomy, impact, or security) and measure every opportunity against them, not against other people's opinions.",
+      "Dissect the last workday you felt satisfied: look for autonomy, competence, and relatedness, and move toward whatever gives you all three."
+    ]
+  },
+  "feeling-lost": {
+    "slug": "feeling-lost",
+    "readMinutes": 6,
+    "hook_ar": [
+      "كريم قاعد على مكتبه الساعة 11 بالليل، فاتح اللينكدإن، بيتفرج على زمايله اللي اترقّوا وهو في نفس المكان بقاله سنتين. مش فاشل، بيسلّم شغله في معاده، مديره راضي عنه. بس جواه حاسس إن في حاجة واقفة، وكل يوم بيعدي هو بيسأل نفس السؤال: 'أنا رايح فين بالظبط؟'",
+      "لو الكلام ده بيوصفك، خليني أقولك حاجة من الأول: التوهان مش معناه إنك فاشل. ده معناه إنك وصلت لمحطة لازم تقف عندها وتعيد الحساب. الفرق بين اللي بيفضل تايه واللي بيلاقي طريقه مش الشطارة، ده الطريقة اللي بيسأل بيها نفسه."
+    ],
+    "hook_en": [
+      "It is 11 p.m. and Karim is at his desk, scrolling LinkedIn, watching colleagues get promoted while he has been in the same seat for two years. He is not failing. He delivers on time, his manager is happy. But something inside feels stalled, and every day he asks the same question: where exactly am I going?",
+      "If that sounds like you, let me say this first: feeling lost is not a sign that you are failing. It is a signal that you have reached a station where you need to stop and recalculate. The difference between staying lost and finding your way is not talent. It is the way you question yourself."
+    ],
+    "sections": [
+      {
+        "heading_ar": "الوقفة دي طبيعية، مش نهاية الطريق",
+        "heading_en": "This Plateau Is Normal, Not the End of the Road",
+        "paras_ar": [
+          "اللي حاسس بيه كريم ليه اسم في علم المسار المهني: 'البلاتوه' أو الهضبة. وهي مرحلة بتيجي لأغلب الناس، لما بتوصل لمستوى إنت شاطر فيه بجد، بس مفيش تحدي جديد ولا خطوة واضحة قدامك. الشغل بيمشي، بس الإحساس بالتقدم بيقف.",
+          "الغلطة إن الناس بتفسّر الوقفة دي على إنها حكم عليهم: 'يبقى أنا مش كفاية.' لأ. الهضبة مش دليل ضعف، دي علامة إنك خلصت المرحلة اللي إنت فيها ومحتاج تعرّف بنفسك تحدي جديد. الكوتش أول حاجة بيعملها إنه بيطمّنك إن ده مكان، مش هوية."
+        ],
+        "paras_en": [
+          "What Karim feels has a name in career research: the plateau. It is a stage most people hit, when you reach a level you are genuinely good at, but there is no fresh challenge and no obvious next step. The work still moves. The sense of progress stops.",
+          "The mistake is reading the plateau as a verdict: 'so I am not enough.' No. A plateau is not proof of weakness. It is a sign that you have finished the level you are on and need to define a new challenge. The first thing a coach does is remind you this is a place, not an identity."
+        ],
+        "science_ar": "المفهوم: 'الهضبة المهنية' (Career Plateau) — مرحلة مدروسة وطبيعية في أي مسار، مش فشل.",
+        "science_en": "The concept: the 'career plateau' — a well-studied, normal stage in any path, not a failure.",
+        "stat": {
+          "value": "~2",
+          "unit_ar": "سنة",
+          "unit_en": "years",
+          "label_ar": "متوسط المدة اللي بيفضل فيها الموظف في نفس الدور قبل ما يحس بالوقفة",
+          "label_en": "typical time in the same role before people start to feel stalled"
+        }
+      },
+      {
+        "heading_ar": "الفرق بين إنك تلفّ في دماغك وإنك تفكّر بجد",
+        "heading_en": "The Difference Between Looping and Actually Reflecting",
+        "paras_ar": [
+          "كريم فاكر إنه بيفكر في مستقبله. بس اللي بيعمله فعلاً إنه بيعيد نفس الشريط: 'ليه أنا كده؟ ليه الناس سبقتني؟' ده مش تفكير، ده اجترار — دورة مقفولة بتزوّد القلق ومبتوصّلش لحاجة. المخ بيلف في نفس النقطة من غير باب يخرج منه.",
+          "التأمل الحقيقي عكس كده تماماً: أسئلة محددة بمخرج. مش 'ليه أنا تايه؟' لكن 'إمتى آخر مرة حسيت إني متحمس في شغلي؟ إيه اللي كان فيه؟' الكوتش بيحوّل اللفّان لأسئلة ليها إجابة، وده اللي بينقلك من الدوّامة للخطوة."
+        ],
+        "paras_en": [
+          "Karim thinks he is planning his future. What he is actually doing is replaying the same tape: 'why am I like this? why did everyone pass me?' That is not thinking. It is rumination, a closed loop that grows anxiety and leads nowhere. The mind circles one spot with no exit.",
+          "Real reflection is the opposite: specific questions with a way out. Not 'why am I lost?' but 'when did I last feel energized at work, and what was in that moment?' A coach turns the looping into questions that have answers, and that is what moves you from the spiral to a step."
+        ],
+        "science_ar": "المفهوم: الفرق بين الاجترار (Rumination) واللفّ في الدماغ، والتأمل (Reflection) المنظّم بأسئلة محددة.",
+        "science_en": "The concept: the difference between rumination (looping) and structured reflection (specific questions).",
+        "stat": {
+          "value": "3",
+          "unit_ar": "أسئلة",
+          "unit_en": "questions",
+          "label_ar": "كل ما تنقل الاجترار لتأمل بسؤال محدد وله مخرج، بتقرّب خطوة",
+          "label_en": "each vague worry you turn into a specific, answerable question moves you a step"
+        }
+      },
+      {
+        "heading_ar": "خطتك مش هتيجي كلها من التخطيط",
+        "heading_en": "Your Path Won't Come From Planning Alone",
+        "paras_ar": [
+          "كريم مستني اللحظة اللي هتتضح فيها الصورة كاملة قبل ما يتحرك. بس المسارات الحقيقية نادراً ما بتتبني كده. جون كرمبولتز، عالم نفسي في ستانفورد، لقى إن معظم الناس وصلوا لشغلهم عن طريق أحداث مخططهاش — مكالمة، لقاء، فرصة جت بالصدفة.",
+          "نظريته اسمها 'الصدفة المخططة': الصدفة بتلعب دور، بس اللي بيستفيد منها هو اللي عنده فضول بيجرّب، وإصرار بيكمّل. يعني مش هتقعد تستنى الوضوح، إنت بتخلق فرص للصدفة تشتغل: تكلّم حد، تجرّب مشروع صغير، تقول 'أيوة' لحاجة مش متأكد منها."
+        ],
+        "paras_en": [
+          "Karim is waiting for the full picture to become clear before he moves. But real careers are rarely built that way. John Krumboltz, a Stanford psychologist, found that most people landed their work through events they never planned: a call, a chance meeting, an opportunity that just appeared.",
+          "His theory is called Planned Happenstance: chance plays a role, but the person who benefits is the one with the curiosity to try and the persistence to follow through. So you do not sit waiting for clarity. You create chances for luck to work: talk to someone, run a small experiment, say 'yes' to something you are unsure about."
+        ],
+        "science_ar": "المفهوم: نظرية 'الصدفة المخططة' لكرمبولتز (Planned Happenstance) — الفضول والإصرار بيحوّلوا الصدفة لفرصة.",
+        "science_en": "The concept: Krumboltz's Planned Happenstance Theory — curiosity and persistence turn chance into opportunity."
+      },
+      {
+        "heading_ar": "قدراتك مش متسمّرة — دي بتكبر",
+        "heading_en": "Your Abilities Aren't Fixed — They Grow",
+        "paras_ar": [
+          "في صوت جوّه كريم بيقوله: 'أنا نوعي كده، مش هتقدر أتعلم حاجة جديدة في السن ده.' الصوت ده اسمه 'العقلية الثابتة' — إنك بتفتكر إن قدراتك رقم ثابت اتولدت بيه وخلاص. والعقلية دي بتخليك تهرب من أي تحدي عشان تحميه من الفشل.",
+          "كارول دويك، عالمة نفس في ستانفورد، أثبتت إن العكس هو الحقيقة: المهارات بتتبني بالممارسة، والمخ بيتغير مع كل تحدي. لما تقول 'أنا لسه معرفتش' بدل 'أنا مش قدها'، بتفتح باب التعلم. التوهان بيبقى أخف بكتير لما تعرف إنك تحت التمرين مش تحت الحكم."
+        ],
+        "paras_en": [
+          "There is a voice inside Karim saying: 'this is just who I am, I can't learn something new at this age.' That voice is the fixed mindset — believing your abilities are a fixed number you were born with. That belief makes you dodge every challenge to protect yourself from failing.",
+          "Carol Dweck, a Stanford psychologist, showed the opposite is true: skills are built through practice, and the brain changes with every challenge. When you say 'I haven't learned it yet' instead of 'I can't,' you open the door to learning. Feeling lost gets far lighter once you know you are in training, not on trial."
+        ],
+        "science_ar": "المفهوم: عقلية النمو مقابل العقلية الثابتة لكارول دويك (Growth vs Fixed Mindset).",
+        "science_en": "The concept: Carol Dweck's growth versus fixed mindset."
+      }
+    ],
+    "takeaway_ar": [
+      "سمّي اللي بتحس بيه صح: دي 'هضبة' طبيعية في المسار، مش حكم إنك فاشل.",
+      "حوّل اللفّان في دماغك لسؤال محدد وله مخرج، زي: 'إمتى آخر مرة حسيت بحماس، وإيه اللي كان فيه؟'",
+      "متستناش الوضوح — اعمل حركة صغيرة تخلّي الصدفة تشتغل: كلّم حد، جرّب مشروع، قول 'أيوة' لفرصة."
+    ],
+    "takeaway_en": [
+      "Name it correctly: this is a normal plateau in your path, not a verdict that you are failing.",
+      "Turn the looping into one specific, answerable question, like: 'when did I last feel energized, and what was in that moment?'",
+      "Don't wait for clarity — make one small move that lets luck work: talk to someone, run an experiment, say 'yes' to an opportunity."
+    ]
+  },
+  "professional-identity": {
+    "slug": "professional-identity",
+    "readMinutes": 6,
+    "hook_ar": [
+      "تخيل يوسف داخل انترفيو. لسه ماقالش غير \"صباح الخير\" وسلّم بإيده، والمقابلة اتكوّن عنده انطباع كامل عنه. مش عن شهاداته، ولا عن الـ CV اللي قدامها — لأ، عن يوسف نفسه. ثقته، صوته، الطريقة اللي بيبص بيها في عينها.",
+      "المشكلة إن يوسف فاكر إن هويته المهنية هي الورقتين بتوع السيرة الذاتية. بس الحقيقة إن هويتك المهنية أعمق من كده بكتير: هي القصة اللي بتحكيها عن نفسك، والصورة اللي الناس بتقرأها منك في أول خمس دقايق. تعال نبنيها صح."
+    ],
+    "hook_en": [
+      "Picture Youssef walking into an interview. He has only said \"good morning\" and shaken a hand, and the interviewer has already formed a full impression of him. Not of his degrees, not of the CV on the desk — of Youssef himself. His confidence, his voice, the way he holds eye contact.",
+      "The trouble is that Youssef thinks his professional identity is those two pages of a resume. But your professional identity runs much deeper: it is the story you tell about yourself, and the picture people read off you in the first five minutes. Let's build it right."
+    ],
+    "sections": [
+      {
+        "heading_ar": "أول خمس دقايق بتكتب كل حاجة",
+        "heading_en": "The First Five Minutes Write the Rest",
+        "paras_ar": [
+          "الدماغ البشري مش بيستنى. قبل ما إنت تخلص جملتك الأولى، الشخص اللي قدامك يكون بنى انطباع عنك من إشارات صغيرة: نبرة صوتك، وقفتك، ابتسامتك. العلماء بيسموا ده \"thin-slicing\" — إن الناس بتاخد شريحة رفيعة جدًا من سلوكك وتبني عليها حكم كامل، وغالبًا بيكون دقيق بشكل مرعب.",
+          "الخطر إن الانطباع الأول ده مش بيقف عند نفسه. لو ظهرت واثق ومرتب، الناس بتفترض إنك كمان شاطر وأمين ومنظم — من غير أي دليل. ده اسمه \"halo effect\"، إن صفة واحدة إيجابية بتلوّن كل الصفات التانية. فبدل ما تحارب النظام ده، اشتغل معاه: خلّي أول انطباع يشتغل لصالحك مش ضدك."
+        ],
+        "paras_en": [
+          "The human brain does not wait. Before you finish your first sentence, the person across from you has built an impression from tiny cues: your tone, your posture, your smile. Psychologists call this \"thin-slicing\" — people take an incredibly thin slice of your behavior and build a whole judgment on it, and it is often unnervingly accurate.",
+          "The catch is that this first impression does not stay put. If you come across as confident and put-together, people assume you are also competent, honest, and organized — with no other evidence. That is the \"halo effect\": one positive trait bleeds into all the others. So instead of fighting the system, work with it: make that first impression land in your favor, not against you."
+        ],
+        "science_ar": "العِلم: thin-slicing وبحث Ambady و Rosenthal — الناس بتحكم في ثوان، والحكم ده بيتلوّن بالـ halo effect.",
+        "science_en": "The science: thin-slicing and the work of Ambady & Rosenthal — people judge in seconds, and that judgment gets colored by the halo effect.",
+        "stat": {
+          "value": "0.1",
+          "unit_ar": "ثانية",
+          "unit_en": "second",
+          "label_ar": "الوقت اللي محتاجه وش إنسان عشان يكوّن حكم عن الثقة والجاذبية (Willis & Todorov)",
+          "label_en": "the time a face needs to trigger a judgment of trustworthiness and likability (Willis & Todorov)"
+        }
+      },
+      {
+        "heading_ar": "إنت القصة اللي بتحكيها عن نفسك",
+        "heading_en": "You Are the Story You Tell About Yourself",
+        "paras_ar": [
+          "لما حد يسألك \"احكيلي عن نفسك\"، إنت مش بتسرد وظايف — إنت بتحكي قصة. عالم النفس Dan McAdams سمّى ده \"narrative identity\": إن كل واحد فينا بيبني هويته من الحكاية اللي بيرويها عن ماضيه وحاضره وطموحه. مش الأحداث نفسها اللي بتحدد مين إنت، لأ، الطريقة اللي بتربطهم بيها في خيط واحد له معنى.",
+          "يعني بدل ما تقول \"اشتغلت هنا سنتين وبعدين سبت\"، تقول \"اتعلمت هناك إزاي أبني فريق من الصفر، وحبيت الجزء ده لدرجة إني دورت على تحدي أكبر\". نفس الحقايق، بس القصة بقت ليها اتجاه ومعنى. هويتك المهنية بتتبني من الخيط ده — مش من قايمة تواريخ."
+        ],
+        "paras_en": [
+          "When someone says \"tell me about yourself,\" you are not listing jobs — you are telling a story. The psychologist Dan McAdams called this \"narrative identity\": each of us builds an identity from the tale we tell about our past, present, and where we are headed. It is not the events themselves that define you, but the way you thread them into one meaningful line.",
+          "So instead of \"I worked there two years then left,\" you say \"That is where I learned to build a team from scratch, and I loved it so much I went looking for a bigger challenge.\" Same facts, but now the story has a direction and a point. Your professional identity is built from that thread — not from a list of dates."
+        ],
+        "science_ar": "العِلم: narrative identity عند Dan McAdams — احنا القصة اللي بنحكيها عن نفسنا، مش قايمة الأحداث.",
+        "science_en": "The science: Dan McAdams' narrative identity — we are the story we tell about ourselves, not the list of events."
+      },
+      {
+        "heading_ar": "سمعتك: اللي الناس بتقوله وإنت مش موجود",
+        "heading_en": "Reputation: What People Say When You Leave the Room",
+        "paras_ar": [
+          "فيه تعريف بسيط وقاسي للسمعة: هي اللي الناس بتقوله عنك بعد ما تسيب الأوضة. إنت مش موجود عشان تدافع عن نفسك، فاللي بيتقال هو الحكاية الحقيقية اللي بنيتها من غير ما تحس. وده اللي بيفتحلك أبواب أو بيقفلها من غير ما تعرف السبب.",
+          "والسمعة دي بتتبني بالتناسق (consistency). لو إنت الشخص اللي بيرد على الإيميلات، وبيسلّم في ميعاده، وبيقول \"مش عارف\" لما مايعرفش — كل تصرف من دول بيبعت إشارة (signal) واضحة إنك موثوق. التناسق مش ممل، التناسق هو اللي بيخلي الناس تراهن عليك."
+        ],
+        "paras_en": [
+          "There is a simple, brutal definition of reputation: it is what people say about you after you leave the room. You are not there to defend yourself, so what gets said is the real story you have quietly built. And that is what opens doors for you, or quietly closes them, without your ever knowing why.",
+          "Reputation is built through consistency. If you are the person who answers emails, delivers on time, and says \"I don't know\" when they don't — every one of those acts sends a clear signal that you are reliable. Consistency is not boring; consistency is what makes people willing to bet on you."
+        ],
+        "science_ar": "العِلم: السمعة كإشارة (signaling) بتتبني بالتناسق — اللي الناس بتقوله وإنت مش في الأوضة.",
+        "science_en": "The science: reputation as a signal built through consistency — what people say when you are not in the room.",
+        "stat": {
+          "value": "5",
+          "unit_ar": "دقايق",
+          "unit_en": "minutes",
+          "label_ar": "أول خمس دقايق بتحدد الإطار اللي الناس بتقرا بيه كل اللي بعده — فاصنعها بوعي",
+          "label_en": "the first five minutes set the frame people read everything else through — so shape them deliberately"
+        }
+      }
+    ],
+    "takeaway_ar": [
+      "اهتم بأول خمس دقايق زي ما بتهتم بالـ CV: نبرة صوتك ووقفتك بيبعتوا إشارة قبل ما تتكلم.",
+      "جهّز قصتك المهنية في خيط واحد له معنى — مش قايمة وظايف، لأ، حكاية ليها اتجاه.",
+      "ابنِ سمعتك بالتناسق: خلّي تصرفاتك ثابتة عشان الناس تقول عنك كويس وإنت مش موجود."
+    ],
+    "takeaway_en": [
+      "Treat the first five minutes like you treat your CV: your tone and posture send a signal before you speak.",
+      "Prepare your professional story as one meaningful thread — not a list of jobs, but a tale with direction.",
+      "Build your reputation through consistency: keep your actions steady so people speak well of you when you're not there."
+    ]
+  },
+  "salary-negotiation": {
+    "slug": "salary-negotiation",
+    "readMinutes": 6,
+    "hook_ar": [
+      "منى قاعدة قدام المدير، والإنترفيو مشى تمام. فجأة بيسألها: \"إنتي متوقعة كام؟\" جواها رقم، بس صوت صغير بيهمس: \"متطمعيش، وافقي وخلاص.\" قالت رقم أقل من اللي في دماغها بألفين جنيه، عشان متبانش طماعة. المدير هز راسه بسرعة ووافق في ثانية. وهنا حسّت إنها غلطت.",
+      "الموقف ده بيتكرر مع كتير مننا. بنوافق على أول رقم عشان نتجنب إحساس إننا بنطمع أو بنعمل مشكلة. بس التفاوض مش قلة أدب ولا طمع، ده جزء طبيعي ومتوقع من أي شغل. المدير نفسه مستني إنك تتكلمي. تعالي نفهم إزاي تتفاوضي بثقة ومن غير ذنب."
+    ],
+    "hook_en": [
+      "Mona sat across from the hiring manager, and the interview had gone well. Then came the question: \"What number are you expecting?\" A figure lived in her head, but a small voice whispered: \"Don't be greedy, just say yes.\" So she named a number two thousand pounds lower than the one she wanted, just so she wouldn't seem grasping. The manager nodded instantly and agreed. That's when she knew she'd slipped.",
+      "This scene repeats for so many of us. We accept the first number to avoid feeling greedy or difficult. But negotiating isn't rudeness or greed, it's a normal, expected part of any job. The manager is actually waiting for you to speak. Let's understand how to negotiate with confidence, and without the guilt."
+    ],
+    "sections": [
+      {
+        "heading_ar": "أول رقم بيحكم اللعبة كلها",
+        "heading_en": "The First Number Rules Everything",
+        "paras_ar": [
+          "لما المدير بيقولك \"الميزانية حوالي عشرة آلاف\"، دماغك بتتعلق في الرقم ده وبيبقى نقطة البداية لأي كلام بعد كده. حتى لو إنت عارفة إن شغلك يستاهل أكتر، الرقم الأول بيشدّك ناحيته، وكل مساومة بتدور حواليه. ده مش ضعف فيكي، ده الطريقة اللي مخنا شغال بيها.",
+          "عشان كده مهم إنك تدخلي بأرقام السوق قبل المقابلة، وتكوني إنتي اللي طرحتي رقم مدروس ومبني على قيمة شغلك، مش رقم من الهوا. لو عندك رقم واقعي وقوي في إيدك، الحوار كله هيتحرك ناحية اللي إنتي عايزاه، مش اللي هما بدأوا بيه."
+        ],
+        "paras_en": [
+          "When the manager says \"the budget is around ten thousand,\" your mind latches onto that figure and it becomes the starting point for everything that follows. Even if you know your work is worth more, that first number tugs you toward it, and every counter-offer orbits around it. That's not weakness in you, it's simply how the brain works.",
+          "That's why it matters to walk in knowing market rates, and to be the one who puts forward a considered number rooted in the value of your work, not a figure pulled from thin air. When you hold a realistic, strong number, the whole conversation shifts toward what you want, instead of where they began."
+        ],
+        "science_ar": "الظاهرة دي اسمها انحياز التثبيت (Anchoring Bias)، اكتشفها العالمين تفرسكي وكانمان: أول رقم بيتقال بيشتغل زي المرساة وبيسحب باقي المفاوضة ناحيته.",
+        "science_en": "This is called anchoring bias (Tversky & Kahneman): the first number thrown out acts like an anchor and drags the rest of the negotiation toward it.",
+        "stat": {
+          "value": "~2x",
+          "unit_ar": "ضعف",
+          "unit_en": "times",
+          "label_ar": "قوة تأثير أول رقم على النتيجة النهائية مقارنة بأي رقم بعده",
+          "label_en": "how strongly the first number pulls the final outcome compared with later ones"
+        }
+      },
+      {
+        "heading_ar": "مين يقول الرقم الأول؟",
+        "heading_en": "Who Names the Number First?",
+        "paras_ar": [
+          "فيه نصيحة قديمة بتقول \"استني هما يقولوا الرقم الأول.\" النصيحة دي منطقية لما إنت مش عارفة حاجة عن السوق أو عن الشركة. بس لو عملتي بحثك كويس وعارفة رينج السوق، إنك تبدئي إنتي بيديكي ميزة، لإنك بتحطي المرساة عند رقم بيخدمك.",
+          "الحيلة إنك تبدئي برقم طموح بس معقول، مش رقم خيالي يخلي الحوار يقف. لو بدأتي واطي عشان الأدب، حطيتي المرساة ضدك بإيدك. القاعدة البسيطة: لو معلوماتك أقوى منهم، اتكلمي الأول. لو معلوماتك ضعيفة، خليهم يبدأوا وبعدين تفاوضي من مكان أعرف."
+        ],
+        "paras_en": [
+          "There's an old piece of advice: \"Let them say the first number.\" It makes sense when you know nothing about the market or the company. But if you've done your homework and know the market range, opening first gives you an edge, because you get to set the anchor at a number that serves you.",
+          "The trick is to open with a number that's ambitious but reasonable, not a fantasy figure that stalls the conversation. If you open low out of politeness, you've set the anchor against yourself. The simple rule: if your information is stronger than theirs, speak first. If it's weak, let them open, then negotiate from a more informed place."
+        ],
+        "science_ar": "الحكمة هنا مبنية على نفس مبدأ التثبيت: صاحب المعلومة الأقوى بيكسب لما يحط المرساة الأول، والطرف التاني بيفضل يتفاوض حواليها.",
+        "science_en": "The wisdom here builds on the same anchoring principle: the better-informed side wins by setting the anchor first, and the other party ends up negotiating around it."
+      },
+      {
+        "heading_ar": "قوّتك الحقيقية: البديل اللي في إيدك",
+        "heading_en": "Your Real Power: The Alternative in Your Hand",
+        "paras_ar": [
+          "أكبر مصدر ثقة في أي تفاوض مش الكلام الحلو، ده إنك يكون عندك خطة بديلة. لو معاكي عرض تاني، أو شغلك الحالي كويس وإنتي مش محتاجة تنطي، بتتكلمي وإنتي مطمنة إنك مش هتخسري حاجة. البديل ده هو اللي بيديكي القدرة تقولي \"لأ\" من غير خوف.",
+          "قبل أي مقابلة، اسألي نفسك: لو الاتفاق ده ماحصلش، أنا هعمل إيه؟ الإجابة دي هي حدّك اللي مش هتنزلي تحته. من غير بديل واضح، أي رقم بيبان مغري وبتوافقي من خوف. مع بديل قوي، بتفاوضي من مكان قوة، والطرف التاني بيحس بده حتى لو مقلتيهوش."
+        ],
+        "paras_en": [
+          "The biggest source of confidence in any negotiation isn't smooth talk, it's having a backup plan. If you hold another offer, or your current job is solid and you don't need to jump, you speak from a place of calm because you have nothing to lose. That alternative is what lets you say \"no\" without fear.",
+          "Before any meeting, ask yourself: if this deal falls through, what will I do? That answer is your floor, the line you won't drop below. Without a clear alternative, any number looks tempting and you accept out of fear. With a strong one, you negotiate from strength, and the other side feels it even if you never say it aloud."
+        ],
+        "science_ar": "المبدأ ده اسمه BATNA يعني أفضل بديل لاتفاق متفاوَض عليه، من كتاب \"Getting to Yes\" لفيشر ويوري: كل ما بديلك أقوى، قدرتك على التفاوض بتبقى أكبر.",
+        "science_en": "This is called BATNA, your Best Alternative To a Negotiated Agreement, from \"Getting to Yes\" by Fisher & Ury: the stronger your alternative, the greater your power to negotiate.",
+        "stat": {
+          "value": "1",
+          "unit_ar": "بديل",
+          "unit_en": "alternative",
+          "label_ar": "بديل واحد جاهز يكفي يقلب ميزان التفاوض لصالحك",
+          "label_en": "one ready alternative is enough to tip the balance in your favor"
+        }
+      },
+      {
+        "heading_ar": "الرينج والسكوت: أدوات بسيطة بتفرق",
+        "heading_en": "The Range and the Silence: Small Tools That Matter",
+        "paras_ar": [
+          "بدل ما تقولي رقم واحد جامد، اطرحي رينج معقول، زي \"من اتناشر لخمستاشر ألف\"، بس خلي أقل رقم في الرينج ده لسه رقم إنتي مبسوطة بيه. الرينج بيخلي الحوار مفتوح ومرن، ومبيوقفش الطرف التاني عند نقطة واحدة. ولما تتكلمي، اربطي الرقم بقيمتك مش باحتياجك: قولي إنتي بتقدمي إيه، مش إنك محتاجة تدفعي إيجار.",
+          "ولما يقولك رقم أقل من المتوقع، متردّيش بسرعة. اسكتي شوية، خلي في لحظة صمت. السكوت بيخلي الطرف التاني يحس إن الرقم واطي وكتير بيبدأ يحسّن العرض من نفسه عشان يملا الفراغ. الصمت مش إحراج، ده أداة تفاوض قوية وهادية."
+        ],
+        "paras_en": [
+          "Instead of naming one rigid figure, offer a reasonable range, like \"between twelve and fifteen thousand,\" but make sure the bottom of that range is still a number you'd be happy with. A range keeps the conversation open and flexible, and doesn't pin the other side to a single point. And when you speak, tie the number to your value, not your need: talk about what you bring, not that you have rent to pay.",
+          "When they name a number lower than expected, don't reply quickly. Pause, let a moment of silence sit. That silence makes the other side feel the number was low, and many will start improving the offer on their own just to fill the gap. Silence isn't awkwardness, it's a strong and quiet negotiation tool."
+        ],
+        "science_ar": "دول تكتيكين معروفين: الفريمنج بالرينج بدل النقطة الواحدة، وتكتيك \"الفلينش\" أو السكوت اللي بيدفع الطرف التاني يحسّن عرضه، مع قاعدة التفاوض على القيمة مش الاحتياج.",
+        "science_en": "These are two well-known tactics: framing with a range instead of a single point, and the \"flinch\" or silence tactic that nudges the other side to improve their offer, alongside the rule of negotiating on value, not need."
+      }
+    ],
+    "takeaway_ar": [
+      "اعملي بحثك عن رينج السوق قبل أي مقابلة، وادخلي برقم مبني على قيمة شغلك مش من الهوا.",
+      "جهّزي بديلك (BATNA) قبل ما تتكلمي، عشان تقدري تقولي لأ من غير خوف، وده اللي بيديكي ثقتك الحقيقية.",
+      "اطرحي رينج بدل رقم واحد، واستخدمي الصمت بعد أي عرض واطي، وافتكري إن التفاوض حق طبيعي مش قلة أدب."
+    ],
+    "takeaway_en": [
+      "Do your homework on the market range before any meeting, and open with a number rooted in the value of your work, not thin air.",
+      "Prepare your BATNA before you speak, so you can say no without fear, that's what gives you real confidence.",
+      "Offer a range instead of a single number, use silence after any low offer, and remember that negotiating is a normal right, not rudeness."
+    ]
+  },
+  "work-life-balance": {
+    "slug": "work-life-balance",
+    "readMinutes": 6,
+    "hook_ar": [
+      "منى بتشتغل في شركة تسويق، وبقالها سنتين هي أول واحدة بترد على الإيميل الصبح وآخر واحدة بتقفل اللابتوب بالليل. كل مرة يطلب منها المدير حاجة، بتقول \"تمام\" على طول. النجاح جه فعلاً: ترقية، مشاريع أكبر، ناس بتحترم شغلها.",
+      "بس من شهرين، بقت تصحى تعبانة قبل ما اليوم يبدأ. الشغل اللي كانت بتحبه بقى تقيل، وبقت تحس إن مفيش فايدة من أي حاجة بتعملها. منى مش كسلانة ولا فشلت — منى في أول طريق الاحتراق الوظيفي، والفرق إنها لسه ماخدتش بالها."
+    ],
+    "hook_en": [
+      "Mona works at a marketing firm. For two years she's been the first to answer email in the morning and the last to close her laptop at night. Whenever her manager asks for something, she says yes instantly. And success came: a promotion, bigger projects, people who respect her work.",
+      "But two months ago she started waking up already tired. The work she used to love feels heavy, and lately nothing she does seems to matter. Mona isn't lazy and she hasn't failed. Mona is at the start of burnout — she just hasn't named it yet."
+    ],
+    "sections": [
+      {
+        "heading_ar": "الاحتراق مش تعب — دي تلات حاجات مختلفة",
+        "heading_en": "Burnout Isn't Just Tiredness — It's Three Things",
+        "paras_ar": [
+          "إنت فاكر إن الاحتراق يعني إنك تعبان وخلاص؟ الباحثة كريستينا ماسلاك، اللي درست الموضوع ده من السبعينات، لقت إنه تلات حاجات بيمشوا مع بعض. الأول: إرهاق عاطفي — بطاريتك فاضية وإنت لسه صاحي. التاني: السخرية والبُعد — بتبدأ تبقى ساخر من شغلك وناسك، وكإنك بتتفرج عليهم من بعيد. التالت: إحساس إنك مبقتش بتنجز حاجة، حتى لو أرقامك كويسة.",
+          "خد بالك من الفرق ده، لإنه بيغير العلاج. لو مرهق بس، ممكن أجازة تحلها. بس السخرية والبُعد بييجوا من إن شغلك بقى بلا معنى أو بلا سيطرة — دي محتاجة تغيير في طريقة شغلك، مش أسبوع على البحر. منى مثلاً مش تعبانة وخلاص؛ هي وصلت للحتة اللي بتحس فيها إن مفيش فايدة."
+        ],
+        "paras_en": [
+          "You think burnout just means you're tired? Christina Maslach, who has studied this since the 1970s, found it's actually three things moving together. First: emotional exhaustion — your battery is empty even while you're awake. Second: cynicism and detachment — you start feeling distant from your work and the people in it, like you're watching from behind glass. Third: a sense of reduced efficacy, that you're not accomplishing anything, even when your numbers look fine.",
+          "Notice the difference, because it changes the cure. If you're only exhausted, rest can fix that. But cynicism and reduced efficacy come from work that has lost its meaning or its control — and those need a change in how you work, not a week at the beach. Mona isn't just tired; she's reached the part where nothing feels worth it."
+        ],
+        "science_ar": "العلم: نموذج ماسلاك للاحتراق الوظيفي — تلات أبعاد: الإرهاق العاطفي، السخرية/البُعد، وضعف الإحساس بالإنجاز.",
+        "science_en": "The science: Maslach's model of burnout — three dimensions: emotional exhaustion, cynicism/depersonalization, and reduced efficacy.",
+        "stat": {
+          "value": "3",
+          "unit_ar": "أبعاد",
+          "unit_en": "dimensions",
+          "label_ar": "الاحتراق الوظيفي مش حاجة واحدة — تلاتة بيمشوا مع بعض",
+          "label_en": "Burnout isn't one thing — it's three moving together"
+        }
+      },
+      {
+        "heading_ar": "الراحة الحقيقية مش إنك تبعد عن المكتب",
+        "heading_en": "Real Recovery Isn't Just Leaving the Office",
+        "paras_ar": [
+          "إنت ممكن تقفل اللابتوب الساعة ٦، بس دماغك تفضل في اجتماع بكرة لحد ما تنام. الباحثة سابين سونينتاغ سمّت اللي إنت محتاجه ده \"الانفصال النفسي\" — مش إنك تسيب الشغل بجسمك بس، لأ، إنك تفصل عنه بعقلك كمان. من غير الانفصال ده، جسمك بياخد أجازة ومخك لأ.",
+          "الحلو إن ده حاجة بتتعمل بقصد، مش بالصدفة. حاجة بتشغل دماغك بالكامل — رياضة، طبخ، لعبة، مكالمة مع صاحب — بتقطع حبل التفكير في الشغل أحسن من إنك تقعد تتفرج على السقف. جرب تعمل طقس صغير بعد الشغل يقول لمخك: خلاص، اليوم قفل. منى لو غيّرت هدومها ومشيت عشر دقايق قبل ما تفتح الموبايل، هتبدأ تفصل فعلاً."
+        ],
+        "paras_en": [
+          "You can close the laptop at 6, but your mind can stay in tomorrow's meeting until you fall asleep. Sabine Sonnentag named what you actually need: psychological detachment — not just leaving work physically, but mentally switching off from it. Without that, your body takes a break while your brain doesn't.",
+          "The good news: detachment is something you do on purpose, not by accident. An activity that fully occupies your mind — exercise, cooking, a game, a call with a friend — cuts the thread of work-thinking better than staring at the ceiling. Build a small after-work ritual that tells your brain the day is closed. If Mona changed clothes and walked ten minutes before touching her phone, she'd start to actually detach."
+        ],
+        "science_ar": "العلم: الانفصال النفسي والتعافي من الشغل (سابين سونينتاغ) — الراحة تبدأ لما مخك يفصل، مش بس جسمك.",
+        "science_en": "The science: psychological detachment and recovery from work (Sabine Sonnentag) — rest begins when your mind switches off, not just your body."
+      },
+      {
+        "heading_ar": "مخك بيشتغل بالموجات — مش خط مستقيم",
+        "heading_en": "Your Brain Works in Waves — Not a Straight Line",
+        "paras_ar": [
+          "إنت مش ماكينة تفضل شغالة ٨ ساعات بنفس القوة. جسمك بيمشي على إيقاعات قصيرة اسمها الإيقاعات فوق-اليومية — دورات تركيز حوالي ٩٠ دقيقة، بعدها المخ بيطلب راحة قصيرة عشان يشحن. لما تعاند الموجة دي وتفضل شاغط، إنتاجك بيقل وإنت مش واخد بالك.",
+          "بدل ما تقاوم، اركب الموجة. اشتغل بتركيز ٩٠ دقيقة على حاجة واحدة، وبعدها خد ١٠-١٥ دقيقة تبعد فيها عن الشاشة فعلاً — قوم، اتحرك، اشرب مية. الراحة القصيرة دي مش وقت ضايع؛ دي اللي بتخلي الـ ٩٠ دقيقة اللي جاية تنفع. منى كانت بتشتغل ٤ ساعات ورا بعض من غير ما تقوم — ده مش اجتهاد، ده استنزاف."
+        ],
+        "paras_en": [
+          "You're not a machine that runs 8 hours at the same power. Your body moves in short cycles called ultradian rhythms — focus cycles of about 90 minutes, after which the brain asks for a short break to recharge. When you fight that wave and keep pushing, your output drops without you noticing.",
+          "Instead of resisting, ride the wave. Work with focus for 90 minutes on one thing, then take 10 to 15 minutes genuinely away from the screen — stand up, move, drink water. That short break isn't wasted time; it's what makes the next 90 minutes usable. Mona used to work 4 hours straight without getting up — that's not dedication, it's depletion."
+        ],
+        "science_ar": "العلم: الإيقاعات فوق-اليومية (ultradian rhythms) — دورات تركيز حوالي ٩٠ دقيقة يتبعها احتياج طبيعي للراحة.",
+        "science_en": "The science: ultradian rhythms — focus cycles of about 90 minutes followed by a natural need for a break.",
+        "stat": {
+          "value": "90",
+          "unit_ar": "دقيقة",
+          "unit_en": "minutes",
+          "label_ar": "طول دورة التركيز قبل ما مخك يطلب راحة",
+          "label_en": "The length of a focus cycle before your brain asks for a break"
+        }
+      },
+      {
+        "heading_ar": "بلاش \"توازن\" — الأصح إنك تلاقي إيقاعك",
+        "heading_en": "Forget 'Balance' — Find Your Rhythm Instead",
+        "paras_ar": [
+          "كلمة \"توازن\" بتخدعك، لإنها بتخليك تتخيل ميزان ثابت: نص شغل ونص حياة، بالظبط، كل يوم. بس الحياة مش كده. في نظرية اسمها نظرية الحدود بتقول إن فيه ناس بتفصل تماماً بين الشغل والبيت (فصل)، وناس بتخلط بينهم (دمج) — ومفيش طريقة صح للكل. المهم إنك تختار حدودك بوعي، مش إنها تتفرض عليك.",
+          "عشان كده الأحلى إنك تفكر في \"إيقاع\" بدل \"توازن\". الإيقاع متحرك: فيه أسابيع الشغل فيها بياخد أكتر، وأسابيع حياتك بتاخد أكتر، والمهم إن الموجة ترجع تتوازن مع الوقت مش في نفس اليوم. لو منى قالت لنفسها \"أنا محتاجة إيقاع أقدر أكمّل عليه سنين\" بدل \"لازم أوازن كل يوم\"، هتاخد قرارات أرحم وأذكى."
+        ],
+        "paras_en": [
+          "The word 'balance' tricks you, because it makes you picture a fixed scale: half work, half life, exactly, every day. But life doesn't work that way. Boundary theory describes people who fully separate work and home (segmentation) and people who blend them (integration) — and there's no single right answer. What matters is that you choose your boundaries on purpose, instead of letting them be imposed on you.",
+          "That's why it's better to think in terms of 'rhythm' instead of 'balance.' Rhythm is dynamic: some weeks work takes more, some weeks life takes more, and what matters is that the wave evens out over time — not within a single day. If Mona told herself 'I need a rhythm I can sustain for years' instead of 'I must balance every day,' she'd make kinder, smarter decisions."
+        ],
+        "science_ar": "العلم: نظرية الحدود (الفصل مقابل الدمج) — وإعادة تأطير \"التوازن\" الثابت كـ\"إيقاع\" متحرك.",
+        "science_en": "The science: boundary theory (segmentation vs. integration) — and reframing static 'balance' as dynamic 'rhythm.'"
+      }
+    ],
+    "takeaway_ar": [
+      "افحص نفسك بتلات أسئلة مش سؤال واحد: مرهق؟ ساخر وبعيد؟ حاسس إنك مش بتنجز؟ — كل واحد ليه علاج مختلف.",
+      "اعمل طقس انفصال بعد الشغل: غيّر هدومك، امشي، أو اعمل حاجة بتشغل دماغك بالكامل قبل ما ترجع للموبايل.",
+      "اشتغل بموجات ٩٠ دقيقة وبعدها راحة حقيقية، وفكّر في إيقاع تكمّل عليه سنين بدل توازن مثالي كل يوم."
+    ],
+    "takeaway_en": [
+      "Check yourself with three questions, not one: Exhausted? Cynical and detached? Feeling you're not accomplishing anything? Each has a different cure.",
+      "Build an after-work detachment ritual: change clothes, take a walk, or do something that fully occupies your mind before you reach for your phone.",
+      "Work in 90-minute waves followed by real breaks, and aim for a rhythm you can sustain for years instead of a perfect daily balance."
+    ]
+  },
+  "career-change": {
+    "slug": "career-change",
+    "readMinutes": 6,
+    "hook_ar": [
+      "كريم قاعد على مكتبه الساعة 11 بالليل، مؤشر الماوس واقف فوق زرار \"إرسال\" على إيميل استقالته. سبع سنين في المحاسبة، ترقية جاية، وشركة محترمة. بس كل صبح بيصحى وجواه صوت بيقول \"مش دي أنا\". دلوقتي، بعد يوم وحش تاني، حاسس إنه لو مبعتش الإيميل ده دلوقتي، هيفضل حبيس نفس الحياة عشر سنين تانيين.",
+      "لكن قبل ما يدوس الزرار، في سؤال واحد لازم يقف عنده: هو بيجري ناحية حاجة، ولا بيهرب من حاجة؟ الفرق بين الاتنين هو اللي هيحدد لو ده أفضل قرار في حياته، ولا أكبر غلطة. تغيير المسار قرار كبير، ولازم ياخد وقته."
+    ],
+    "hook_en": [
+      "Karim is at his desk at 11 p.m., cursor hovering over \"send\" on his resignation email. Seven years in accounting, a promotion on the way, a respectable firm. But every morning a quiet voice says, \"This isn't me.\" After another rough day, he feels that if he doesn't send it now, he'll be trapped in the same life for another decade.",
+      "Before he clicks, there's one question worth stopping for: is he running toward something, or away from something? The difference between the two will decide whether this is the best call of his life, or the biggest mistake. Changing your path is a big decision, and it deserves real time."
+    ],
+    "sections": [
+      {
+        "heading_ar": "السنين اللي فاتت مش سبب تفضل",
+        "heading_en": "The Years You've Put In Aren't a Reason to Stay",
+        "paras_ar": [
+          "أكتر جملة بتخلي الناس تفضل في شغل مش مناسبها: \"أنا صرفت عمري في المجال ده، إزاي أرميه؟\". بس السنين اللي راحت راحت خلاص، مش هترجع سواء فضلت أو مشيت. القرار الصح مبنيش على اللي دفعته قبل كده، مبني على اللي قدامك.",
+          "لو كنت هتبدأ من النهارده، وانت عارف كل اللي تعرفه، كنت هتختار نفس المجال تاني؟ لو الإجابة \"لأ\" بوضوح، يبقى السبب الوحيد اللي مخليك قاعد هو الخوف من إن التعب راح على الفاضي. والتعب مراحش، ده علّمك تعرف مكانك فين."
+        ],
+        "paras_en": [
+          "The line that keeps people stuck: \"I've spent my whole career here, how do I throw it away?\" But the years are already gone. They don't come back whether you stay or leave. A good decision isn't built on what you've already paid, it's built on what's ahead.",
+          "If you started today, knowing everything you now know, would you choose this field again? If the answer is a clear \"no,\" the only thing keeping you seated is the fear that the effort was wasted. It wasn't. It taught you exactly where you don't belong."
+        ],
+        "science_ar": "ده اسمه مغالطة التكلفة الغارقة (sunk cost fallacy): إننا نكمل في حاجة عشان استثمرنا فيها، مش عشان لسه مستحقة.",
+        "science_en": "This is the sunk cost fallacy: we keep going because of what we've already invested, not because it's still worth it.",
+        "stat": {
+          "value": "7",
+          "unit_ar": "سنين",
+          "unit_en": "years",
+          "label_ar": "استثمار قديم مش بيرجع، مهما كان قراره النهارده",
+          "label_en": "of past investment that never returns, whatever you decide today"
+        }
+      },
+      {
+        "heading_ar": "التغيير بيحصل بالتجربة، مش بالتخطيط في دماغك",
+        "heading_en": "Change Happens by Doing, Not by Planning in Your Head",
+        "paras_ar": [
+          "أغلب الناس فاكرة إن التغيير بيبدأ بإنك تقعد تفكر وتخطط لحد ما تلاقي \"الشغف\" وبعدين تنط. الواقع بالعكس تماماً: انت بتعرف نفسك من خلال ما تعمل، مش قبل ما تعمل. مفيش قد ما تفكر في أوضتك هيقولك المجال الجديد ده مناسبك ولا لأ.",
+          "يعني بدل ما تستنى اليقين الكامل قبل ما تتحرك، اتحرك خطوة صغيرة، جرّب، وبعدين اقعد فكّر في اللي حصل. كل تجربة صغيرة بتديك معلومة حقيقية عن نفسك مكانش ممكن تعرفها وانت قاعد. القرار الكبير بيتبني من شوية قرارات صغيرة متجرّبة."
+        ],
+        "paras_en": [
+          "Most people think change starts with sitting, thinking, and planning until you find your \"passion,\" then leaping. It's the reverse: you learn who you are by acting, not before acting. No amount of thinking in your room will tell you if the new field fits.",
+          "So instead of waiting for total certainty before you move, take a small step, try it, then reflect on what happened. Every small experiment gives you real data about yourself that you could never get while seated. A big decision is built from a handful of tested small ones."
+        ],
+        "science_ar": "ده جوهر كتاب Herminia Ibarra \"Working Identity\": التغيير المهني بيحصل بمنطق \"جرّب واتعلّم\" (test-and-learn) — تعمل الأول وبعدين تفهم.",
+        "science_en": "This is the core of Herminia Ibarra's \"Working Identity\": career change happens through test-and-learn — you act first, then make sense of it."
+      },
+      {
+        "heading_ar": "جرّب على الصغير قبل ما تنط على الكبير",
+        "heading_en": "Run Small Experiments Before the Big Leap",
+        "paras_ar": [
+          "مش لازم تسيب شغلك عشان تعرف لو المجال التاني بيناسبك. ابدأ بمشروع جانبي صغير، شغلانة فريلانس واحدة، كورس بالليل، أو حتى تتطوع في حاجة قريبة من اللي نفسك فيه. المخاطرة هنا محدودة، والمعلومة اللي بترجعلك حقيقية.",
+          "كريم قبل ما يبعت الاستقالة، ممكن ياخد مشروع تصميم واحد بالليل، أو يساعد صاحبه في مشروعه شهر. لو حس بالحياة، دي إشارة. ولو اكتشف إنه بيكره التفاصيل، يبقى وفّر على نفسه قفزة كانت هتكلفه سنين — والمعلومة دي أرخص بكتير وانت لسه ماسك شغلك."
+        ],
+        "paras_en": [
+          "You don't have to quit to find out if the other field fits. Start with a small side project, one freelance gig, a night course, or volunteering near the thing you're curious about. The risk is contained, and the information you get back is real.",
+          "Before sending that resignation, Karim could take one design project at night, or help a friend's business for a month. If it makes him feel alive, that's a signal. If he discovers he hates the details, he just saved himself a leap that would've cost years — and that lesson is far cheaper while you still hold your job."
+        ],
+        "science_ar": "دي فكرة التجارب الصغيرة قليلة المخاطرة (small low-risk experiments): تختبر المسار الجديد على جنب قبل ما تراهن بكل حاجة.",
+        "science_en": "This is the idea of small, low-risk experiments: you test the new path on the side before betting everything on it.",
+        "stat": {
+          "value": "1",
+          "unit_ar": "مشروع جانبي",
+          "unit_en": "side project",
+          "label_ar": "بيديك يقين أكتر من شهور تفكير في دماغك",
+          "label_en": "gives you more certainty than months of thinking"
+        }
+      },
+      {
+        "heading_ar": "بتجري ناحية حاجة، ولا بتهرب من حاجة؟",
+        "heading_en": "Running Toward Something, or Away From It?",
+        "paras_ar": [
+          "في فرق كبير بين إنك تسيب شغلك عشان مبسوط بحاجة تانية ونفسك فيها، وبين إنك تسيبه عشان تعبت من مديرك أو زهقت من روتينك. الأولانية بتوديك لمكان، والتانية بس بتبعدك عن مكان — وساعات بتلاقي نفس الوحشة مستنياك في الشغل الجديد.",
+          "قبل ما تقرر، اسأل نفسك: لو مشكلتك دلوقتي اتحلت — مدير أحسن، مرتب أعلى، فريق مريح — هتفضل عايز تغيّر المجال؟ لو آه، يبقى انت فعلاً بتجري ناحية حاجة حقيقية. لو لأ، يبقى مشكلتك في الظروف، مش في المسار نفسه، والحل غالباً أبسط مما فاكر."
+        ],
+        "paras_en": [
+          "There's a big difference between leaving because something else genuinely pulls you, and leaving because you're exhausted by your manager or bored of your routine. The first takes you toward a place; the second only takes you away from one — and the same emptiness often waits for you in the new job.",
+          "Before you decide, ask: if today's problem were solved — a better boss, higher pay, an easier team — would you still want to change fields? If yes, you're truly running toward something real. If no, your problem is the circumstances, not the path, and the fix is usually simpler than you think."
+        ],
+        "science_ar": "ده الفرق بين إنك تجري \"ناحية\" حاجة (toward) وإنك تهرب \"من\" حاجة (away) — القرار السليم بيتبني على انجذاب، مش على هروب.",
+        "science_en": "This is the difference between moving toward something and running away from something — a sound decision is built on attraction, not escape."
+      }
+    ],
+    "takeaway_ar": [
+      "متفضلش في مكان عشان السنين اللي راحت — اسأل: لو ببدأ النهارده كنت هختاره تاني؟",
+      "متستناش اليقين قبل ما تتحرك — جرّب مشروع صغير على جنب، وبعدين اقعد افهم اللي حسيته.",
+      "قبل ما تسيب، اتأكد إنك بتجري ناحية حاجة نفسك فيها، مش بس بتهرب من مشكلة ممكن تتحل."
+    ],
+    "takeaway_en": [
+      "Don't stay for the years already spent — ask: if I started today, would I choose this again?",
+      "Don't wait for certainty before you move — run one small side experiment, then reflect on how it felt.",
+      "Before you leave, make sure you're running toward something you want, not just away from a problem you could fix."
+    ]
+  },
+  "daily-productivity": {
+    "slug": "daily-productivity",
+    "readMinutes": 5,
+    "hook_ar": [
+      "الساعة بقت 6 المغرب، ونوران قافلة اللاب توب وهي حاسة إنها اتهرست. من الصبح وهي قدام الشاشة، ردّت على 40 إيميل، دخلت 6 اجتماعات، وفتحت الشيت اللي المفروض تخلصه… وقفلته تاني. اليوم كان مليان لآخره، بس لو سألتها عملتي إيه فعلاً، هتبقى إجابتها: مش عارفة.",
+      "المشكلة مش إن نوران كسلانة، بالعكس هي طول اليوم مشغولة. المشكلة إن المشغولية حاجة والإنتاجية حاجة تانية خالص. إنتِ ممكن تفضلي بتجري طول النهار وفي الآخر تبصّي تلاقي أهم حاجة لسه واقفة مكانها. تعالي نتفرج على 3 حيل بسيطة، كل واحدة مبنية على علم حقيقي، هيحوّلوا يومك من زحمة بلا نتيجة لشغل ليه أثر."
+    ],
+    "hook_en": [
+      "It's 6 PM and Nouran shuts her laptop feeling wrung out. Since morning she's answered 40 emails, sat through 6 meetings, and opened the spreadsheet she was supposed to finish… then closed it again. The day was full to the brim. But ask her what she actually got done, and the honest answer is: not sure.",
+      "Nouran isn't lazy — she was busy all day. And that's the trap: busy and productive are two completely different things. You can run nonstop from morning to night and still watch the one thing that mattered stay exactly where it was. Here are 3 simple techniques, each built on real science, that turn a crowded day into work that leaves a mark."
+    ],
+    "sections": [
+      {
+        "heading_ar": "الحيلة الأولى: حاصر شغلك في وقت ضيّق (Timeboxing)",
+        "heading_en": "Technique 1: Box your work into a tight window (Timeboxing)",
+        "paras_ar": [
+          "فيه قاعدة اسمها قانون باركنسون بتقول إن الشغل بيتمدّد عشان يملا الوقت المتاح ليه. لو إديتي نفسك يوم كامل عشان تكتبي تقرير، هياخد يوم كامل. لو إديتي نفسك ساعتين بس، غالباً هتخلصيه في ساعتين. مش سحر، ده إن الوقت المفتوح بيسيب مساحة للتسويف والرجوع للحاجة مية مرة.",
+          "الحل إنك تحطي لكل مهمة \"صندوق وقت\" محدد قبل ما تبدأي يومك. مش \"هخلص الشيت النهاردة\"، لأ ده \"الشيت من 10 لـ 11:30\". اكتبي المهمة في الأجندة زي ما هي اجتماع، وامسكي نفسك بالحد ده. كال نيوبورت، صاحب فكرة الـ Deep Work، بيعمل كده لكل ساعة في يومه — كل خانة ليها شغل واحد واضح."
+        ],
+        "paras_en": [
+          "Parkinson's Law says work expands to fill the time you give it. Give yourself a whole day to write a report and it'll take a whole day. Give yourself two hours and it'll usually get done in two. It's not magic — open-ended time just leaves room to stall and to revisit the same thing ten times over.",
+          "The fix is to assign each task a fixed \"time box\" before your day starts. Not \"finish the spreadsheet today\" but \"spreadsheet, 10:00 to 11:30.\" Write the task into your calendar like it's a meeting, and hold yourself to the edge. Cal Newport, who coined Deep Work, timeboxes every hour of his day — each block gets one clear job."
+        ],
+        "science_ar": "العلم: قانون باركنسون + الـ Timeboxing من فكرة العمل العميق لكال نيوبورت.",
+        "science_en": "The science: Parkinson's Law + Timeboxing, rooted in Cal Newport's Deep Work."
+      },
+      {
+        "heading_ar": "الحيلة التانية: حاجة واحدة في المرة (Single-Tasking)",
+        "heading_en": "Technique 2: One thing at a time (Single-Tasking)",
+        "paras_ar": [
+          "كل ما تسيبي مهمة نص نص وتقفزي على تانية، دماغك مبيسيبش الأولى بسهولة. الباحثة صوفي ليروا سمّت ده \"بقايا الانتباه\" — جزء من تركيزك بيفضل عالق في المهمة القديمة وإنتِ بتحاولي تبدأي في الجديدة. فعشان كده لما بترجعي للشغل بعد ما ترّدي على رسالة سريعة، بتحسّي إن دماغك لسه بايظ شوية.",
+          "الحل مش معقّد: قفلي كل حاجة مالهاش لازمة، وامسكي مهمة واحدة لحد ما تخلصيها أو تخلصي الصندوق بتاعها. سيبي الموبايل في أوضة تانية، اقفلي تبويبات الإيميل والشات. التبديل بيحسّسك إنك بتنجزي أكتر، بس الحقيقة إنه بياكل من عمق تركيزك وبيبطّئك."
+        ],
+        "paras_en": [
+          "Every time you leave a task half-done to jump to another, your brain doesn't let the first one go. Researcher Sophie Leroy called this \"attention residue\" — part of your focus stays stuck on the old task while you try to start the new one. That's why, after a quick reply to a message, coming back to real work feels foggy for a while.",
+          "The fix isn't complicated: close what you don't need and hold one task until it's done or its box is up. Put the phone in another room, shut the email and chat tabs. Switching feels like you're getting more done, but really it's eating your depth of focus and slowing you down."
+        ],
+        "science_ar": "العلم: بقايا الانتباه وكلفة التبديل بين المهام — أبحاث صوفي ليروا.",
+        "science_en": "The science: attention residue and the cost of task-switching — Sophie Leroy's research.",
+        "stat": {
+          "value": "23",
+          "unit_ar": "دقيقة",
+          "unit_en": "minutes",
+          "label_ar": "متوسط الوقت اللي بتاخده عشان ترجّعي تركيزك بعد المقاطعة (أبحاث جلوريا مارك)",
+          "label_en": "average time to refocus after an interruption (Gloria Mark's research)"
+        }
+      },
+      {
+        "heading_ar": "الحيلة التالتة: فرّغي دماغك بجلسات قصيرة مركّزة (Pomodoro + التقاط سريع)",
+        "heading_en": "Technique 3: Empty your head with short focused sprints (Pomodoro + quick capture)",
+        "paras_ar": [
+          "طريقة البومودورو بسيطة: 25 دقيقة شغل مركّز، وبعدها 5 دقايق راحة، وتكرري. الحلاوة إن 25 دقيقة رقم صغير مش مرعب، فبتبدأي بدل ما تسوّفي، والراحة القصيرة بتخليك تكمّلي من غير ما تحترقي. وكل \"بومودورو\" هو صندوق وقت صغير، فالحيلة دي بتشتغل مع أول حيلة زي القطعتين اللي بيكمّلوا بعض.",
+          "بس فيه حتة مهمة: وإنتِ شغالة، هتيجي في دماغك أفكار — \"اتصلي بفلان\"، \"متنسيش الفاتورة\". دي بتنق في دماغك وتشدّ تركيزك، وده اسمه أثر زايجارنيك: المهام اللي لسه مقفولتش بتفضل تشغل عقلك. الحل: ورقة جنبك، أول ما تيجي فكرة اكتبيها في سطر وكمّلي. مجرد ما تكتبيها، دماغك بيطمّن ويسيبها."
+        ],
+        "paras_en": [
+          "The Pomodoro technique is simple: 25 minutes of focused work, then a 5-minute break, and repeat. The beauty is that 25 minutes isn't scary, so you actually start instead of stalling, and the short break keeps you going without burning out. Each Pomodoro is a mini time box, so this pairs with Technique 1 like two halves of the same idea.",
+          "But here's the key part: while you work, thoughts will pop up — \"call so-and-so,\" \"don't forget the invoice.\" They nag at you and pull your focus. That's the Zeigarnik effect: unfinished tasks keep tugging at your mind. The fix: keep a notepad beside you, jot each thought in one line, and keep going. Once it's written, your brain relaxes and lets it go."
+        ],
+        "science_ar": "العلم: تقنية البومودورو + أثر زايجارنيك — الالتقاط السريع بيحرّر انتباهك.",
+        "science_en": "The science: the Pomodoro technique + the Zeigarnik effect — quick capture frees your attention.",
+        "stat": {
+          "value": "25",
+          "unit_ar": "دقيقة",
+          "unit_en": "minutes",
+          "label_ar": "طول جلسة البومودورو الواحدة قبل استراحة قصيرة",
+          "label_en": "the length of one Pomodoro sprint before a short break"
+        }
+      }
+    ],
+    "takeaway_ar": [
+      "قبل ما تبدأي يومك، حطي لكل مهمة صندوق وقت ضيّق في الأجندة، وامسكي نفسك بالحد.",
+      "مهمة واحدة في المرة: اقفلي الموبايل والتبويبات، وبلاش تبديل — بقايا الانتباه بتبوّظ تركيزك.",
+      "شغّلي بومودورو (25/5)، وسيبي ورقة جنبك تكتبي فيها أي فكرة طارية عشان تفرّغي دماغك وترجعي بسرعة."
+    ],
+    "takeaway_en": [
+      "Before the day starts, give every task a tight time box in your calendar — and hold the edge.",
+      "One task at a time: silence the phone, close the tabs, don't switch — attention residue wrecks focus.",
+      "Run Pomodoros (25/5) and keep a notepad beside you to capture stray thoughts, so your head clears and you dive back in fast."
+    ]
+  },
+  "healthy-habits": {
+    "slug": "healthy-habits",
+    "readMinutes": 6,
+    "hook_ar": [
+      "كريم اشترى اشتراك جيم في يناير، وقال السنة دي بجد. صحي بدري يومين، بعدها الدنيا بردت، والشنطة فضلت على الباب أسبوع، وبعد تلاتة أسابيع خلص كل حماسه وقعد يقول لنفسه \"أنا مبقدرش على الالتزام\". المشكلة مش في كريم، المشكلة في إنه بنى العادة غلط من الأول.",
+      "الحكاية مش إرادة ولا عزيمة. العلم بيقول إن العادات ليها ميكانيزم بيتكرر جواك من غير ما تحس، ولو فهمت الميكانيزم ده تقدر تلعب بيه لصالحك. تعالى نفكك إزاي العادة بتتبني بجد، وليه \"الـ21 يوم\" اللي سمعتها كلها كلام فاضي."
+    ],
+    "hook_en": [
+      "Karim bought a gym membership in January and swore this year was different. He went twice, the excitement cooled, the gym bag sat by the door for a week, and after three weeks he'd decided he was just \"bad at commitment.\" The problem was never Karim. He built the habit wrong from day one.",
+      "This isn't about willpower or discipline. Science shows habits run on a mechanism that loops inside you automatically — and once you understand it, you can bend it in your favor. Let's take apart how a habit really gets built, and why the \"21 days\" you've heard everywhere is a myth."
+    ],
+    "sections": [
+      {
+        "heading_ar": "افهم اللوب: إشارة، روتين، مكافأة",
+        "heading_en": "Understand the Loop: Cue, Routine, Reward",
+        "paras_ar": [
+          "تشارلز دوهيج في كتابه \"The Power of Habit\" شرح إن أي عادة عبارة عن لوب من تلات حاجات: إشارة (cue) بتشغل العادة، روتين (routine) اللي هو الفعل نفسه، ومكافأة (reward) اللي المخ بيفتكرها ويقول \"عايز أكرر ده تاني\". كريم كان فاكر إن المشكلة في الروتين، بس هو أصلاً معندوش إشارة واضحة تفكره أصلاً يروح الجيم.",
+          "لما تعرف الإشارة والمكافأة بتوعك، تقدر تصمم اللوب بإيدك. كريم غيّر الخطة: حط شنطة الجيم جنب المفتاح (إشارة واضحة)، وبعد كل تمرين ياخد دُش سخن ويسمع أغانيه المفضلة (مكافأة حقيقية حاسس بيها). فجأة المخ ابتدا يربط الجيم بحاجة حلوة، مش بعقاب."
+        ],
+        "paras_en": [
+          "In \"The Power of Habit,\" Charles Duhigg showed that every habit is a loop of three parts: a cue that triggers it, a routine which is the action itself, and a reward the brain remembers so it says \"let's do that again.\" Karim thought his problem was the routine. He actually had no clear cue reminding him to go at all.",
+          "Once you know your cue and your reward, you can design the loop on purpose. Karim rebuilt it: gym bag next to his keys (an obvious cue), and after every session a hot shower with his favorite playlist (a reward he could actually feel). Suddenly his brain started linking the gym to something good, not to punishment."
+        ],
+        "science_ar": "العِلم: ده اسمه \"لوب العادة\" (إشارة، روتين، مكافأة) من كتاب تشارلز دوهيج \"The Power of Habit\".",
+        "science_en": "The science: this is the \"habit loop\" — cue, routine, reward — from Charles Duhigg's \"The Power of Habit.\""
+      },
+      {
+        "heading_ar": "ابدأ من هويتك، وخليها 1% كل يوم",
+        "heading_en": "Start From Identity, and Go 1% Better",
+        "paras_ar": [
+          "جيمس كلير في \"Atomic Habits\" بيقول إن أقوى عادة هي اللي بتتبني على هوية، مش على هدف. بدل ما تقول \"عايز أخس\"، قول \"أنا بقيت شخص بيتحرك كل يوم\". كريم بطّل يعد الكيلوهات وابتدا يقول لنفسه \"أنا واحد رياضي\"، وكل مرة يروح فيها كان بيثبت الجملة دي لنفسه أكتر.",
+          "والحاجة التانية: التحسن الصغير بيتراكم. لو اتحسنت 1% كل يوم، على مدار سنة بتبقى أحسن حوالي 37 مرة، مش بسبب قفزة كبيرة، لكن بسبب تراكم صغير كل يوم. عشان كده كلير بيقول ابدأ صغير جداً — تمرين دقيقتين أحسن من خطة ساعتين مش هتعملها."
+        ],
+        "paras_en": [
+          "In \"Atomic Habits,\" James Clear argues the strongest habits are built on identity, not on goals. Instead of \"I want to lose weight,\" say \"I'm the kind of person who moves every day.\" Karim stopped counting kilos and started telling himself \"I'm an athlete\" — and every session became one more vote for that story.",
+          "The second idea: small improvements compound. Get 1% better each day and over a year you're roughly 37 times better — not from one big leap, but from tiny gains stacking up. That's why Clear says start absurdly small: a two-minute workout beats the two-hour plan you'll never actually do."
+        ],
+        "science_ar": "العِلم: \"العادات المبنية على الهوية\" وقاعدة الـ1% أحسن كل يوم، من كتاب جيمس كلير \"Atomic Habits\".",
+        "science_en": "The science: identity-based habits and the 1%-better rule, from James Clear's \"Atomic Habits.\"",
+        "stat": {
+          "value": "37x",
+          "unit_ar": "ضعف",
+          "unit_en": "times better",
+          "label_ar": "لو اتحسنت 1% كل يوم على مدار سنة",
+          "label_en": "if you improve 1% every day for a year"
+        }
+      },
+      {
+        "heading_ar": "اربط العادة بحاجة موجودة، وقول \"لو حصل X أعمل Y\"",
+        "heading_en": "Stack the Habit, and Say \"If X, Then Y\"",
+        "paras_ar": [
+          "بدل ما تستنى مزاجك يظبط، اربط العادة الجديدة بعادة قديمة ثابتة — ده اسمه habit stacking عند جيمس كلير. كريم قال: \"بعد ما أشرب قهوة الصبح على طول، ألبس هدوم التمرين\". القهوة كانت الإشارة الجاهزة اللي بتشغل العادة الجديدة من غير ما يفكر.",
+          "وفيه حاجة أقوى: نية التنفيذ. بيتر جولفيتزر أثبت إن لما تكتب خطة على شكل \"لو حصل X أعمل Y\"، فرصة إنك تنفذها بتزيد جداً. \"لو الساعة بقت 6 مسا، أروح الجيم\" أقوى بمراحل من \"هتمرن بكرة\"، لأنك حددت الوقت والمكان والفعل قبل ما اللحظة تيجي."
+        ],
+        "paras_en": [
+          "Instead of waiting to feel like it, attach the new habit to a solid old one — James Clear calls this habit stacking. Karim's version: \"Right after my morning coffee, I put on my workout clothes.\" The coffee became the ready-made cue that fired the new routine before he could overthink it.",
+          "There's something even stronger: implementation intentions. Peter Gollwitzer proved that writing a plan as \"if X, then Y\" dramatically raises the odds you follow through. \"If it's 6 PM, then I go to the gym\" beats \"I'll train tomorrow,\" because you've fixed the time, place, and action before the moment arrives."
+        ],
+        "science_ar": "العِلم: \"habit stacking\" من جيمس كلير، و\"نية التنفيذ\" (لو X أعمل Y) من أبحاث بيتر جولفيتزر.",
+        "science_en": "The science: habit stacking (James Clear) plus implementation intentions — \"if X, then Y\" — from Peter Gollwitzer's research."
+      },
+      {
+        "heading_ar": "استحمل التمن الحقيقي: مش 21 يوم",
+        "heading_en": "Pay the Real Price: It's Not 21 Days",
+        "paras_ar": [
+          "الرقم \"21 يوم\" اللي كلنا سمعناه خرافة. فيليبا لالي وفريقها في دراسة سنة 2010 تابعوا ناس بيبنوا عادات جديدة، ولقوا إن العادة بتاخد في المتوسط حوالي 66 يوم عشان تبقى أوتوماتيك — والمدى كان واسع من حوالي 18 يوم لأكتر من 250 يوم حسب العادة والشخص. كريم لما عرف الرقم ده، بطّل يزعل إنه لسه محسش إنها بقت سهلة بعد أسبوعين.",
+          "أهم استنتاج من الدراسة: إنك تفوّت يوم واحد مبيكسرش العادة. اللي بيكسرها إنك تسيبها خالص. عشان كده القاعدة العملية: متفوّتش مرتين ورا بعض. لو النهارده مروحتش، بكرة روح حتى لو 10 دقايق — المهم تحافظ على استمرارية اللوب."
+        ],
+        "paras_en": [
+          "The famous \"21 days\" is a myth. In a 2010 study, Phillippa Lally and her team followed people forming new habits and found it took on average about 66 days for a behavior to become automatic — with a wide range, from roughly 18 days to over 250, depending on the habit and the person. When Karim learned this, he stopped panicking that it still felt hard after two weeks.",
+          "The study's most useful finding: missing a single day doesn't break the habit. What breaks it is quitting entirely. So the practical rule is: never miss twice in a row. Skipped today? Show up tomorrow, even for 10 minutes — what matters is keeping the loop alive."
+        ],
+        "science_ar": "العِلم: العادة بتاخد في المتوسط ~66 يوم تبقى أوتوماتيك (فيليبا لالي وزملاؤها، 2010)، مش 21 يوم.",
+        "science_en": "The science: habits take on average ~66 days to become automatic (Lally et al., 2010) — not 21.",
+        "stat": {
+          "value": "66",
+          "unit_ar": "يوم",
+          "unit_en": "days",
+          "label_ar": "المتوسط عشان العادة تبقى أوتوماتيك (مش 21)",
+          "label_en": "average for a habit to become automatic (not 21)"
+        }
+      }
+    ],
+    "takeaway_ar": [
+      "صمم اللوب بإيدك: إشارة واضحة قدامك + روتين صغير + مكافأة حاسس بيها بجد.",
+      "اربط العادة الجديدة بعادة قديمة، واكتبها \"لو حصل X أعمل Y\" — وابدأ بحاجة صغيرة تتحسن 1% كل يوم.",
+      "استنى 66 يوم مش 21، ومتفوّتش مرتين ورا بعض — الاستمرارية أهم من الكمال."
+    ],
+    "takeaway_en": [
+      "Design the loop yourself: an obvious cue in front of you + a small routine + a reward you genuinely feel.",
+      "Stack the new habit onto an old one and write it as \"if X, then Y\" — and start tiny, aiming for 1% better each day.",
+      "Expect 66 days, not 21, and never miss twice in a row — consistency beats perfection."
+    ]
+  }
+}

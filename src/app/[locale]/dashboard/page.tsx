@@ -52,6 +52,20 @@ export default async function DashboardPage() {
   const eligibility = computeEligibility(eligibilityData);
   const lastReadingDate = eligibilityData.completedAssessments[0]?.completed_at ?? null;
 
+  const isAr = locale === "ar";
+  const statusLabel = (s: string) => {
+    const map: Record<string, { ar: string; en: string }> = {
+      pending: { ar: "قيد الانتظار", en: "Pending" },
+      proof_submitted: { ar: "في انتظار المراجعة", en: "Under review" },
+      confirmed: { ar: "مؤكد", en: "Confirmed" },
+      completed: { ar: "مكتمل", en: "Completed" },
+      attended: { ar: "تمّ الحضور", en: "Attended" },
+      cancelled: { ar: "ملغي", en: "Cancelled" },
+    };
+    const m = map[s] ?? { ar: s, en: s };
+    return isAr ? m.ar : m.en;
+  };
+
   const now = new Date();
   const upcoming = (bookings as Booking[] | null)?.filter(
     (b) => b.session?.starts_at && new Date(b.session.starts_at) > now && b.status !== "cancelled"
@@ -231,7 +245,7 @@ export default async function DashboardPage() {
                       </p>
                     </div>
                     <Badge variant={booking.status === "confirmed" ? "success" : "warning"}>
-                      {booking.status}
+                      {statusLabel(booking.status)}
                     </Badge>
                   </div>
                 </div>

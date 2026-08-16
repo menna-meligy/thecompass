@@ -86,8 +86,8 @@ export default function CareerCompass() {
           </h2>
           <p className="text-white/55" style={{ fontSize: "1.02rem", lineHeight: 1.8, maxWidth: "34rem", margin: "0 auto" }}>
             {isRtl
-              ? "جاوب ٧ أسئلة سريعة عن إحساسك بشغلك ومسارك، وهنديك قراءة مخصّصة بالذكاء الاصطناعي مع أنسب خطوة تبدأ بيها."
-              : "Answer 7 quick questions about how you feel in your career, and get an AI-personalized reading with the best next step for you."}
+              ? "جاوب ٧ أسئلة سريعة عن شغلك وحياتك، وإحنا عندك نتيجة مخصوصة ليك تساعدك تبدأ طريقك."
+              : "Answer 7 quick questions about your career and life, and get a personalized result to help you start your path."}
           </p>
         </div>
 

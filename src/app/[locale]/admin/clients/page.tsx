@@ -61,8 +61,8 @@ export default async function AdminClientsPage() {
         subtitle={isAr ? "جميع العملاء المسجلين وتقدمهم" : "All registered clients and their progress"}
       />
 
-      {/* Table */}
-      <div style={{
+      {/* Desktop table */}
+      <div className="hidden sm:block" style={{
         background: "rgba(30,41,59,0.6)",
         border: "1px solid rgba(245,158,11,0.12)",
         borderRadius: "12px",
@@ -208,6 +208,42 @@ export default async function AdminClientsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {rows.length === 0 ? (
+          <div className="py-12 text-center text-white/25 text-sm">{isAr ? "لا يوجد عملاء بعد" : "No clients yet"}</div>
+        ) : rows.map((client) => {
+          const bookingCount = client.bookings?.length || 0;
+          const sortedBookings = [...(client.bookings || [])].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          const lastBooking = sortedBookings[0];
+          const statusStyle = lastBooking ? STATUS_STYLES[lastBooking.status] || STATUS_STYLES.pending : null;
+          const initials = (client.full_name || client.email || "?").charAt(0).toUpperCase();
+          const displayName = client.full_name || client.email;
+          return (
+            <div key={client.id} className="rounded-xl p-4" style={{ background: "rgba(30,41,59,0.6)", border: "1px solid rgba(245,158,11,0.12)" }}>
+              <div className="flex items-center gap-3 mb-3">
+                <div style={{ width: "40px", height: "40px", borderRadius: "50%", background: "linear-gradient(135deg,#F59E0B,#D97706)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 900, color: "#0f172a", flexShrink: 0 }}>{initials}</div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-white font-bold text-sm truncate">{displayName}</p>
+                  {client.full_name && <p className="text-white/35 text-xs truncate">{client.email}</p>}
+                </div>
+                {statusStyle && lastBooking && (
+                  <span style={{ padding: "3px 10px", borderRadius: "12px", background: statusStyle.bg, color: statusStyle.color, fontSize: "0.72rem", fontWeight: 700, flexShrink: 0 }}>{isAr ? statusStyle.label_ar : statusStyle.label_en}</span>
+                )}
+              </div>
+              <div className="flex items-center justify-between text-xs mb-3">
+                <span className="inline-flex items-center gap-1.5 text-white/50"><Calendar className="h-3.5 w-3.5" style={{ color: "rgba(245,158,11,0.5)" }} />{bookingCount} {isAr ? "حجز" : "bookings"}</span>
+                <span className="text-white/40">{lastBooking ? formatRelDate(lastBooking.created_at, locale) : "-"}</span>
+              </div>
+              <Link href={`/${locale}/admin/clients/${client.id}`} className="flex items-center justify-center gap-1.5 hover:bg-[rgba(245,158,11,0.2)]" style={{ padding: "8px", borderRadius: "8px", background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B", fontSize: "0.82rem", fontWeight: 700, textDecoration: "none" }}>
+                {isAr ? "عرض المسار" : "View Roadmap"}
+                <ArrowRight className="h-3.5 w-3.5" style={{ transform: isAr ? "rotate(180deg)" : undefined }} />
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BookOpen, SlidersHorizontal } from "lucide-react";
 import WorkshopCard from "@/components/workshops/WorkshopCard";
+import { topicLabel } from "@/lib/topics";
 import type { Workshop } from "@/types/index";
 
 interface Props {
@@ -66,7 +67,7 @@ export default function WorkshopsClient({
               color: activeTopic === topic ? "#0f172a" : "rgba(255,255,255,0.5)",
             }}
           >
-            {topic}
+            {topicLabel(topic, locale)}
           </button>
         ))}
 

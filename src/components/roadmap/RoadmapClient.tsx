@@ -154,11 +154,12 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
         (async () => {
           for (const task of next) {
             if (task.id === "reg-node") continue;
-            await (supabase as any).from("user_tasks").upsert({
+            const { error } = await (supabase as any).from("user_tasks").upsert({
               id: task.id, user_id: uid, title: task.title, icon: task.icon,
-              status: task.status, position: task.position, pinned: task.pinned || false,
+              status: task.status, position: task.position,
               track: "mentee", steps: task.steps ?? [],
             }, { onConflict: "id" });
+            if (error) console.error("mentee task save failed:", error.message);
           }
           const nextIds = next.map((t) => t.id);
           for (const task of prev.filter((t) => t.id !== "reg-node" && !nextIds.includes(t.id))) {
@@ -180,17 +181,17 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
       // Persist to DB async (fire-and-forget)
       (async () => {
         for (const task of next) {
-          await (supabase as any).from("user_tasks").upsert({
+          const { error } = await (supabase as any).from("user_tasks").upsert({
             id: task.id,
             user_id: uid,
             title: task.title,
             icon: task.icon,
             status: task.status,
             position: task.position,
-            pinned: task.pinned || false,
             track: "mentor",
             steps: task.steps ?? [],
           }, { onConflict: "id" });
+          if (error) console.error("mentor note save failed:", error.message);
         }
         // Remove deleted tasks
         const nextIds = next.map((t) => t.id);

@@ -31,10 +31,10 @@ const MILESTONES = [
     t: 0.16,
     icon: MapPin,
     path: "workshops",
-    titleAr: "شوف",
+    titleAr: "الورش",
     titleEn: "Explore",
-    descAr: "تصفّح الورش والمحتوى واختر اللي يناسب رحلتك",
-    descEn: "Browse workshops and content, find what fits you",
+    descAr: "خذ التقييم عشان تعرف أول خطوة ليك",
+    descEn: "Take the assessment to know your first step",
   },
   {
     t: 0.5,
@@ -49,10 +49,10 @@ const MILESTONES = [
     t: 0.84,
     icon: Zap,
     path: "dashboard/roadmap",
-    titleAr: "تحوّل",
-    titleEn: "Transform",
-    descAr: "طبّق اللي اتعلمته وتابع تقدّمك على الخريطة",
-    descEn: "Apply what you learn and track your progress",
+    titleAr: "ابدأ",
+    titleEn: "Start",
+    descAr: "طبّق اللي اتعلمته مع منتور خاص بيك",
+    descEn: "Apply what you learn with your own mentor",
   },
 ];
 
@@ -80,6 +80,16 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
   // Milestone anchor points, computed from the actual path geometry.
   const [points, setPoints] = useState<Point[]>([]);
   const [active, setActive] = useState(-1);
+
+  // On narrow screens the side-attached cards overflow, so center them instead.
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const onChange = () => setIsMobile(mq.matches);
+    onChange();
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
 
   useEffect(() => {
     const p = pathRef.current;
@@ -123,8 +133,8 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
         </h2>
         <p className="text-white/50 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
           {isRtl
-            ? "انزل بالماوس واتبع الطريق… كل خطوة تقرّبك من التغيير"
-            : "Scroll down and follow the road. Every step gets you closer to change"}
+            ? "كل خطوة تقرّبك من نفسك.. واتبع الطريق اللي تختاره"
+            : "Every step brings you closer to yourself. Follow the path you choose"}
         </p>
       </div>
 
@@ -259,16 +269,30 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
                 animate={{ opacity: reached ? 1 : 0.35, y: reached ? 0 : 8 }}
                 transition={{ duration: 0.4 }}
                 className="absolute"
-                style={{
-                  top: `${(pt.y / 260) * 100}%`,
-                  [onRight ? "left" : "right"]: `${onRight ? armEndPct : 100 - armEndPct}%`,
-                  transform: "translateY(-50%)",
-                  marginInlineStart: onRight ? "1.5%" : 0,
-                  marginInlineEnd: onRight ? 0 : "1.5%",
-                  width: "42%",
-                  maxWidth: "200px",
-                  textAlign: onRight ? "start" : "end",
-                }}
+                style={
+                  isMobile
+                    ? {
+                        // Centered under each node via insets + auto margins (framer-motion
+                        // owns `transform`, so we can't use translateX here). Never overflows.
+                        top: `${(pt.y / 260) * 100}%`,
+                        left: 0,
+                        right: 0,
+                        marginInline: "auto",
+                        width: "84%",
+                        maxWidth: "300px",
+                        textAlign: "center",
+                      }
+                    : {
+                        top: `${(pt.y / 260) * 100}%`,
+                        [onRight ? "left" : "right"]: `${onRight ? armEndPct : 100 - armEndPct}%`,
+                        transform: "translateY(-50%)",
+                        marginInlineStart: onRight ? "1.5%" : 0,
+                        marginInlineEnd: onRight ? 0 : "1.5%",
+                        width: "42%",
+                        maxWidth: "200px",
+                        textAlign: onRight ? "start" : "end",
+                      }
+                }
               >
                 <Link
                   href={`/${locale}/${m.path}`}
@@ -287,6 +311,7 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
                     aria-hidden="true"
                     className="absolute"
                     style={{
+                      display: isMobile ? "none" : undefined,
                       top: "50%",
                       [onRight ? "left" : "right"]: "-5px",
                       width: "10px",
@@ -302,7 +327,10 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
                   />
                   <div
                     className="flex items-center gap-2 mb-1.5"
-                    style={{ flexDirection: onRight ? "row" : "row-reverse" }}
+                    style={{
+                      flexDirection: isMobile ? "row" : onRight ? "row" : "row-reverse",
+                      justifyContent: isMobile ? "center" : "flex-start",
+                    }}
                   >
                     <span
                       className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"

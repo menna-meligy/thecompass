@@ -79,7 +79,7 @@ export function AdminTopBar() {
   }
 
   return (
-    <header className="h-14 flex items-center justify-between px-6 border-b border-[rgba(245,158,11,0.08)] bg-[#0a0f1a]/80 backdrop-blur-sm flex-shrink-0">
+    <header className="h-14 flex items-center justify-between px-6 max-md:ps-16 border-b border-[rgba(245,158,11,0.08)] bg-[#0a0f1a]/80 backdrop-blur-sm flex-shrink-0">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-sm">
         {crumbs.map((crumb, i) => (

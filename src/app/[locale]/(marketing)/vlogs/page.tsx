@@ -1,16 +1,11 @@
-import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
-import VlogCard from "@/components/vlogs/VlogCard";
-import type { Vlog } from "@/types/index";
+import { getTranslations, getLocale } from "next-intl/server";
+import ArticleCard from "@/components/content/ArticleCard";
+import { getAllArticles } from "@/content/articles";
 
 export default async function VlogsPage() {
   const t = await getTranslations("vlogs");
-  const supabase = await createClient();
-
-  const { data: vlogs } = await supabase
-    .from("vlogs")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const locale = await getLocale();
+  const articles = getAllArticles();
 
   return (
     <div className="min-h-screen bg-[#0f172a]">
@@ -25,19 +20,14 @@ export default async function VlogsPage() {
 
       {/* Content */}
       <div style={{ maxWidth: "80rem", margin: "0 auto", padding: "2.5rem 1.5rem" }}>
-        {!vlogs || vlogs.length === 0 ? (
-          <div
-            className="flex flex-col items-center justify-center py-24"
-            style={{ border: "1px dashed rgba(245,158,11,0.15)", borderRadius: "10px", background: "rgba(30,41,59,0.2)" }}
-          >
-            <p className="text-white/40 font-semibold text-sm">
-              {vlogs === null ? t("error") : t("empty")}
-            </p>
+        {articles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24" style={{ border: "1px dashed rgba(245,158,11,0.15)", borderRadius: "10px", background: "rgba(30,41,59,0.2)" }}>
+            <p className="text-white/40 font-semibold text-sm">{t("empty")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(vlogs as Vlog[]).map((vlog) => (
-              <VlogCard key={vlog.id} vlog={vlog} />
+            {articles.map((article) => (
+              <ArticleCard key={article.slug} article={article} locale={locale} />
             ))}
           </div>
         )}

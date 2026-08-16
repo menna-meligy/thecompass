@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { validateReceipt, type ParsedReceipt } from "@/lib/payments/receipt";
 
+export const runtime = "nodejs";
+
 // Manual InstaPay / Vodafone Cash verification (no external AI / gateway).
 // The receipt is OCR'd in the browser; here we validate the extracted values
 // against the booking's trusted price + today, and enforce that the transaction
@@ -66,13 +68,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ verified: false, error: errors[0], errors, expected: expectedAmount });
     }
 
-    // Passed — store reference + proof + mark awaiting admin.
+    // Ensure a stored receipt image exists. The client tries to upload first
+    // (non-fatal); if that failed, upload here with the service-role client so a
+    // verified receipt ALWAYS has a proof the admin can review + confirm.
+    let finalProofUrl = proofUrl;
+    if (!finalProofUrl) {
+      try {
+        const safe = (file.name || "receipt.png").replace(/[^a-zA-Z0-9._-]/g, "_");
+        const path = `payments/${bookingId}-${safe}`;
+        const buf = Buffer.from(await file.arrayBuffer());
+        const { error: upErr } = await admin.storage
+          .from("payment-proofs")
+          .upload(path, buf, { contentType: file.type || "image/png", upsert: true });
+        if (!upErr) finalProofUrl = admin.storage.from("payment-proofs").getPublicUrl(path).data.publicUrl;
+      } catch {
+        /* ignore — handled below */
+      }
+    }
+    if (!finalProofUrl) {
+      // No stored proof → the booking could never be confirmed. Ask to retry.
+      return NextResponse.json({ verified: false, error: "upload_failed" });
+    }
+
+    // Passed — store reference + proof + mark awaiting admin review.
     await admin
       .from("payments")
       .update({
         gateway_txn_id: `ref:${parsed.reference}`,
         status: "pending_verification",
-        ...(proofUrl ? { proof_url: proofUrl } : {}),
+        proof_url: finalProofUrl,
       })
       .eq("booking_id", bookingId)
       .eq("status", "pending");

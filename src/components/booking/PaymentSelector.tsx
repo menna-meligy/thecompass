@@ -4,7 +4,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { CreditCard, Smartphone, Wallet, Check } from "lucide-react";
 import type { PaymentMethod } from "@/types/index";
 
-const instapayNumber = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01027857707";
+const instapayNumber = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093026726";
 const vodafoneNumber = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
 
 interface PaymentSelectorProps {
