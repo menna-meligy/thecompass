@@ -65,7 +65,7 @@ export default function ClientSessionNotesForm({
 
   // Dirty tracking
   const [isDirty, setIsDirty] = useState(false);
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout>();
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const initialValuesRef = useRef({ publicNote: "", privateNote: "" });
 
   // Fetch existing notes
