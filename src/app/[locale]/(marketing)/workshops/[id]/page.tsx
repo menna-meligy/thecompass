@@ -255,7 +255,7 @@ export default async function WorkshopDetailPage(props: PageProps<"/[locale]/wor
                               border: `1px solid ${isGroup ? "rgba(52,211,153,0.3)" : "rgba(129,140,248,0.3)"}`,
                             }}
                           >
-                            {isGroup ? (isRtl ? "الورشة الكاملة" : "Full Workshop") : (isRtl ? "جلسة فردية" : "1-on-1")}
+                            {isGroup ? (isRtl ? `الورشة الكاملة (${sessions?.length} جلسات)` : `Full Workshop (${sessions?.length} sessions)`) : (isRtl ? "جلسة فردية" : "1-on-1")}
                           </span>
                           <span style={{ display: "flex", alignItems: "baseline", gap: "4px", color: accentColor, fontWeight: 900 }}>
                             <span style={{ fontSize: "1.4rem", lineHeight: 1 }}>{priceNum ?? t("free")}</span>
