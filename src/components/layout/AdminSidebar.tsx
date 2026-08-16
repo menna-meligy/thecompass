@@ -146,6 +146,7 @@ export function AdminSidebar() {
       groupEn: "Programs",
       items: [
         { href: `/${locale}/admin/workshops`, labelAr: "الجلسات والورش", labelEn: "Sessions & Workshops", icon: BookOpen },
+        { href: `/${locale}/admin/reflections`, labelAr: "رسائل التشجيع", labelEn: "Reflections", icon: FileText },
       ],
     },
     {

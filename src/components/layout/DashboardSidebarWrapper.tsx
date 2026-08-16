@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Calendar, Map, User, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Calendar, Map, User, LogOut, Menu, X, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,6 +17,7 @@ export default function DashboardSidebarWrapper({ children, locale }: Props) {
   const navItems = [
     { href: `/${locale}/dashboard`, icon: LayoutDashboard, labelAr: "الرئيسية", labelEn: "Home", exact: true },
     { href: `/${locale}/dashboard/bookings`, icon: Calendar, labelAr: "حجوزاتي", labelEn: "Bookings", exact: false },
+    { href: `/${locale}/dashboard/reflections`, icon: MessageSquare, labelAr: "التشجيع", labelEn: "Feedback", exact: false },
     { href: `/${locale}/dashboard/roadmap`, icon: Map, labelAr: "الخريطة", labelEn: "Roadmap", exact: false },
     { href: `/${locale}/dashboard/profile`, icon: User, labelAr: "الملف", labelEn: "Profile", exact: false },
   ];

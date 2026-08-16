@@ -821,7 +821,12 @@ export type Database = {
           private_notes: string | null;
           encouragement_ar: string | null;
           encouragement_en: string | null;
+          mentor_notes_ar: string | null;
+          mentor_notes_en: string | null;
+          status: string | null;
+          version: number;
           submitted_at: string;
+          updated_at: string | null;
         };
         Insert: {
           id?: string;
@@ -831,7 +836,12 @@ export type Database = {
           private_notes?: string | null;
           encouragement_ar?: string | null;
           encouragement_en?: string | null;
+          mentor_notes_ar?: string | null;
+          mentor_notes_en?: string | null;
+          status?: string | null;
+          version?: number;
           submitted_at?: string;
+          updated_at?: string | null;
         };
         Update: {
           id?: string;
@@ -841,7 +851,12 @@ export type Database = {
           private_notes?: string | null;
           encouragement_ar?: string | null;
           encouragement_en?: string | null;
+          mentor_notes_ar?: string | null;
+          mentor_notes_en?: string | null;
+          status?: string | null;
+          version?: number;
           submitted_at?: string;
+          updated_at?: string | null;
         };
         Relationships: [];
       };
@@ -870,6 +885,78 @@ export type Database = {
         Row: { reflection_id: string; milestone_id: string };
         Insert: { reflection_id: string; milestone_id: string };
         Update: { reflection_id?: string; milestone_id?: string };
+        Relationships: [];
+      };
+      session_notes: {
+        Row: {
+          id: string;
+          booking_id: string;
+          client_id: string;
+          content_ar: string;
+          content_en: string;
+          is_public: boolean;
+          version: number;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          booking_id: string;
+          client_id: string;
+          content_ar: string;
+          content_en: string;
+          is_public?: boolean;
+          version?: number;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          booking_id?: string;
+          client_id?: string;
+          content_ar?: string;
+          content_en?: string;
+          is_public?: boolean;
+          version?: number;
+          created_by?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      notes_audit_log: {
+        Row: {
+          id: string;
+          table_name: string;
+          record_id: string;
+          operation: string;
+          changed_by: string;
+          old_values: Record<string, unknown> | null;
+          new_values: Record<string, unknown> | null;
+          timestamp: string;
+        };
+        Insert: {
+          id?: string;
+          table_name: string;
+          record_id: string;
+          operation: string;
+          changed_by: string;
+          old_values?: Record<string, unknown> | null;
+          new_values?: Record<string, unknown> | null;
+          timestamp?: string;
+        };
+        Update: {
+          id?: string;
+          table_name?: string;
+          record_id?: string;
+          operation?: string;
+          changed_by?: string;
+          old_values?: Record<string, unknown> | null;
+          new_values?: Record<string, unknown> | null;
+          timestamp?: string;
+        };
         Relationships: [];
       };
       skill_assessments: {

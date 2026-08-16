@@ -6,7 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:unit": "vitest run tests/notes/operations.unit.test.ts",
+    "test:integration": "vitest run tests/api/notes.integration.test.ts",
+    "test:performance": "vitest run tests/performance/notes.performance.test.ts",
+    "test:unit:watch": "vitest watch tests/notes/operations.unit.test.ts",
+    "test:coverage": "vitest run --coverage tests/notes tests/api tests/performance",
+    "test:e2e": "playwright test tests/e2e/notes.workflows.e2e.test.ts",
+    "test:a11y": "playwright test tests/accessibility/notes.accessibility.test.ts",
+    "test:e2e:ui": "playwright test --ui tests/e2e",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:performance && npm run test:e2e && npm run test:a11y",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:report": "node scripts/generate-test-report.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -39,11 +50,16 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "playwright": "^1.60.0",
     "playwright-chromium": "^1.60.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }

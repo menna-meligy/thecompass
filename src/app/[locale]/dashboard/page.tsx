@@ -258,27 +258,19 @@ export default async function DashboardPage() {
                   className="bg-[rgba(30,41,59,0.6)] border border-[rgba(245,158,11,0.12)] rounded-xl p-4 border-s-2"
                   style={{ borderInlineStartColor: "#F59E0B" }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="font-medium text-white text-sm">
-                        {getLocalizedField(
-                          (booking.session?.workshop as unknown as Record<string, unknown>) || {},
-                          "title",
-                          locale
-                        )}
-                      </p>
-                      <p className="text-xs text-white/40 mt-1">
-                        {booking.session?.starts_at
-                          ? formatDateTime(booking.session.starts_at, locale)
-                          : ""}
-                      </p>
-                    </div>
-                    <Link
-                      href={`/${locale}/dashboard/materials/${booking.id}`}
-                      className="text-xs text-[#F59E0B] font-medium"
-                    >
-                      {locale === "ar" ? "المواد" : "Materials"}
-                    </Link>
+                  <div>
+                    <p className="font-medium text-white text-sm">
+                      {getLocalizedField(
+                        (booking.session?.workshop as unknown as Record<string, unknown>) || {},
+                        "title",
+                        locale
+                      )}
+                    </p>
+                    <p className="text-xs text-white/40 mt-1">
+                      {booking.session?.starts_at
+                        ? formatDateTime(booking.session.starts_at, locale)
+                        : ""}
+                    </p>
                   </div>
                 </div>
               ))}

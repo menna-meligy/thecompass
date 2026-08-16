@@ -5,9 +5,17 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getLocalizedField } from "@/lib/utils";
 import type { Booking } from "@/types/index";
 import {
-  Calendar, Clock, CheckCircle2, FileText, Compass, BookOpen, ArrowRight, MapPin, AlertTriangle
+  Calendar, Clock, CheckCircle2, FileText, Compass, BookOpen, ArrowRight, MapPin, AlertTriangle, MessageSquare
 } from "lucide-react";
 import PaymentCountdownTimer from "@/components/booking/PaymentCountdownTimer";
+import dynamic from "next/dynamic";
+
+const ClientReflectionsCard = dynamic(
+  () => import("@/components/dashboard/ClientReflectionsCard")
+);
+const ClientSessionNotesForm = dynamic(
+  () => import("@/components/dashboard/ClientSessionNotesForm")
+);
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; border: string; label: string; labelAr: string }> = {
   pending:   { bg: "rgba(245,158,11,0.12)",  color: "#F59E0B", border: "rgba(245,158,11,0.35)",  label: "Pending",   labelAr: "قيد الانتظار" },
@@ -184,116 +192,138 @@ export default async function BookingsPage() {
               );
               const statusStyle = STATUS_STYLES[booking.status] || STATUS_STYLES.pending;
               const paymentStyle = booking.payment ? PAYMENT_STYLES[booking.payment.status] || PAYMENT_STYLES.pending : null;
+              const isPastBooking = booking.status === "completed";
 
               return (
-                <div
-                  key={booking.id}
-                  style={{
-                    background: "rgba(30,41,59,0.6)",
-                    border: "1px solid rgba(245,158,11,0.12)",
-                    borderRadius: "12px",
-                    padding: "20px 22px",
-                    transition: "border-color 0.15s",
-                  }}
-                >
-                  {/* Top row: title + status */}
-                  <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontWeight: 800, color: "white", fontSize: "0.975rem", marginBottom: "4px", lineHeight: 1.3 }}>
-                        {workshopTitle || (isAr ? "جلسة فردية" : "General Session")}
-                      </p>
+                <div key={booking.id} className="space-y-3">
+                  {/* Main booking card */}
+                  <div
+                    style={{
+                      background: "rgba(30,41,59,0.6)",
+                      border: "1px solid rgba(245,158,11,0.12)",
+                      borderRadius: "12px",
+                      padding: "20px 22px",
+                      transition: "border-color 0.15s",
+                    }}
+                  >
+                    {/* Top row: title + status */}
+                    <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: 800, color: "white", fontSize: "0.975rem", marginBottom: "4px", lineHeight: 1.3 }}>
+                          {workshopTitle || (isAr ? "جلسة فردية" : "General Session")}
+                        </p>
 
-                      {/* Date + time */}
-                      {booking.session?.starts_at && (
-                        <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: "6px" }}>
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
-                            <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-                              {formatDate(booking.session.starts_at, locale)}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
-                            <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-                              {new Date(booking.session.starts_at).toLocaleTimeString(
-                                locale === "ar" ? "ar-EG" : "en-US",
-                                { hour: "2-digit", minute: "2-digit" }
-                              )}
-                            </span>
-                          </div>
-                          {booking.session?.location_or_link && (
+                        {/* Date + time */}
+                        {booking.session?.starts_at && (
+                          <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: "6px" }}>
                             <div className="flex items-center gap-1.5">
-                              <MapPin className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
-                              <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)", maxWidth: "140px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                {booking.session.location_or_link}
+                              <Calendar className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
+                              <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
+                                {formatDate(booking.session.starts_at, locale)}
                               </span>
                             </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Status badge */}
-                    <div
-                      style={{
-                        display: "inline-flex", alignItems: "center", gap: "5px",
-                        padding: "5px 11px", borderRadius: "20px",
-                        background: statusStyle.bg, border: `1px solid ${statusStyle.border}`,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <CheckCircle2 className="h-3.5 w-3.5" style={{ color: statusStyle.color }} />
-                      <span style={{ fontSize: "0.75rem", fontWeight: 700, color: statusStyle.color }}>
-                        {isAr ? statusStyle.labelAr : statusStyle.label}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Payment deadline timer for pending bookings */}
-                  {booking.status === "pending" && (booking as any).payment_deadline && (
-                    <>
-                      <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
-                      <div style={{ marginBottom: "12px" }}>
-                        <PaymentCountdownTimer paymentDeadline={(booking as any).payment_deadline} />
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
+                              <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
+                                {new Date(booking.session.starts_at).toLocaleTimeString(
+                                  locale === "ar" ? "ar-EG" : "en-US",
+                                  { hour: "2-digit", minute: "2-digit" }
+                                )}
+                              </span>
+                            </div>
+                            {booking.session?.location_or_link && (
+                              <div className="flex items-center gap-1.5">
+                                <MapPin className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
+                                <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)", maxWidth: "140px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                  {booking.session.location_or_link}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </>
-                  )}
 
-                  {/* Divider */}
-                  <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
-
-                  {/* Bottom row: amount + payment status + receipt */}
-                  <div className="flex items-center justify-between gap-3 flex-wrap">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      {booking.payment && (
-                        <span style={{ color: "#F59E0B", fontWeight: 900, fontSize: "0.95rem" }}>
-                          {formatCurrency(booking.payment.amount, locale)}
+                      {/* Status badge */}
+                      <div
+                        style={{
+                          display: "inline-flex", alignItems: "center", gap: "5px",
+                          padding: "5px 11px", borderRadius: "20px",
+                          background: statusStyle.bg, border: `1px solid ${statusStyle.border}`,
+                          flexShrink: 0,
+                        }}
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" style={{ color: statusStyle.color }} />
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: statusStyle.color }}>
+                          {isAr ? statusStyle.labelAr : statusStyle.label}
                         </span>
-                      )}
-                      {booking.payment && paymentStyle && (
-                        <div
-                          style={{
-                            display: "inline-flex", alignItems: "center", gap: "4px",
-                            padding: "3px 9px", borderRadius: "12px",
-                            background: paymentStyle.bg,
-                          }}
-                        >
-                          <span style={{ fontSize: "0.7rem", fontWeight: 700, color: paymentStyle.color }}>
-                            {isAr ? paymentStyle.labelAr : paymentStyle.label}
+                      </div>
+                    </div>
+
+                    {/* Payment deadline timer for pending bookings */}
+                    {booking.status === "pending" && (booking as any).payment_deadline && (
+                      <>
+                        <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
+                        <div style={{ marginBottom: "12px" }}>
+                          <PaymentCountdownTimer paymentDeadline={(booking as any).payment_deadline} />
+                        </div>
+                      </>
+                    )}
+
+                    {/* Divider */}
+                    <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
+
+                    {/* Bottom row: amount + payment status + receipt */}
+                    <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {booking.payment && (
+                          <span style={{ color: "#F59E0B", fontWeight: 900, fontSize: "0.95rem" }}>
+                            {formatCurrency(booking.payment.amount, locale)}
+                          </span>
+                        )}
+                        {booking.payment && paymentStyle && (
+                          <div
+                            style={{
+                              display: "inline-flex", alignItems: "center", gap: "4px",
+                              padding: "3px 9px", borderRadius: "12px",
+                              background: paymentStyle.bg,
+                            }}
+                          >
+                            <span style={{ fontSize: "0.7rem", fontWeight: 700, color: paymentStyle.color }}>
+                              {isAr ? paymentStyle.labelAr : paymentStyle.label}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {booking.payment?.proof_url && (
+                        <div className="flex items-center gap-1.5">
+                          <FileText className="h-3.5 w-3.5" style={{ color: "#22C55E" }} />
+                          <span style={{ fontSize: "0.75rem", color: "#22C55E", fontWeight: 600 }}>
+                            {isAr ? "تم رفع الإيصال ✓" : "Receipt uploaded ✓"}
                           </span>
                         </div>
                       )}
                     </div>
-
-                    {booking.payment?.proof_url && (
-                      <div className="flex items-center gap-1.5">
-                        <FileText className="h-3.5 w-3.5" style={{ color: "#22C55E" }} />
-                        <span style={{ fontSize: "0.75rem", color: "#22C55E", fontWeight: 600 }}>
-                          {isAr ? "تم رفع الإيصال ✓" : "Receipt uploaded ✓"}
-                        </span>
-                      </div>
-                    )}
                   </div>
+
+                  {/* Reflection and notes section for completed bookings */}
+                  {isPastBooking && (
+                    <div className="space-y-2">
+                      {/* Reflection card */}
+                      <ClientReflectionsCard
+                        bookingId={booking.id}
+                        clientId={user.id}
+                        locale={locale as "ar" | "en"}
+                      />
+
+                      {/* Notes form */}
+                      <ClientSessionNotesForm
+                        bookingId={booking.id}
+                        clientId={user.id}
+                        locale={locale as "ar" | "en"}
+                      />
+                    </div>
+                  )}
                 </div>
               );
             })}
