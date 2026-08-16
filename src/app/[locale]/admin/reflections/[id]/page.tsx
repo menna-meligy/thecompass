@@ -103,22 +103,8 @@ export default function AdminReflectionDetailPage() {
     );
   }
 
-  const sessionTitle = reflection.booking?.session?.workshop
-    ? getLocalizedField(
-        reflection.booking.session.workshop as Record<string, unknown>,
-        "title",
-        locale
-      )
-    : isAr
-    ? "جلسة فردية"
-    : "General Session";
-
-  const sessionDate = reflection.booking?.session?.starts_at
-    ? new Date(reflection.booking.session.starts_at).toLocaleDateString(
-        isAr ? "ar-EG" : "en-US",
-        { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
-      )
-    : "Unknown";
+  const sessionTitle = isAr ? "جلسة" : "Session";
+  const sessionDate = "Unknown";
 
   const encouragement = isAr
     ? reflection.encouragement_ar
