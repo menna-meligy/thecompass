@@ -40,15 +40,7 @@ export default async function ClientReflectionsPage() {
       private_notes,
       encouragement_ar,
       encouragement_en,
-      submitted_at,
-      mentor:profiles(full_name),
-      booking:bookings(
-        session_id,
-        session:sessions(
-          starts_at,
-          workshop:workshops(title_ar, title_en)
-        )
-      )
+      submitted_at
     `
     )
     .eq("client_id", user.id)
@@ -58,7 +50,7 @@ export default async function ClientReflectionsPage() {
     console.error("Error fetching reflections:", error);
   }
 
-  const typed = (reflections || []) as ReflectionWithDetails[];
+  const typed = (reflections || []) as unknown as ReflectionWithDetails[];
 
   return (
     <div className="min-h-screen bg-[#0f172a] px-4 py-10">
@@ -112,20 +104,7 @@ export default async function ClientReflectionsPage() {
         ) : (
           <div className="space-y-4">
             {typed.map((reflection) => {
-              const sessionTitle = reflection.booking?.session?.workshop
-                ? getLocalizedField(
-                    reflection.booking.session.workshop as Record<string, unknown>,
-                    "title",
-                    locale
-                  )
-                : isAr
-                ? "جلسة فردية"
-                : "General Session";
-
-              const sessionDate = reflection.booking?.session?.starts_at
-                ? formatDate(reflection.booking.session.starts_at, locale)
-                : "Unknown date";
-
+              const sessionTitle = isAr ? "جلسة" : "Session";
               const encouragement = isAr
                 ? reflection.encouragement_ar
                 : reflection.encouragement_en;
@@ -158,24 +137,14 @@ export default async function ClientReflectionsPage() {
                       </p>
 
                       {/* Date info */}
-                      {reflection.booking?.session?.starts_at && (
-                        <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: "6px" }}>
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
-                            <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-                              {sessionDate}
-                            </span>
-                          </div>
-                          {reflection.mentor?.full_name && (
-                            <div className="flex items-center gap-1.5">
-                              <MessageSquare className="h-3.5 w-3.5" style={{ color: "rgba(245,158,11,0.5)" }} />
-                              <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-                                {isAr ? "من:" : "From:"} {reflection.mentor.full_name}
-                              </span>
-                            </div>
-                          )}
+                      <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: "6px" }}>
+                        <div className="flex items-center gap-1.5">
+                          <Calendar className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
+                          <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
+                            {formatDate(reflection.submitted_at, locale)}
+                          </span>
                         </div>
-                      )}
+                      </div>
                     </div>
 
                     {/* Status badge */}
