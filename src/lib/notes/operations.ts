@@ -126,14 +126,10 @@ export async function createSessionReflection(
         booking_id: bookingId,
         client_id: clientId,
         mentor_id: mentorId,
-        created_by: mentorId,
         encouragement_ar: data.encouragement_ar,
         encouragement_en: data.encouragement_en,
         private_notes: data.private_notes,
-        is_public: data.is_public ?? true,
-        status: data.status ?? "published",
         submitted_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       })
       .select()
       .single();
