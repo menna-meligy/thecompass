@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     // Get time slots for each session
     const sessionIds = sessions?.map((s) => s.id) || [];
-    let slots = [];
+    let slots: any[] = [];
 
     if (sessionIds.length > 0) {
       const { data: timeSlots, error: slotsError } = await supabase
