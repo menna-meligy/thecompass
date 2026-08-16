@@ -16,7 +16,7 @@ const ZONE_LABEL: Record<Zone, { ar: string; en: string }> = {
 function fallbackFeedback(locale: QuizLocale, zone: Zone, recTitle: string): string {
   const z = ZONE_LABEL[zone][locale];
   if (locale === "ar") {
-    return `من إجاباتك، إنت ${z}. الحاجة الكويسة إنك واخد خطوة إنك تفهم نفسك أكتر، وده أصعب جزء. أنسب بداية ليك دلوقتي: ${recTitle}، هيساعدك تحوّل الإحساس ده لخطوات واضحة.`;
+    return `من إجاباتك، إنت ${z}. الحاجة الكويسة إنك واخد خطوة إنك تفهم نفسك أكتر، وده أصعب جزء. أنسب بداية ليك دلوقتي: ${recTitle}، هيساعدك أوصل الإحساس ده لخطوات واضحة.`;
   }
   return `From your answers, you're ${z.toLowerCase()}. The good news is you've taken the step of understanding yourself; that's the hardest part. Your best starting point right now: ${recTitle}, which will turn this feeling into clear, doable steps.`;
 }

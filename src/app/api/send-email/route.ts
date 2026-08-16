@@ -102,6 +102,31 @@ export async function POST(request: NextRequest) {
         <p style="color: #666; font-size: 12px;">البوصلة: إشعار إداري</p>
       </div>
     `;
+  } else if (type === "activation") {
+    const activationLink = body.activation_link;
+    if (!activationLink) {
+      return NextResponse.json({ error: "Missing activation_link" }, { status: 400 });
+    }
+    const { activationEmail: activationEmailFn } = await import("@/lib/email/templates");
+    const emailData = { userName, activationLink };
+    const result = activationEmailFn(emailData);
+    subject = result.subject;
+    html = result.html;
+  } else if (type === "payment_reminder") {
+    const { paymentReminderEmail: paymentReminderFn } = await import("@/lib/email/templates");
+    const hoursRemaining = body.hours_remaining || 24;
+    const amount = payment?.amount != null ? `${payment.amount} ج.م` : body.amount || "-";
+    const emailData = { userName, workshopTitle, amount, hoursRemaining, appUrl: process.env.NEXT_PUBLIC_APP_URL };
+    const result = paymentReminderFn(emailData);
+    subject = result.subject;
+    html = result.html;
+  } else if (type === "payment_cancelled") {
+    const { paymentCancelledEmail: paymentCancelledFn } = await import("@/lib/email/templates");
+    const amount = payment?.amount != null ? `${payment.amount} ج.م` : body.amount || "-";
+    const emailData = { userName, workshopTitle, amount, appUrl: process.env.NEXT_PUBLIC_APP_URL };
+    const result = paymentCancelledFn(emailData);
+    subject = result.subject;
+    html = result.html;
   } else {
     return NextResponse.json({ error: "Unknown email type" }, { status: 400 });
   }

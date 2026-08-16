@@ -13,7 +13,7 @@ UPDATE public.workshops SET
   title_en        = 'Play it Right. Get Accepted',
   title_ar        = 'العب صح، واتقبل',
   description_en  = 'Scholarships aren''t luck. They''re a game with rules. And there are people who win every time, not because they''re smarter, but because they understand how to play. If you keep getting rejected while others with less effort get through, the problem isn''t you. It''s how you''re presenting yourself.',
-  description_ar  = 'المنح مش حظ. دي لعبة ليها قواعد، وفي ناس بتكسبها كل مرة؛ مش لإنهم أذكى، لكن لإنهم فاهمين يلعبوها صح. لو مبتتقبلش رغم إنك شايف ناس بمجهود أقل بيوصلوا، فالمشكلة مش فيك… المشكلة في طريقة ما بتقدّم بيها نفسك.',
+  description_ar  = 'المنح مش حظ. دي لعبة ليها قواعد، وفي ناس بتكسبها كل مرة؛ مش لإنهم أذكى، لكن لإنهم ازاي يلعبوها صح. لو مبتتقبلش رغم إنك شايف ناس بمجهود أقل بيوصلوا، فالمشكلة مش فيك… المشكلة في الطريقه اللي بتقدم بيها نفسك.',
   topic           = 'scholarships',
   target_audience_en = 'Anyone who wants to apply for scholarships or study abroad opportunities',
   target_audience_ar = 'أي حد عايز يقدم على منح أو فرص دراسة بالخارج',
@@ -27,7 +27,7 @@ UPDATE public.workshops SET
   ]'::jsonb,
   outline_ar      = '[
     {"session": "الجلسة 1", "title": "اكتشاف نفسك", "bullets": ["إنت عايز تسافر ليه؟", "إيه دوافعك الحقيقية؟", "أنسب دولة + مجال ليك"]},
-    {"session": "الجلسة 2", "title": "قائمة منح مخصصة ليك", "bullets": ["بنجهز لك Catalog منح كامل مناسب ليك", "كل الخيارات المتاحة حسب مجالك وهدفك", "بنراجع القائمة ونختار الهدف"]},
+    {"session": "الجلسة 2", "title": "قائمة منح مخصصة ليك", "bullets": ["بنجهز لك كتالوج منح كامل مناسب ليك", "كل الخيارات المتاحة حسب مجالك وهدفك", "بنراجع القائمة ونختار الهدف"]},
     {"session": "الجلسة 3", "title": "Mentor من نفس التجربة", "bullets": ["أخد منحة شبه اللي إنت مقدم عليها في نفس مجالك", "يقولك كل المطلوب", "أسهل طريقة توصله", "يديك materials واضحة تبدأ بيها"]},
     {"session": "الجلسة 4", "title": "أول مراجعة للابلكيشن", "bullets": ["تكتب أول نسخة من الـ Application", "الـ Mentor يراجع SOP (خطاب الحافز)", "الـ Mentor يراجع Recommendation Letters"]},
     {"session": "الجلسة 5", "title": "مراجعة نهائية وتعديلات", "bullets": ["تحسين كل نقطة ضعيفة", "مراجعة النسخة النهائية", "تجهيزك قبل الديدلاين"]}

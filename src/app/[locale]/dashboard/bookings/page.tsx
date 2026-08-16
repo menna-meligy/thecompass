@@ -5,8 +5,9 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatCurrency, getLocalizedField } from "@/lib/utils";
 import type { Booking } from "@/types/index";
 import {
-  Calendar, Clock, CheckCircle2, FileText, Compass, BookOpen, ArrowRight, MapPin
+  Calendar, Clock, CheckCircle2, FileText, Compass, BookOpen, ArrowRight, MapPin, AlertTriangle
 } from "lucide-react";
+import PaymentCountdownTimer from "@/components/booking/PaymentCountdownTimer";
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; border: string; label: string; labelAr: string }> = {
   pending:   { bg: "rgba(245,158,11,0.12)",  color: "#F59E0B", border: "rgba(245,158,11,0.35)",  label: "Pending",   labelAr: "قيد الانتظار" },
@@ -33,7 +34,7 @@ export default async function BookingsPage() {
 
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("*, session:sessions(*, workshop:workshops(*)), payment:payments(*)")
+    .select("*, session:sessions(*, workshop:workshops(*)), payment:payments(*), payment_deadline")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -247,6 +248,16 @@ export default async function BookingsPage() {
                       </span>
                     </div>
                   </div>
+
+                  {/* Payment deadline timer for pending bookings */}
+                  {booking.status === "pending" && (booking as any).payment_deadline && (
+                    <>
+                      <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
+                      <div style={{ marginBottom: "12px" }}>
+                        <PaymentCountdownTimer paymentDeadline={(booking as any).payment_deadline} />
+                      </div>
+                    </>
+                  )}
 
                   {/* Divider */}
                   <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />

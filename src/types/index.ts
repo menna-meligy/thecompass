@@ -86,6 +86,9 @@ export interface Booking {
   time_slot_id: string | null;
   status: BookingStatus;
   created_at: string;
+  payment_deadline?: string | null;
+  payment_reminder_sent_at?: string | null;
+  payment_cancelled_at?: string | null;
   // relation joins
   session?: Session;
   time_slot?: TimeSlot;
@@ -345,6 +348,9 @@ export type Database = {
           time_slot_id: string | null;
           status: string;
           created_at: string;
+          payment_deadline: string | null;
+          payment_reminder_sent_at: string | null;
+          payment_cancelled_at: string | null;
         };
         Insert: {
           id?: string;
@@ -353,6 +359,9 @@ export type Database = {
           time_slot_id?: string | null;
           status?: string;
           created_at?: string;
+          payment_deadline?: string | null;
+          payment_reminder_sent_at?: string | null;
+          payment_cancelled_at?: string | null;
         };
         Update: {
           id?: string;
@@ -361,6 +370,9 @@ export type Database = {
           time_slot_id?: string | null;
           status?: string;
           created_at?: string;
+          payment_deadline?: string | null;
+          payment_reminder_sent_at?: string | null;
+          payment_cancelled_at?: string | null;
         };
         Relationships: [
           {

@@ -104,3 +104,63 @@ export function reminder30MinEmail(d: ReminderData): { subject: string; html: st
     `),
   };
 }
+
+export interface ActivationEmailData {
+  userName: string;
+  activationLink: string;
+}
+
+/** Account activation email. */
+export function activationEmail(d: ActivationEmailData): { subject: string; html: string } {
+  return {
+    subject: `تفعيل حسابك في البوصلة 🧭`,
+    html: layout(`
+      <h2 style="color:#fff; margin:0 0 10px;">أهلاً بيك في البوصلة 🧭</h2>
+      <p style="line-height:1.7; margin:0 0 12px;">أهلاً ${d.userName}،</p>
+      <p style="line-height:1.7; margin:0 0 12px;">شكراً على التسجيل معنا! عشان نتأكد إن البريد الإلكتروني بتاعك صحيح، لازم تضغط على الزرار تحت وتفعّل حسابك.</p>
+      <div style="text-align: center; margin: 20px 0;">
+        ${ctaButton(d.activationLink, "فعّل الحساب الآن")}
+      </div>
+      <p style="line-height:1.7; margin:0; font-size:13px; color:rgba(255,255,255,0.6);">اللينك صالح لمدة ٢٤ ساعة بس. لو لم تتسجل أنت بتاعك، متقلقش ولا حتحصل حاجة.</p>
+    `),
+  };
+}
+
+export interface PaymentReminderData {
+  userName: string;
+  workshopTitle: string;
+  amount: string;
+  hoursRemaining: number;
+  appUrl?: string;
+}
+
+/** Payment reminder email - first reminder at 12 hours. */
+export function paymentReminderEmail(d: PaymentReminderData): { subject: string; html: string } {
+  return {
+    subject: `⏰ تذكير: استكمل دفعتك لتأكيد جلستك — ${d.workshopTitle}`,
+    html: layout(`
+      <h2 style="color:#fff; margin:0 0 10px;">تذكير بالدفع ⏰</h2>
+      <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
+      <p style="line-height:1.7; margin:0 0 12px;">اخترت جلسة في <strong style="color:#F59E0B;">${d.workshopTitle}</strong> بقيمة <strong style="color:#F59E0B;">${d.amount}</strong>، لكن لما تكملش الدفع فيها بعد!</p>
+      <p style="line-height:1.7; margin:0 0 12px; color:#fca5a5;">⏳ عندك <strong style="color:#fca5a5;">${d.hoursRemaining} ساعات</strong> عشان تكمل الدفع وإلا هنلغي حجزك!</p>
+      <div style="background:rgba(245,158,11,0.1); border-right:3px solid #F59E0B; padding:12px 16px; margin:14px 0; border-radius:4px;">
+        <p style="color:#F59E0B; margin:0; font-weight:bold;">💡 استكمل الدفع دلوقتي عشان ما تخسر مكانك</p>
+      </div>
+      ${d.appUrl ? ctaButton(`${d.appUrl}/ar/dashboard/bookings`, "استكمل الدفع") : ""}
+    `),
+  };
+}
+
+/** Payment cancellation email - booking has been cancelled due to non-payment. */
+export function paymentCancelledEmail(d: Omit<PaymentReminderData, 'hoursRemaining'>): { subject: string; html: string } {
+  return {
+    subject: `❌ تم إلغاء حجزك — لم تكمل الدفع في الوقت المحدد`,
+    html: layout(`
+      <h2 style="color:#fca5a5; margin:0 0 10px;">تم إلغاء الحجز ❌</h2>
+      <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
+      <p style="line-height:1.7; margin:0 0 12px;">نأسف، لكن حجزك في <strong>${d.workshopTitle}</strong> تم إلغاؤه لأنك ما أكملتش الدفع في الوقت المحدد.</p>
+      <p style="line-height:1.7; margin:0 0 12px;">لو بتفكر تحجز مرة ثانية، اضغط الزرار تحت وختار جلسة جديدة. 💪</p>
+      ${d.appUrl ? ctaButton(`${d.appUrl}/ar/book/general`, "اختر جلسة جديدة") : ""}
+    `),
+  };
+}

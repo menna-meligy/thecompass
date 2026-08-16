@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Session not found or not available" }, { status: 404 });
   }
 
-  // Create booking
+  // Create booking with 24-hour payment deadline
+  const paymentDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
   const { data: booking, error: bookingError } = await supabase
     .from("bookings")
     .insert({
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
       session_id,
       time_slot_id: time_slot_id || null,
       status: "pending",
+      payment_deadline: paymentDeadline,
     })
     .select()
     .single();
@@ -102,8 +104,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // For manual payments, return booking_id
-  return NextResponse.json({ booking_id: booking.id });
+  // For manual payments, return booking_id and payment_deadline
+  return NextResponse.json({
+    booking_id: booking.id,
+    payment_deadline: booking.payment_deadline,
+  });
 }
 
 async function createPaymobOrder({

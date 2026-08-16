@@ -8,9 +8,6 @@ import type { Booking, RoadmapProgress } from "@/types/index";
 import { Calendar, BookOpen, ChevronRight, ClipboardList, Map, User, Compass } from "lucide-react";
 import type { AssessmentResult } from "@/lib/compass/types";
 import { ZONE_LABELS } from "@/lib/compass/templates";
-import { fetchEligibilityData } from "@/lib/skills/operations";
-import { computeEligibility } from "@/lib/skills/eligibility";
-import AssessmentCard from "@/components/compass/AssessmentCard";
 import NextSessionCountdown from "@/components/dashboard/NextSessionCountdown";
 
 export default async function DashboardPage() {
@@ -24,7 +21,7 @@ export default async function DashboardPage() {
 
   if (!user) redirect(`/${locale}/auth`);
 
-  const [{ data: profile }, { data: bookings }, { data: roadmap }, { data: latestAssessment }, eligibilityData] =
+  const [{ data: profile }, { data: bookings }, { data: roadmap }, { data: latestAssessment }] =
     await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
@@ -46,11 +43,7 @@ export default async function DashboardPage() {
         .order("completed_at", { ascending: false })
         .limit(1)
         .single(),
-      fetchEligibilityData(supabase, user.id),
     ]);
-
-  const eligibility = computeEligibility(eligibilityData);
-  const lastReadingDate = eligibilityData.completedAssessments[0]?.completed_at ?? null;
 
   const isAr = locale === "ar";
   const statusLabel = (s: string) => {
@@ -196,13 +189,6 @@ export default async function DashboardPage() {
       <CompassHeroCard
         locale={locale}
         assessment={latestAssessment as { result_snapshot: AssessmentResult; happiness_score: number; completed_at: string } | null}
-      />
-
-      {/* Assessment eligibility card */}
-      <AssessmentCard
-        eligibility={eligibility}
-        locale={locale as "ar" | "en"}
-        lastReadingDate={lastReadingDate ?? undefined}
       />
 
       <div className="grid md:grid-cols-2 gap-8 mt-10">

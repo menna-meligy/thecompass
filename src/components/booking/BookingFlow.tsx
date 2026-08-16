@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import PaymentCountdownTimer from "./PaymentCountdownTimer";
 
 const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093026726";
 const VODAFONE_NUMBER = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
@@ -82,6 +83,7 @@ export default function BookingFlow({
   const SUPPORT_PHONE = "01093026726";
   const [uploading, setUploading] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [paymentDeadline, setPaymentDeadline] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const supabase = createClient();
@@ -144,6 +146,7 @@ export default function BookingFlow({
       const data = await res.json();
       if (data.booking_id) {
         setBookingId(data.booking_id);
+        setPaymentDeadline(data.payment_deadline || null);
         setStep("proof");
       } else {
         setBookingError(data.error || (isAr ? "حدث خطأ، حاول مرة أخرى" : "Something went wrong, please try again"));
@@ -529,6 +532,13 @@ export default function BookingFlow({
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Payment deadline timer */}
+      {paymentDeadline && (
+        <div style={{ marginBottom: "20px" }}>
+          <PaymentCountdownTimer paymentDeadline={paymentDeadline} />
         </div>
       )}
 
