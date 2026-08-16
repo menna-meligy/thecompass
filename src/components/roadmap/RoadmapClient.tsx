@@ -221,7 +221,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
     ? (isAr ? "أهداف العميل" : "Client's Goals")
     : (isAr ? "أهدافي" : "My Goals");
   const tab2Label = isAdmin
-    ? (isAr ? "ملاحظاتي (المنتور)" : "My Notes (Mentor)")
+    ? (isAr ? "ملاحظات (المنتور)" : "Notes (Mentor)")
     : (isAr ? "ملاحظات المنتور" : "Mentor Notes");
 
   return (
@@ -333,7 +333,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
                 locale={locale}
                 useDB={true}
                 readOnly={!isAdmin}
-                trackLabel={isAdmin ? (isAr ? "ملاحظاتي (المنتور)" : "Mentor Notes") : (isAr ? "ملاحظات المنتور" : "Mentor Notes")}
+                trackLabel={isAdmin ? (isAr ? "ملاحظات (المنتور)" : "Mentor Notes") : (isAr ? "ملاحظات المنتور" : "Mentor Notes")}
                 trackColor="#A78BFA"
               />
             )}
