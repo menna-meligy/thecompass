@@ -7,7 +7,6 @@ interface CreateNoteBody {
   bookingId: string;
   content_ar: string;
   content_en: string;
-  is_public: boolean;
 }
 
 export async function POST(req: NextRequest) {
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     // Parse and validate body
     const body = await req.json() as CreateNoteBody;
-    const { bookingId, content_ar, content_en, is_public } = body;
+    const { bookingId, content_ar, content_en } = body;
 
     // Validate required fields
     if (!bookingId || !content_ar || !content_en) {
@@ -55,8 +54,7 @@ export async function POST(req: NextRequest) {
       userClient,
       bookingId,
       user.id,
-      { ar: content_ar, en: content_en },
-      is_public ?? false
+      { ar: content_ar, en: content_en }
     );
 
     if (!result.success) {
@@ -69,8 +67,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         id: result.data.id,
-        created_at: result.data.created_at,
-        is_public: result.data.is_public,
+        updated_at: result.data.updated_at,
       },
       { status: 201 }
     );
