@@ -25,17 +25,10 @@ export interface SessionReflectionData {
   booking_id: string;
   client_id: string;
   mentor_id: string;
-  created_by?: string;
   encouragement_ar?: string;
   encouragement_en?: string;
-  mentor_notes_ar?: string;
-  mentor_notes_en?: string;
   private_notes?: string;
-  is_public: boolean;
-  status: "draft" | "published" | "archived";
   submitted_at: string;
-  updated_at: string;
-  skills?: Array<{ skill_id: string; mentor_level: number }>;
 }
 
 /**
@@ -45,10 +38,8 @@ export interface ClientNoteData {
   id: string;
   booking_id: string;
   client_id: string;
-  content_ar?: string;
-  content_en?: string;
-  is_public: boolean;
-  created_at: string;
+  public_notes?: string;
+  private_notes?: string;
   updated_at: string;
 }
 
