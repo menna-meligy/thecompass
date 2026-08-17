@@ -8,11 +8,7 @@ interface CreateReflectionBody {
   clientId: string;
   encouragement_ar?: string | null;
   encouragement_en?: string | null;
-  mentor_notes_ar?: string | null;
-  mentor_notes_en?: string | null;
   private_notes?: string | null;
-  is_public?: boolean;
-  status?: "draft" | "published";
 }
 
 export async function POST(req: NextRequest) {
@@ -43,11 +39,7 @@ export async function POST(req: NextRequest) {
       clientId,
       encouragement_ar,
       encouragement_en,
-      mentor_notes_ar,
-      mentor_notes_en,
       private_notes,
-      is_public = true,
-      status = "published",
     } = body;
 
     if (!bookingId || !clientId) {
@@ -87,11 +79,7 @@ export async function POST(req: NextRequest) {
         {
           encouragement_ar: encouragement_ar ?? undefined,
           encouragement_en: encouragement_en ?? undefined,
-          mentor_notes_ar: mentor_notes_ar ?? undefined,
-          mentor_notes_en: mentor_notes_en ?? undefined,
           private_notes: private_notes ?? undefined,
-          is_public,
-          status,
         },
         user.id
       );
@@ -106,8 +94,6 @@ export async function POST(req: NextRequest) {
           encouragement_ar: encouragement_ar ?? undefined,
           encouragement_en: encouragement_en ?? undefined,
           private_notes: private_notes ?? undefined,
-          is_public,
-          status,
         }
       );
     }
@@ -123,7 +109,6 @@ export async function POST(req: NextRequest) {
       {
         id: result.data.id,
         booking_id: bookingId,
-        status: result.data.status,
         created_at: result.data.submitted_at,
       },
       { status: existing ? 200 : 201 }
