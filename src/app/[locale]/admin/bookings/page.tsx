@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Check, X, UserCheck, Clock, Eye, Search, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import PaymentCountdownTimer from "@/components/booking/PaymentCountdownTimer";
 
 type BookingStatus = "all" | "pending" | "proof_submitted" | "confirmed" | "cancelled" | "attended";
 
@@ -13,6 +14,7 @@ interface BookingRow {
   id: string;
   status: string;
   created_at: string;
+  payment_deadline?: string;
   user?: { full_name?: string; email?: string };
   session?: {
     starts_at?: string;
@@ -47,8 +49,9 @@ function receiptState(b: BookingRow): string {
   return b.status;
 }
 
-const FILTER_TABS: { key: BookingStatus; labelAr: string; labelEn: string }[] = [
+const FILTER_TABS: { key: BookingStatus | "payment_pending"; labelAr: string; labelEn: string }[] = [
   { key: "all",             labelAr: "الكل",          labelEn: "All" },
+  { key: "payment_pending", labelAr: "بانتظار الدفع", labelEn: "Awaiting payment" },
   { key: "proof_submitted", labelAr: "إيصال مرفوع",   labelEn: "Proof sent" },
   { key: "pending",         labelAr: "معلق",           labelEn: "Pending" },
   { key: "confirmed",       labelAr: "مؤكد",           labelEn: "Confirmed" },
@@ -71,7 +74,7 @@ export default function AdminBookingsPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("bookings")
-      .select("id, status, created_at, user:profiles(full_name, email), session:sessions(starts_at, location_or_link, workshop:workshops(title_ar, title_en)), payment:payments(status, amount, proof_url, created_at)")
+      .select("id, status, created_at, payment_deadline, user:profiles(full_name, email), session:sessions(starts_at, location_or_link, workshop:workshops(title_ar, title_en)), payment:payments(status, amount, proof_url, created_at)")
       .order("created_at", { ascending: false });
     // bookings→payments is one-to-many → PostgREST returns `payment` as an array;
     // collapse to the most-recent single payment so amount/status render.
@@ -136,10 +139,15 @@ export default function AdminBookingsPage() {
 
   const filtered = bookings.filter((b) => {
     if (filter !== "all") {
-      // "pending" tab groups the awaiting-receipt bookings; otherwise match the derived state.
-      const ds = receiptState(b);
-      const matchKey = ds === "awaiting_receipt" ? "pending" : ds;
-      if (matchKey !== filter) return false;
+      if (filter === "payment_pending") {
+        // Show only pending status bookings (those awaiting payment)
+        if (b.status !== "pending") return false;
+      } else {
+        // "pending" tab groups the awaiting-receipt bookings; otherwise match the derived state.
+        const ds = receiptState(b);
+        const matchKey = ds === "awaiting_receipt" ? "pending" : ds;
+        if (matchKey !== filter) return false;
+      }
     }
     if (search) {
       const q = search.toLowerCase();
@@ -204,7 +212,14 @@ export default function AdminBookingsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-1 flex-wrap">
           {FILTER_TABS.map((tab) => {
-            const count = tab.key === "all" ? bookings.length : bookings.filter((b) => b.status === tab.key).length;
+            let count = 0;
+            if (tab.key === "all") {
+              count = bookings.length;
+            } else if (tab.key === "payment_pending") {
+              count = bookings.filter((b) => b.status === "pending" && b.payment_deadline).length;
+            } else {
+              count = bookings.filter((b) => b.status === tab.key).length;
+            }
             return (
               <button
                 key={tab.key}
@@ -243,6 +258,7 @@ export default function AdminBookingsPage() {
                 <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "العميل" : "Client"}</th>
                 <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "الجلسة" : "Session"}</th>
                 <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "الموعد" : "Date"}</th>
+                <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "مهلة الدفع" : "Payment Due"}</th>
                 <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "الحالة" : "Status"}</th>
                 <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "المبلغ" : "Amount"}</th>
                 <th className="text-start py-3 px-4 text-[0.65rem] font-bold uppercase tracking-widest text-white/30">{isAr ? "إجراءات" : "Actions"}</th>
@@ -251,7 +267,7 @@ export default function AdminBookingsPage() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center text-white/25 text-sm">
+                  <td colSpan={7} className="py-16 text-center text-white/25 text-sm">
                     {isAr ? "لا توجد حجوزات" : "No bookings found"}
                   </td>
                 </tr>
@@ -275,6 +291,15 @@ export default function AdminBookingsPage() {
                     </td>
                     <td className="py-3 px-4">
                       <p className="text-white/50 text-xs">{sessionDate}</p>
+                    </td>
+                    <td className="py-3 px-4">
+                      {booking.status === "pending" && booking.payment_deadline ? (
+                        <div className="text-xs">
+                          <PaymentCountdownTimer paymentDeadline={booking.payment_deadline} />
+                        </div>
+                      ) : (
+                        <p className="text-white/50 text-xs">-</p>
+                      )}
                     </td>
                     <td className="py-3 px-4">
                       <span className={cn("inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold", statusCfg.bg, statusCfg.text)}>
