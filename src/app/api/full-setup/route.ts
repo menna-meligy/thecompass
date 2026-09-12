@@ -93,7 +93,12 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Not authorized" }, { status: 403 });
     }
 
-    const results = {
+    const results: {
+      tables_created: Array<{ table: string; status: string; error?: string }>;
+      policies_applied: Array<any>;
+      errors: Array<any>;
+      summary: { tables_status: string; policies_status: string; ready_for_testing: boolean };
+    } = {
       tables_created: [],
       policies_applied: [],
       errors: [],
