@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Update the payment with manual approval
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from("payments")
     .update({
       admin_approved: approved,
