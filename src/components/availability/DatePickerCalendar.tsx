@@ -96,7 +96,7 @@ export default function DatePickerCalendar({
   };
 
   const handleDateClick = (day: number) => {
-    if (!isDateInPast(day) && !isDateOccupied(day)) {
+    if (!isDateInPast(day)) {
       const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
       const dateString = formatDateToISO(date);
       onDateSelect(dateString);
@@ -161,11 +161,12 @@ export default function DatePickerCalendar({
 
           let bgColor = "rgba(30,41,59,0.6)";
           let borderColor = "rgba(148,163,184,0.2)";
-          let textColor = "rgba(255,255,255,0.5)";
-          let cursor = "not-allowed";
+          let textColor = "rgba(255,255,255,0.7)";
+          let cursor = "pointer";
 
           if (inPast) {
             textColor = "rgba(255,255,255,0.2)";
+            cursor = "not-allowed";
           } else if (selected) {
             bgColor = "#F59E0B";
             borderColor = "#F59E0B";
@@ -187,7 +188,7 @@ export default function DatePickerCalendar({
             <button
               key={day}
               onClick={() => handleDateClick(day)}
-              disabled={inPast || occupied || !available}
+              disabled={inPast}
               style={{
                 padding: "12px 8px",
                 borderRadius: "6px",
