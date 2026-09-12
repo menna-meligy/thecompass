@@ -366,17 +366,19 @@ export default function AdminBookingsPage() {
       </div>
 
       {/* Detail Modal */}
-      <BookingDetailModal
-        bookingId={selectedBookingId || ""}
-        isOpen={!!selectedBookingId}
-        onClose={() => {
-          setSelectedBookingId(null);
-          setSelectedBookingData(null);
-          load();
-        }}
-        isAr={isAr}
-        bookingData={selectedBookingData}
-      />
+      {selectedBookingId && selectedBookingData && (
+        <BookingDetailModal
+          bookingId={selectedBookingId}
+          isOpen={!!selectedBookingId}
+          onClose={() => {
+            setSelectedBookingId(null);
+            setSelectedBookingData(null);
+            load();
+          }}
+          isAr={isAr}
+          bookingData={selectedBookingData}
+        />
+      )}
     </div>
   );
 }
