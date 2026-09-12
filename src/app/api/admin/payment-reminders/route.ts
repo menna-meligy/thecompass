@@ -25,8 +25,6 @@ export async function POST(request: Request) {
         payment_deadline,
         session:sessions(
           id,
-          title_ar,
-          title_en,
           workshop:workshops(title_ar, title_en)
         ),
         payment:payments(amount)
@@ -54,9 +52,11 @@ export async function POST(request: Request) {
           );
 
           const workshopTitle =
-            (booking.session?.workshop?.title_ar || booking.session?.title_ar) ||
+            booking.session?.workshop?.title_ar ||
             "جلسة";
-          const amount = booking.payment?.amount || 0;
+          const paymentArray = booking.payment as any[];
+          const payment = Array.isArray(paymentArray) ? paymentArray[0] : paymentArray;
+          const amount = payment?.amount || 0;
 
           // Send reminder email
           await resend.emails.send({
@@ -102,8 +102,6 @@ export async function POST(request: Request) {
         user_id,
         payment_deadline,
         session:sessions(
-          title_ar,
-          title_en,
           workshop:workshops(title_ar, title_en)
         ),
         payment:payments(amount)
@@ -136,8 +134,7 @@ export async function POST(request: Request) {
 
           if (user?.email) {
             const workshopTitle =
-              (booking.session?.workshop?.title_ar ||
-                booking.session?.title_ar) ||
+              booking.session?.workshop?.title_ar ||
               "جلسة";
 
             // Send cancellation email

@@ -3,12 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { Check, X, UserCheck, Clock, Eye, Search, Filter } from "lucide-react";
+import { Check, X, UserCheck, Clock, Eye, Search, Filter, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import PaymentCountdownTimer from "@/components/booking/PaymentCountdownTimer";
+import BookingDetailModal from "@/components/admin/BookingDetailModal";
 
-type BookingStatus = "all" | "pending" | "proof_submitted" | "confirmed" | "cancelled" | "attended";
+type BookingStatus = "all" | "pending" | "proof_submitted" | "confirmed" | "cancelled" | "attended" | "payment_pending";
 
 interface BookingRow {
   id: string;
@@ -69,6 +70,8 @@ export default function AdminBookingsPage() {
   const [search, setSearch] = useState("");
   const [actioning, setActioning] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [selectedBookingData, setSelectedBookingData] = useState<BookingRow | null>(null);
 
   const load = useCallback(async () => {
     const supabase = createClient();
@@ -163,6 +166,16 @@ export default function AdminBookingsPage() {
   function actionButtons(booking: BookingRow, ds: string, isActioning: boolean | undefined) {
     return (
       <div className="flex items-center gap-1.5">
+        <button
+          onClick={() => {
+            setSelectedBookingId(booking.id);
+            setSelectedBookingData(booking);
+          }}
+          title={isAr ? "عرض التفاصيل" : "View details"}
+          className="w-7 h-7 flex items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors"
+        >
+          <Info className="h-3.5 w-3.5" />
+        </button>
         {booking.payment?.proof_url && (
           <a href={booking.payment.proof_url} target="_blank" rel="noopener" title={isAr ? "عرض الإيصال" : "View proof"} className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors"><Eye className="h-3.5 w-3.5" /></a>
         )}
@@ -351,6 +364,19 @@ export default function AdminBookingsPage() {
           );
         })}
       </div>
+
+      {/* Detail Modal */}
+      <BookingDetailModal
+        bookingId={selectedBookingId || ""}
+        isOpen={!!selectedBookingId}
+        onClose={() => {
+          setSelectedBookingId(null);
+          setSelectedBookingData(null);
+          load();
+        }}
+        isAr={isAr}
+        bookingData={selectedBookingData}
+      />
     </div>
   );
 }
