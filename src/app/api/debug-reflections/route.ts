@@ -134,7 +134,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Create test data
-    const result = {
+    const result: {
+      created: Array<{ type: string; id?: string }>;
+      errors: Array<{ step: string; error: string }>;
+    } = {
       created: [],
       errors: [],
     };
