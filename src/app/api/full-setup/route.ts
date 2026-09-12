@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
 
     for (const table of tableChecks) {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from(table.name)
           .select("id")
           .limit(1);
