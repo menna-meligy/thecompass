@@ -107,6 +107,11 @@ export interface Payment {
   proof_url: string | null;
   status: PaymentStatus;
   created_at: string;
+  admin_approved?: boolean;
+  admin_approval_notes_ar?: string | null;
+  admin_approval_notes_en?: string | null;
+  approved_by?: string | null;
+  approved_at?: string | null;
 }
 
 export interface DiscountCode {
