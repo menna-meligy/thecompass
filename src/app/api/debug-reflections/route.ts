@@ -13,7 +13,11 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const debug = {
+    const debug: {
+      user_id: string;
+      user_email: string;
+      checks: Array<{ check: string; status: string; data?: unknown; error?: string }>;
+    } = {
       user_id: user.id,
       user_email: user.email,
       checks: [],
