@@ -281,21 +281,46 @@ export default function CentralizedAvailabilityManager({
                 {/* Quick assign form */}
                 {selectedSlotId === slot.id && (
                   <div className="border-t border-white/5 pt-2 mt-2 space-y-2">
-                    <select
-                      value={selectedWorkshopId}
-                      onChange={(e) => {
-                        setSelectedWorkshopId(e.target.value);
-                        setSelectedSessionId("");
-                      }}
-                      className="w-full px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs"
-                    >
-                      <option value="">{isAr ? "اختر ورشة" : "Select workshop"}</option>
-                      {workshops.map((w) => (
-                        <option key={w.id} value={w.id}>
-                          {isAr ? w.title_ar : w.title_en}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        value={selectedWorkshopId}
+                        onChange={(e) => {
+                          setSelectedWorkshopId(e.target.value);
+                          setSelectedSessionId("");
+                        }}
+                        className="px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs"
+                      >
+                        <option value="">{isAr ? "ورشة" : "Workshop"}</option>
+                        {workshops.length === 0 ? (
+                          <option disabled>{isAr ? "لا توجد ورش" : "No workshops"}</option>
+                        ) : (
+                          workshops.map((w) => (
+                            <option key={w.id} value={w.id}>
+                              {isAr ? w.title_ar : w.title_en}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                      <select
+                        value={selectedSessionId}
+                        onChange={(e) => {
+                          setSelectedSessionId(e.target.value);
+                          setSelectedWorkshopId("");
+                        }}
+                        className="px-2 py-1 bg-white/5 border border-white/10 rounded text-white text-xs"
+                      >
+                        <option value="">{isAr ? "جلسة فردية" : "Individual Session"}</option>
+                        {sessions.length === 0 ? (
+                          <option disabled>{isAr ? "لا توجد جلسات" : "No sessions"}</option>
+                        ) : (
+                          sessions.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.workshop?.title_en || "Session"}
+                            </option>
+                          ))
+                        )}
+                      </select>
+                    </div>
                     <button
                       onClick={handleAssignSlot}
                       disabled={saving || (!selectedWorkshopId && !selectedSessionId)}
