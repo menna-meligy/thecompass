@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const debug: {
       user_id: string;
       user_email: string | undefined;
-      checks: Array<{ check: string; status: string; data?: unknown; error?: string }>;
+      checks: Array<{ check: string; status: string; [key: string]: unknown }>;
     } = {
       user_id: user.id,
       user_email: user.email,
