@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Loader2 } from "lucide-react";
+import { X, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 import ManualPaymentApproval from "./ManualPaymentApproval";
 import ClientNotesDisplay from "./ClientNotesDisplay";
 
@@ -38,6 +38,14 @@ export default function BookingDetailModal({
   }> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<{
+    extractedDate?: string;
+    extractedAmount?: string;
+    dateMatches?: boolean;
+    amountMatches?: boolean;
+    message?: string;
+  } | null>(null);
 
   useEffect(() => {
     if (isOpen && bookingId) {
@@ -58,6 +66,92 @@ export default function BookingDetailModal({
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const verifyReceipt = async () => {
+    if (!bookingData?.payment?.proof_url) return;
+
+    setVerifying(true);
+    try {
+      const Tesseract = await import("tesseract.js");
+      const result = await Tesseract.default.recognize(bookingData.payment.proof_url, "ara+eng");
+      const text = result.data.text;
+
+      const today = new Date();
+      const todayStr = today.toLocaleDateString("ar-EG");
+      const todayEnStr = today.toLocaleDateString("en-US");
+
+      // Extract date patterns
+      const datePatterns = [
+        /(\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4})/g,
+        /(يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر)/g,
+      ];
+
+      let extractedDate = "";
+      for (const pattern of datePatterns) {
+        const match = text.match(pattern);
+        if (match) {
+          extractedDate = match[0];
+          break;
+        }
+      }
+
+      // Extract amount patterns (EGP, ج.م.ع, or just numbers)
+      const amountPatterns = [
+        /(?:EGP|ج\.م\.ع|جنيه)?\s*(\d+[.,]\d{2}|\d+)\s*(?:EGP|ج\.م\.ع|جنيه)?/g,
+      ];
+
+      let extractedAmount = "";
+      for (const pattern of amountPatterns) {
+        const matches = text.match(pattern);
+        if (matches && matches.length > 0) {
+          extractedAmount = matches[matches.length - 1];
+          break;
+        }
+      }
+
+      const dateMatches =
+        text.includes(todayStr) ||
+        text.includes(todayEnStr) ||
+        text.includes(today.getDate().toString());
+
+      const bookingAmount = bookingData.payment?.amount?.toString();
+      const amountMatches = extractedAmount.includes(bookingAmount || "");
+
+      const message =
+        dateMatches && amountMatches
+          ? isAr
+            ? "تمام التمام! التاريخ والمبلغ صحيح. إذا كانت هناك مشكلة، سيتواصل معك الفريق قريباً"
+            : "Perfect! Date and amount match. If there's any issue, our team will contact you soon."
+          : !dateMatches
+            ? isAr
+              ? "التاريخ على الإيصال ليس اليوم. يرجى التحقق من الإيصال."
+              : "The date on the receipt is not today. Please verify the receipt."
+            : !amountMatches
+              ? isAr
+                ? "المبلغ على الإيصال لا يطابق مبلغ الحجز. يرجى التحقق."
+                : "The amount on the receipt does not match the booking amount. Please verify."
+              : isAr
+                ? "إذا كانت هناك مشكلة، سيتواصل معك الفريق قريباً"
+                : "If there's any issue, our team will contact you soon.";
+
+      setVerificationResult({
+        extractedDate,
+        extractedAmount,
+        dateMatches,
+        amountMatches,
+        message,
+      });
+    } catch (err) {
+      console.error("Verification error:", err);
+      setVerificationResult({
+        message: isAr
+          ? "لم نتمكن من التحقق من الإيصال تلقائياً. سيقوم الفريق بالمراجعة يدوياً."
+          : "We couldn't verify the receipt automatically. Our team will review it manually.",
+      });
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -120,11 +214,27 @@ export default function BookingDetailModal({
           {/* Receipt */}
           {bookingData?.payment?.proof_url && (
             <div>
-              <h3 className="text-sm font-semibold text-blue-300 mb-3">
-                {isAr ? "الإيصال" : "Receipt"}
-              </h3>
-              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
-                <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-blue-300">
+                  {isAr ? "الإيصال" : "Receipt"}
+                </h3>
+                <button
+                  onClick={verifyReceipt}
+                  disabled={verifying}
+                  className="px-2.5 py-1 rounded text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30 disabled:opacity-50 transition-colors"
+                >
+                  {verifying ? (
+                    <>
+                      <Loader2 className="h-3 w-3 inline animate-spin me-1" />
+                      {isAr ? "جاري التحقق..." : "Verifying..."}
+                    </>
+                  ) : (
+                    isAr ? "تحقق من الإيصال" : "Verify Receipt"
+                  )}
+                </button>
+              </div>
+              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4 space-y-3">
+                <div className="flex items-center justify-between">
                   <span className="text-xs text-blue-200">
                     {isAr ? "طريقة الدفع" : "Payment Method"}:{" "}
                     <span className="font-semibold capitalize">{bookingData.payment.method || "-"}</span>
@@ -147,6 +257,32 @@ export default function BookingDetailModal({
                   alt="Receipt"
                   className="w-full max-h-96 object-contain rounded-md border border-blue-500/30 bg-black/30"
                 />
+                {verificationResult && (
+                  <div className={`p-3 rounded-md border-l-4 ${
+                    verificationResult.dateMatches && verificationResult.amountMatches
+                      ? "border-l-emerald-500 bg-emerald-500/10 text-emerald-200"
+                      : "border-l-amber-500 bg-amber-500/10 text-amber-200"
+                  }`}>
+                    <div className="flex items-start gap-2 mb-2">
+                      {verificationResult.dateMatches && verificationResult.amountMatches ? (
+                        <CheckCircle2 className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      )}
+                      <p className="text-xs leading-relaxed">{verificationResult.message}</p>
+                    </div>
+                    {verificationResult.extractedDate && (
+                      <p className="text-xs text-white/60 ms-6">
+                        {isAr ? "التاريخ المستخرج" : "Extracted Date"}: {verificationResult.extractedDate}
+                      </p>
+                    )}
+                    {verificationResult.extractedAmount && (
+                      <p className="text-xs text-white/60 ms-6">
+                        {isAr ? "المبلغ المستخرج" : "Extracted Amount"}: {verificationResult.extractedAmount}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
