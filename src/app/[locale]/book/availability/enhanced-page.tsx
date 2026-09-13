@@ -103,13 +103,16 @@ export default function EnhancedAvailabilityBookingPage() {
   // If slot is selected, show booking flow
   if (selectedSlot && userId) {
     const assignment = selectedSlot.assignments?.[0];
+    const isWorkshop = !!assignment?.workshop_id;
     const title = assignment?.workshop?.title_ar || assignment?.workshop?.title_en || 'Session';
+    // Individual sessions: 500 EGP, Workshops: 1200 EGP
+    const price = isWorkshop ? 1200 : 500;
 
     return (
       <BookingFlow
         sessionId={selectedSlot.id}
         workshopTitle={title}
-        price={500}
+        price={price}
         userId={userId}
         sessionStartsAt={`${selectedSlot.date}T${selectedSlot.start_time}`}
         sessionEndsAt={`${selectedSlot.date}T${selectedSlot.end_time}`}

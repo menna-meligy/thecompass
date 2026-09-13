@@ -311,11 +311,11 @@ export default function CentralizedAvailabilityManager({
                       >
                         <option value="">{isAr ? "جلسة فردية" : "Individual Session"}</option>
                         {sessions.length === 0 ? (
-                          <option disabled>{isAr ? "لا توجد جلسات" : "No sessions"}</option>
+                          <option disabled>{isAr ? "لا توجد جلسات فردية متاحة" : "No individual sessions available"}</option>
                         ) : (
                           sessions.map((s) => (
                             <option key={s.id} value={s.id}>
-                              {s.workshop?.title_en || "Session"}
+                              {isAr ? `جلسة فردية - ${s.workshop?.title_ar || "جلسة"}` : `Individual - ${s.workshop?.title_en || "Session"}`}
                             </option>
                           ))
                         )}
