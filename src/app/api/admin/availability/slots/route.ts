@@ -64,31 +64,52 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { data, error } = await (supabase as any)
+  // Check if slot already exists for this time
+  const { data: existingSlot } = await (supabase as any)
     .from("availability_slots")
-    .insert({
-      date,
-      start_time,
-      end_time,
-      capacity: 1,
-      admin_marked_status: admin_marked_status || "available",
-      created_by: user.id,
-    })
-    .select()
+    .select("id")
+    .eq("date", date)
+    .eq("start_time", start_time)
+    .eq("end_time", end_time)
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  let slot = existingSlot;
+  let data = null;
+
+  if (!existingSlot) {
+    // Create new slot if it doesn't exist
+    const { data: newSlot, error } = await (supabase as any)
+      .from("availability_slots")
+      .insert({
+        date,
+        start_time,
+        end_time,
+        capacity: 1,
+        admin_marked_status: admin_marked_status || "available",
+        created_by: user.id,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    data = newSlot;
+    slot = newSlot;
+  } else {
+    // Use existing slot
+    data = existingSlot;
   }
 
   // Create assignments for all session types
-  if (data?.id) {
+  if (slot?.id) {
     let assignmentsToCreate: any[] = [];
 
     // Handle new multi-select format
     if (assignments && Array.isArray(assignments)) {
       assignmentsToCreate = assignments.map((a: any) => ({
-        slot_id: data.id,
+        slot_id: slot.id,
         session_id: a.session_id || null,
         workshop_id: a.workshop_id || null,
       }));
@@ -96,24 +117,45 @@ export async function POST(request: NextRequest) {
     // Handle legacy single assignment format
     else if (session_id || workshop_id) {
       assignmentsToCreate = [{
-        slot_id: data.id,
+        slot_id: slot.id,
         session_id: session_id || null,
         workshop_id: workshop_id || null,
       }];
     }
 
     if (assignmentsToCreate.length > 0) {
-      const { error: assignmentError } = await (supabase as any)
+      // Filter out assignments that already exist
+      const { data: existingAssignments } = await (supabase as any)
         .from("slot_assignments")
-        .insert(assignmentsToCreate);
+        .select("session_id, workshop_id")
+        .eq("slot_id", slot.id);
 
-      if (assignmentError) {
-        // Delete the slot if assignments fail
-        await (supabase as any)
-          .from("availability_slots")
-          .delete()
-          .eq("id", data.id);
-        return NextResponse.json({ error: assignmentError.message }, { status: 500 });
+      const existingSet = new Set(
+        existingAssignments?.map((a: any) =>
+          `${a.session_id || "null"}-${a.workshop_id || "null"}`
+        ) || []
+      );
+
+      const newAssignments = assignmentsToCreate.filter((a) => {
+        const key = `${a.session_id || "null"}-${a.workshop_id || "null"}`;
+        return !existingSet.has(key);
+      });
+
+      if (newAssignments.length > 0) {
+        const { error: assignmentError } = await (supabase as any)
+          .from("slot_assignments")
+          .insert(newAssignments);
+
+        if (assignmentError) {
+          // Only delete the slot if we just created it (not an existing one)
+          if (!existingSlot) {
+            await (supabase as any)
+              .from("availability_slots")
+              .delete()
+              .eq("id", slot.id);
+          }
+          return NextResponse.json({ error: assignmentError.message }, { status: 500 });
+        }
       }
     }
   }
