@@ -96,13 +96,9 @@ export default function SlotEditModal({
       });
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : isAr
-            ? "حدث خطأ"
-            : "An error occurred"
-      );
+      const errorMsg = err instanceof Error ? err.message : (isAr ? "حدث خطأ" : "An error occurred");
+      console.error("Create slot error:", errorMsg);
+      setError(errorMsg);
     }
   };
 

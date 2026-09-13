@@ -112,8 +112,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: updateError.message }, { status: 500 });
       }
       data = updated;
+      slot = updated;
     } else {
       data = existingSlot;
+      slot = existingSlot;
     }
   }
 
