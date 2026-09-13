@@ -19,6 +19,11 @@ interface PendingReceipt {
   approved_at: string | null;
 }
 
+interface ReceiptWithUser extends PendingReceipt {
+  user_email?: string;
+  user_name?: string;
+}
+
 export default function AdminReceiptsPage() {
   const router = useRouter();
   const locale = useLocale();
@@ -115,17 +120,21 @@ export default function AdminReceiptsPage() {
                 className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-6"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-lg font-bold text-white mb-1">
                       {receipt.workshop_title}
                     </h3>
-                    <p className="text-white/50 text-sm">
+                    <p className="text-white/50 text-sm mb-1">
                       {isAr ? "التاريخ: " : "Date: "}
-                      {receipt.slot_date} {receipt.slot_time}
+                      {receipt.slot_date} @ {receipt.slot_time}
+                    </p>
+                    <p className="text-white/50 text-sm mb-2">
+                      {isAr ? "معرف المستخدم: " : "User ID: "}
+                      <span className="text-white/40 text-xs break-all">{receipt.user_id}</span>
                     </p>
                   </div>
                   <div
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${
+                    className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ml-4 ${
                       receipt.status === "pending"
                         ? "bg-amber-500/20 text-amber-400"
                         : receipt.status === "approved"
@@ -150,7 +159,7 @@ export default function AdminReceiptsPage() {
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="text-white/70 text-sm mb-2">
-                      {isAr ? "السعر" : "Price"}
+                      {isAr ? "السعر المرفوع" : "Upload Price"}
                     </p>
                     <p className="text-white font-bold text-lg">
                       {receipt.price} {isAr ? "ج.م" : "EGP"}
@@ -158,7 +167,7 @@ export default function AdminReceiptsPage() {
                   </div>
                   <div>
                     <p className="text-white/70 text-sm mb-2">
-                      {isAr ? "رفع الملف" : "Uploaded"}
+                      {isAr ? "وقت الرفع" : "Upload Time"}
                     </p>
                     <p className="text-white text-sm">
                       {new Date(receipt.uploaded_at).toLocaleString(
@@ -166,6 +175,21 @@ export default function AdminReceiptsPage() {
                       )}
                     </p>
                   </div>
+                </div>
+
+                {/* Receipt File Link */}
+                <div className="mb-4 p-3 bg-white/5 border border-white/10 rounded-lg">
+                  <p className="text-white/70 text-xs mb-2">
+                    {isAr ? "الملف المرفوع" : "Receipt File"}
+                  </p>
+                  <a
+                    href={`/api/download-receipt?path=${encodeURIComponent(receipt.receipt_url)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#F59E0B] hover:text-[#f5b342] text-sm break-all"
+                  >
+                    {receipt.receipt_url}
+                  </a>
                 </div>
 
                 {receipt.status === "pending" && (
@@ -176,7 +200,7 @@ export default function AdminReceiptsPage() {
                       className="flex-1 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition disabled:opacity-50"
                     >
                       <Check className="w-4 h-4 inline mr-2" />
-                      {isAr ? "موافق" : "Approve"}
+                      {isAr ? "وافق" : "Approve"}
                     </button>
                     <button
                       onClick={() => handleApprove(receipt.id, false)}
@@ -190,12 +214,20 @@ export default function AdminReceiptsPage() {
                 )}
 
                 {receipt.status !== "pending" && receipt.approved_at && (
-                  <div className="bg-white/5 border border-white/10 rounded-lg p-3 text-sm text-white/70">
+                  <div className={`p-3 rounded-lg text-sm ${
+                    receipt.status === "approved"
+                      ? "bg-green-500/10 border border-green-500/30"
+                      : "bg-red-500/10 border border-red-500/30"
+                  }`}>
                     <Clock className="w-4 h-4 inline mr-2" />
-                    {isAr ? "تم الموافقة في " : "Approved on "}
-                    {new Date(receipt.approved_at).toLocaleString(
-                      isAr ? "ar-EG" : "en-GB"
-                    )}
+                    <span className={receipt.status === "approved" ? "text-green-300" : "text-red-300"}>
+                      {receipt.status === "approved"
+                        ? isAr ? "تم الموافقة في " : "Approved on "
+                        : isAr ? "تم الرفض في " : "Rejected on "}
+                      {new Date(receipt.approved_at).toLocaleString(
+                        isAr ? "ar-EG" : "en-GB"
+                      )}
+                    </span>
                   </div>
                 )}
               </div>

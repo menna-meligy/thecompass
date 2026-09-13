@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Upload, Clock, CheckCircle2 } from "lucide-react";
+import { Upload, Clock, CheckCircle2, AlertCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface TimeRemaining {
@@ -11,6 +11,11 @@ interface TimeRemaining {
   hours: number;
   minutes: number;
   seconds: number;
+}
+
+interface ValidationError {
+  type: "date" | "price" | "generic";
+  message: string;
 }
 
 export default function ReceiptPage() {
@@ -29,6 +34,7 @@ export default function ReceiptPage() {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadedReceipt, setUploadedReceipt] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
     hours: 0,
@@ -50,11 +56,42 @@ export default function ReceiptPage() {
     checkAuth();
   }, [router, locale, supabase.auth]);
 
-  // Calculate time remaining (48 hours from now)
+  // Validate date and price on mount
+  useEffect(() => {
+    const errors: ValidationError[] = [];
+
+    if (slotDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const slotDateObj = new Date(slotDate);
+
+      if (slotDateObj.getTime() !== today.getTime()) {
+        errors.push({
+          type: "date",
+          message: isAr
+            ? "يجب أن يكون التاريخ هو تاريخ اليوم"
+            : "The booking date must be today",
+        });
+      }
+    }
+
+    if (price && parseFloat(price) !== 500) {
+      errors.push({
+        type: "price",
+        message: isAr
+          ? "السعر غير صحيح. يجب أن يكون 500 ج.م"
+          : "The price is incorrect. It should be 500 EGP",
+      });
+    }
+
+    setValidationErrors(errors);
+  }, [slotDate, price, isAr]);
+
+  // Calculate time remaining (24 hours from now)
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
-      const deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+      const deadline = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
       const diff = deadline.getTime() - now.getTime();
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -140,27 +177,19 @@ export default function ReceiptPage() {
 
           <p className="text-white/70 mb-6">
             {isAr
-              ? "تم استقبال إيصالك. سيقوم الفريق بالتحقق منه خلال 48 ساعة"
-              : "Receipt uploaded successfully. Our team will review and confirm it within 48 hours"}
+              ? "تم استقبال إيصالك. سيقوم الفريق بالتحقق منه وتأكيده خلال 24 ساعة"
+              : "Receipt uploaded successfully. Our team will review and confirm it within 24 hours"}
           </p>
 
           <div className="bg-[rgba(245,158,11,0.1)] border border-[rgba(245,158,11,0.2)] rounded-xl p-4 mb-6">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Clock className="w-5 h-5 text-[#F59E0B]" />
               <span className="text-[#F59E0B] font-bold">
-                {isAr ? "الوقت المتبقي" : "Time Remaining"}
+                {isAr ? "سيتم التحقق خلال" : "Will be checked in"}
               </span>
             </div>
 
             <div className="grid grid-cols-4 gap-2">
-              <div className="bg-white/5 rounded p-2">
-                <div className="text-2xl font-black text-white">
-                  {String(timeRemaining.days).padStart(2, "0")}
-                </div>
-                <div className="text-xs text-white/50 mt-1">
-                  {isAr ? "أيام" : "Days"}
-                </div>
-              </div>
               <div className="bg-white/5 rounded p-2">
                 <div className="text-2xl font-black text-white">
                   {String(timeRemaining.hours).padStart(2, "0")}
@@ -198,7 +227,7 @@ export default function ReceiptPage() {
             onClick={() => router.push(`/${locale}/dashboard`)}
             className="w-full py-3 bg-[#F59E0B] text-[#0f172a] font-bold rounded-lg hover:bg-[#f5b342] transition"
           >
-            {isAr ? "العودة للداشبورد" : "Return to Dashboard"}
+            {isAr ? "العودة إلى لوحة التحكم" : "Return to Dashboard"}
           </button>
         </div>
       </div>
@@ -216,6 +245,32 @@ export default function ReceiptPage() {
             {isAr ? "يرجى رفع إيصال الدفع للتحقق" : "Please upload your payment receipt"}
           </p>
         </div>
+
+        {/* Validation Errors */}
+        {validationErrors.length > 0 && (
+          <div className="mb-6 space-y-3">
+            {validationErrors.map((error, idx) => (
+              <div
+                key={idx}
+                className="bg-red-500/10 border border-red-500/30 rounded-lg p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-red-300 text-sm">
+                    {error.message}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+              <p className="text-amber-300 text-sm">
+                {isAr
+                  ? "إذا كانت هناك مشكلة، سيتواصل معك الفريق قريباً"
+                  : "If there are any issues, our support team will contact you shortly"}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Slot Details */}
         <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-6 mb-6">
