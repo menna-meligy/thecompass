@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 
 interface AvailabilitySlot {
   id: string;
@@ -21,15 +23,19 @@ interface AvailabilitySlot {
 interface WorkshopAvailabilityCalendarProps {
   workshopId: string;
   isAr: boolean;
+  sessionPrice?: number;
 }
 
 export default function WorkshopAvailabilityCalendar({
   workshopId,
   isAr,
+  sessionPrice = 500,
 }: WorkshopAvailabilityCalendarProps) {
+  const locale = useLocale();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   useEffect(() => {
     loadSlots();
@@ -88,6 +94,17 @@ export default function WorkshopAvailabilityCalendar({
     if (hasAvailable) return "available";
 
     return "unavailable";
+  };
+
+  const getTimeSlotsForDate = (dateStr: string) => {
+    return slotsByDate.get(dateStr) || [];
+  };
+
+  const isDateInPast = (dateStr: string) => {
+    const slotDate = new Date(dateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return slotDate < today;
   };
 
   const monthNames = isAr
@@ -191,7 +208,7 @@ export default function WorkshopAvailabilityCalendar({
       </div>
 
       {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-2 mb-6">
         {days.map((day, idx) => {
           if (day === null) {
             return <div key={`empty-${idx}`} className="aspect-square"></div>;
@@ -200,16 +217,22 @@ export default function WorkshopAvailabilityCalendar({
           const dStr = dateString(day);
           const status = getDayStatus(dStr);
           const daySlots = slotsByDate.get(dStr) || [];
+          const isPast = isDateInPast(dStr);
+          const isSelected = selectedDate === dStr;
 
           return (
-            <div
+            <button
               key={day}
-              className={`aspect-square rounded-lg p-2 transition-all flex items-center justify-center text-xs font-semibold ${
-                status === "available"
-                  ? "bg-green-500/20 border border-green-500/40 text-green-300"
-                  : status === "unavailable"
-                    ? "bg-red-500/20 border border-red-500/40 text-red-300"
-                    : "bg-white/5 border border-white/10 text-white/60"
+              onClick={() => !isPast && status === "available" && setSelectedDate(dStr)}
+              disabled={isPast || status !== "available"}
+              className={`aspect-square rounded-lg p-2 transition-all flex items-center justify-center text-xs font-semibold cursor-pointer ${
+                isSelected
+                  ? "ring-2 ring-amber-400 bg-green-500/30 border border-green-500/60 text-green-300"
+                  : status === "available"
+                    ? "bg-green-500/20 border border-green-500/40 text-green-300 hover:bg-green-500/30"
+                    : status === "unavailable"
+                      ? "bg-red-500/20 border border-red-500/40 text-red-300 cursor-not-allowed"
+                      : "bg-white/5 border border-white/10 text-white/60 cursor-not-allowed"
               }`}
               title={
                 daySlots.length > 0
@@ -218,10 +241,38 @@ export default function WorkshopAvailabilityCalendar({
               }
             >
               {day}
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {/* Time Slots for Selected Date */}
+      {selectedDate && (
+        <div className="border-t border-white/10 pt-4">
+          <h3 className="text-white font-bold mb-3">
+            {isAr ? "المواعيد المتاحة" : "Available Times"}
+          </h3>
+          <div className="space-y-2">
+            {getTimeSlotsForDate(selectedDate).map((slot) => (
+              <Link
+                key={slot.id}
+                href={`/${locale}/book/${slot.id}`}
+                className="block p-3 rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition text-white"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-green-400" />
+                    <span className="font-semibold">{slot.start_time} - {slot.end_time}</span>
+                  </div>
+                  <span className="text-green-400 text-sm font-bold">
+                    {sessionPrice} {isAr ? "ج.م" : "EGP"}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {slots.length === 0 && (
         <p className="text-white/30 text-xs text-center mt-6">
