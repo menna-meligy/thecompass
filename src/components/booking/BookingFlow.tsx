@@ -32,6 +32,8 @@ interface Props {
   sessionStartsAt?: string;
   sessionEndsAt?: string;
   sessionLocation?: string | null;
+  capacity?: number;
+  onBack?: () => void;
 }
 
 export default function BookingFlow({
@@ -42,6 +44,8 @@ export default function BookingFlow({
   sessionStartsAt,
   sessionEndsAt,
   sessionLocation,
+  capacity = 1,
+  onBack,
 }: Props) {
   const t = useTranslations("booking");
   const locale = useLocale();
@@ -245,6 +249,12 @@ export default function BookingFlow({
 
       if (result.verified) {
         setVerifyStatus("ok");
+        // Mark the slot as booked when receipt is uploaded/verified
+        fetch("/api/bookings/mark-slot-booked", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ booking_id: bookingId, capacity }),
+        }).catch(() => {});
         // Notify the admin that a payment is awaiting review (non-blocking).
         fetch("/api/send-email", {
           method: "POST",
@@ -278,7 +288,11 @@ export default function BookingFlow({
       setVerifyStatus("idle");
       setVerifyErrors([]);
     } else if (step === "payment") {
-      window.history.back();
+      if (onBack) {
+        onBack();
+      } else {
+        window.history.back();
+      }
     }
   }
 
