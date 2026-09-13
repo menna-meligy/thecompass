@@ -61,6 +61,9 @@ export default function AvailabilityBookingPage() {
 
   useEffect(() => {
     fetchData();
+    // Poll for updates every 3 seconds to see real-time admin changes
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   async function fetchData() {
