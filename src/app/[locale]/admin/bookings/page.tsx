@@ -391,7 +391,7 @@ export default function AdminBookingsPage() {
                       ? null
                       : booking.payment?.status === "pending_verification"
                         ? "pending"
-                        : booking.payment?.status === "paid" || booking.payment?.admin_approved
+                        : booking.payment?.status === "paid"
                           ? "verified"
                           : booking.payment?.status === "failed"
                             ? "rejected"
