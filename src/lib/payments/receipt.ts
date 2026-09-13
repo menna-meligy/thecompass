@@ -24,10 +24,28 @@ export function parseReceipt(rawText: string): ParsedReceipt {
 
   // Date: "02 Aug 2026" | "2026-08-02" | "02/08/2026"
   let date: Date | null = null;
-  const d = flat.match(/(\d{1,2}\s+[A-Za-z]{3,}\s+\d{4})|(\d{4}-\d{2}-\d{2})|(\d{1,2}\/\d{1,2}\/\d{4})/);
+  const d = flat.match(/(\d{1,2})\s+([A-Za-z]{3,})\s+(\d{4})|(\d{4})-(\d{2})-(\d{2})|(\d{1,2})\/(\d{1,2})\/(\d{4})/);
   if (d) {
-    const parsed = new Date(d[0] + " 12:00:00");
-    if (!isNaN(parsed.getTime())) date = parsed;
+    let parsed: Date | null = null;
+    if (d[1] && d[2] && d[3]) {
+      // Format: "13 Sep 2026"
+      const day = parseInt(d[1], 10);
+      const monthName = d[2].toLowerCase();
+      const year = parseInt(d[3], 10);
+      const months: Record<string, number> = {
+        jan:0, feb:1, mar:2, apr:3, may:4, jun:5,
+        jul:6, aug:7, sep:8, oct:9, nov:10, dec:11
+      };
+      const month = months[monthName.substring(0, 3)] ?? -1;
+      if (month >= 0) parsed = new Date(year, month, day, 12, 0, 0);
+    } else if (d[4] && d[5] && d[6]) {
+      // Format: "2026-08-02"
+      parsed = new Date(parseInt(d[4], 10), parseInt(d[5], 10) - 1, parseInt(d[6], 10), 12, 0, 0);
+    } else if (d[7] && d[8] && d[9]) {
+      // Format: "02/08/2026"
+      parsed = new Date(parseInt(d[9], 10), parseInt(d[8], 10) - 1, parseInt(d[7], 10), 12, 0, 0);
+    }
+    if (parsed && !isNaN(parsed.getTime())) date = parsed;
   }
 
   // Reference: label-independent — longest digit run (>=8) that is not the amount
@@ -56,7 +74,10 @@ export function validateReceipt(
 
   if (p.date == null) errors.push("date_unreadable");
   else {
-    const ageDays = (now.getTime() - p.date.getTime()) / 86_400_000;
+    // Compare calendar days, not exact timestamps
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const receiptDay = new Date(p.date.getFullYear(), p.date.getMonth(), p.date.getDate());
+    const ageDays = (today.getTime() - receiptDay.getTime()) / 86_400_000;
     if (ageDays > maxAge) errors.push("date_too_old");
     else if (ageDays < -1) errors.push("date_future");
   }

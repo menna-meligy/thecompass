@@ -38,6 +38,7 @@ export default function BookingFlow({
   sessionId,
   workshopTitle,
   price,
+  userId,
   sessionStartsAt,
   sessionEndsAt,
   sessionLocation,
@@ -138,21 +139,27 @@ export default function BookingFlow({
     setUploading(true);
     setBookingError(null);
     try {
-      const res = await fetch("/api/bookings", {
+      const res = await fetch("/api/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId, payment_method: selectedMethod, amount: price }),
+        body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price }),
       });
       const data = await res.json();
-      if (data.booking_id) {
-        setBookingId(data.booking_id);
+      if (data.booking?.id || data.success) {
+        setBookingId(data.booking?.id || data.success);
         setPaymentDeadline(data.payment_deadline || null);
         setStep("proof");
       } else {
-        setBookingError(data.error || (isAr ? "حدث خطأ، حاول مرة أخرى" : "Something went wrong, please try again"));
+        // Handle error response with bilingual support
+        const defaultMsg = isAr
+          ? "لم نتمكن من إكمال حجزك. يرجى المحاولة مرة أخرى."
+          : "Could not complete your booking. Please try again.";
+        setBookingError(defaultMsg);
       }
-    } catch {
-      setBookingError(isAr ? "تعذر الاتصال بالخادم، تحقق من اتصالك" : "Could not connect, check your connection");
+    } catch (error) {
+      setBookingError(isAr
+        ? "تعذر الاتصال بالخادم، تحقق من اتصالك"
+        : "Could not connect, check your connection");
     } finally {
       setUploading(false);
     }
@@ -161,9 +168,35 @@ export default function BookingFlow({
   function onFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
+    handleFileSelect(f);
+  }
+
+  function handleFileSelect(f: File) {
+    if (!/image\/(png|jpeg|jpg)/.test(f.type)) {
+      setVerifyStatus("fail");
+      setVerifyErrors(["upload_failed"]);
+      return;
+    }
+    if (f.size > 5 * 1024 * 1024) {
+      setVerifyStatus("fail");
+      setVerifyErrors(["upload_failed"]);
+      return;
+    }
     setProofFile(f);
     setProofPreview(URL.createObjectURL(f));
     setVerifyStatus("idle");
+  }
+
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    const f = e.dataTransfer.files?.[0];
+    if (f) handleFileSelect(f);
   }
 
   async function verifyAndUpload() {
@@ -256,10 +289,19 @@ export default function BookingFlow({
             const isInstapay = method === "instapay";
             const label = isInstapay ? (isAr ? "إنستاباي" : "InstaPay") : (isAr ? "فودافون كاش" : "Vodafone Cash");
             const icon = isInstapay ? "💳" : "📱";
+
+            function handleOpenPaymentApp() {
+              setSelectedMethod(method);
+              setTimeout(() => {
+                const link = method === "instapay" ? payLink : VODAFONE_LINK;
+                window.open(link, "_blank", "noopener,noreferrer");
+              }, 200);
+            }
+
             return (
               <button
                 key={method}
-                onClick={() => setSelectedMethod(method)}
+                onClick={handleOpenPaymentApp}
                 style={{
                   width: "100%", display: "flex", alignItems: "center", gap: "14px",
                   padding: "16px", borderRadius: "8px", cursor: "pointer", textAlign: "start",
@@ -331,6 +373,17 @@ export default function BookingFlow({
           </div>
         )}
 
+        <div style={{ padding: "14px 16px", borderRadius: "8px", background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.25)", color: "rgba(255,255,255,0.75)", fontSize: "0.8rem", marginBottom: "16px", lineHeight: 1.6 }}>
+          <p style={{ fontWeight: 700, color: "#60A5FA", marginBottom: "4px" }}>
+            {isAr ? "📞 هل تحتاج مساعدة؟" : "📞 Need help?"}
+          </p>
+          <p>
+            {isAr
+              ? `اتصل بنا على ${SUPPORT_PHONE} لأي أسئلة أو مشاكل في التحويل`
+              : `Call us on ${SUPPORT_PHONE} for any transfer questions`}
+          </p>
+        </div>
+
         <button
           onClick={createBooking}
           disabled={!selectedMethod || uploading}
@@ -365,6 +418,8 @@ export default function BookingFlow({
 
         <div
           onClick={() => fileRef.current?.click()}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
           style={{
             border: `2px dashed ${proofFile ? "rgba(245,158,11,0.5)" : "rgba(148,163,184,0.20)"}`,
             borderRadius: "10px", padding: "32px 20px", textAlign: "center", cursor: "pointer",
@@ -385,8 +440,8 @@ export default function BookingFlow({
           ) : (
             <>
               <Upload className="h-8 w-8 mx-auto mb-3" style={{ color: "rgba(148,163,184,0.4)" }} />
-              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.85rem" }}>{isAr ? "انقر لاختيار الصورة" : "Click to choose image"}</p>
-              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.72rem", marginTop: "4px" }}>PNG, JPG: {isAr ? "صورة واضحة للإيصال" : "clear screenshot of receipt"}</p>
+              <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.85rem" }}>{isAr ? "اسحب الصورة أو انقر لاختيارها" : "Drag image here or click to choose"}</p>
+              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.72rem", marginTop: "4px" }}>PNG, JPG, {isAr ? "أقل من 5MB: صورة واضحة من اليوم" : "under 5MB: clear screenshot from today"}</p>
             </>
           )}
         </div>
