@@ -61,12 +61,33 @@ export async function GET(request: Request) {
     }
 
     // Filter out past slots (Egypt timezone: UTC+2/+3)
-    const egyptTime = new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo' });
-    const now = new Date(egyptTime);
+    // Get current time in Egypt and parse it properly
+    const now = new Date();
+    const egyptFormatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Cairo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+
+    const parts = egyptFormatter.formatToParts(now);
+    const egyptDate = parts.find(p => p.type === 'year')?.value + '-' +
+                      parts.find(p => p.type === 'month')?.value + '-' +
+                      parts.find(p => p.type === 'day')?.value;
+    const egyptTime = parts.find(p => p.type === 'hour')?.value + ':' +
+                      parts.find(p => p.type === 'minute')?.value + ':' +
+                      parts.find(p => p.type === 'second')?.value;
 
     const filteredSlots = (slots || []).filter((slot: any) => {
-      const slotDateTime = new Date(`${slot.date}T${slot.start_time}`);
-      return slotDateTime > now;
+      // Compare date first, then time
+      if (slot.date > egyptDate) return true;
+      if (slot.date < egyptDate) return false;
+      // Same date, compare time
+      return slot.start_time > egyptTime;
     });
 
     // Return slots with assignments renamed for frontend consistency
