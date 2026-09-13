@@ -32,21 +32,38 @@ export function ProofUpload({ bookingId, onUpload }: ProofUploadProps) {
     setUploading(true);
     setError(null);
 
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `payment-proofs/${bookingId}-${Date.now()}.${ext}`;
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop();
+      const path = `payment-proofs/${bookingId}-${Date.now()}.${ext}`;
 
-    const { error: uploadError, data } = await supabase.storage
-      .from("proofs")
-      .upload(path, file, { upsert: true });
+      // Try to upload, with graceful fallback if bucket doesn't exist
+      const { error: uploadError, data } = await supabase.storage
+        .from("proofs")
+        .upload(path, file, { upsert: true });
 
-    if (uploadError) {
-      setError(uploadError.message);
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        // If bucket doesn't exist, provide helpful message
+        if (uploadError.message.includes("not found") || uploadError.message.includes("NoSuchBucket")) {
+          setError(locale === "ar"
+            ? "عذراً، خدمة التخزين غير متاحة حالياً. يرجى المحاولة مرة أخرى."
+            : "Storage service is temporarily unavailable. Please try again.");
+        } else {
+          setError(uploadError.message);
+        }
+        setPreview(null);
+      } else if (data) {
+        const { data: urlData } = supabase.storage.from("proofs").getPublicUrl(data.path);
+        onUpload(urlData.publicUrl);
+        setUploaded(true);
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(locale === "ar"
+        ? "حدث خطأ أثناء الرفع. يرجى المحاولة مرة أخرى."
+        : "An error occurred during upload. Please try again.");
       setPreview(null);
-    } else {
-      const { data: urlData } = supabase.storage.from("proofs").getPublicUrl(data.path);
-      onUpload(urlData.publicUrl);
-      setUploaded(true);
     }
 
     setUploading(false);

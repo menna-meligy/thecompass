@@ -145,11 +145,11 @@ export default function BookingFlow({
         body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price }),
       });
       const data = await res.json();
-      if (data.booking?.id || data.success) {
-        setBookingId(data.booking?.id || data.success);
+      if (data.booking?.id) {
+        setBookingId(data.booking.id);
         setPaymentDeadline(data.payment_deadline || null);
         setStep("proof");
-      } else {
+      } else if (!res.ok) {
         // Handle error response with bilingual support
         const defaultMsg = isAr
           ? "لم نتمكن من إكمال حجزك. يرجى المحاولة مرة أخرى."

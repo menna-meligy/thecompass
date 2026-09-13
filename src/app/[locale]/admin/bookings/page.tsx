@@ -25,8 +25,6 @@ import BookingDetailModal from "@/components/admin/BookingDetailModal";
 import ReceiptModal from "@/components/admin/ReceiptModal";
 
 type BookingStatus = "all" | "pending" | "proof_submitted" | "confirmed" | "cancelled" | "attended" | "payment_pending";
-type PaymentStatus = "all" | "pending" | "paid" | "pending_verification" | "failed";
-type ReceiptStatus = "all" | "none" | "pending_verification" | "verified" | "rejected";
 
 interface BookingRow {
   id: string;
@@ -91,8 +89,6 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<BookingRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<BookingStatus>("all");
-  const [paymentStatusFilter, setPaymentStatusFilter] = useState<PaymentStatus>("all");
-  const [receiptStatusFilter, setReceiptStatusFilter] = useState<ReceiptStatus>("all");
   const [search, setSearch] = useState("");
   const [actioning, setActioning] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -107,28 +103,41 @@ export default function AdminBookingsPage() {
   const pageRef = useRef(1);
 
   const load = useCallback(async () => {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("bookings")
-      .select(
-        "id, user_id, status, created_at, payment_deadline, user:profiles(full_name, email), session:sessions(starts_at, location_or_link, workshop:workshops(title_ar, title_en)), payment:payments(id, status, amount, method, proof_url, gateway_txn_id, admin_approved, approved_at, admin_approval_notes_ar, admin_approval_notes_en, created_at)"
-      )
-      .order("created_at", { ascending: false });
+    try {
+      const supabase = createClient();
+      const { data: bookingsData, error } = await supabase
+        .from("bookings")
+        .select(
+          "id, user_id, status, created_at, payment_deadline, user:profiles(full_name, email, phone), session:sessions(starts_at, ends_at, location_or_link, price, type, workshop:workshops(title_ar, title_en)), payment:payments(id, status, amount, method, proof_url, gateway_txn_id, admin_approved, approved_at, admin_approval_notes_ar, admin_approval_notes_en, created_at)"
+        )
+        .order("created_at", { ascending: false })
+        .limit(pageSize)
+        .range((pageRef.current - 1) * pageSize, pageRef.current * pageSize - 1);
 
-    // Normalize payments
-    const rows = ((data as unknown as BookingRow[]) || []).map((b) => {
-      const pay = (b as unknown as { payment?: unknown }).payment;
-      const single = Array.isArray(pay)
-        ? [...(pay as { created_at?: string }[])].sort(
-            (a, z) => new Date(z.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
-          )[0]
-        : pay;
-      return { ...b, payment: single as BookingRow["payment"] };
-    });
+      if (error) {
+        console.error("Error loading bookings:", error);
+        setBookings([]);
+      } else {
+        // Normalize payments
+        const rows = ((bookingsData as unknown as BookingRow[]) || []).map((b) => {
+          const pay = (b as unknown as { payment?: unknown }).payment;
+          const single = Array.isArray(pay)
+            ? [...(pay as { created_at?: string }[])].sort(
+                (a, z) => new Date(z.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
+              )[0]
+            : pay;
+          return { ...b, payment: single as BookingRow["payment"] };
+        });
 
-    setBookings(rows);
-    setLoading(false);
-  }, []);
+        setBookings(rows);
+      }
+    } catch (error) {
+      console.error("Failed to load bookings:", error);
+      setBookings([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [pageSize]);
 
   useEffect(() => {
     load();
@@ -186,20 +195,6 @@ export default function AdminBookingsPage() {
         const matchKey = ds === "awaiting_receipt" ? "pending" : ds;
         if (matchKey !== filter) return false;
       }
-    }
-
-    // Filter by payment status
-    if (paymentStatusFilter !== "all") {
-      const payStatus = b.payment?.status || "pending";
-      if (paymentStatusFilter !== payStatus) return false;
-    }
-
-    // Filter by receipt status
-    if (receiptStatusFilter !== "all") {
-      if (receiptStatusFilter === "none" && b.payment?.proof_url) return false;
-      if (receiptStatusFilter === "pending_verification" && b.payment?.status !== "pending_verification") return false;
-      if (receiptStatusFilter === "verified" && !(b.payment?.status === "paid" || b.payment?.admin_approved)) return false;
-      if (receiptStatusFilter === "rejected" && b.payment?.status !== "failed") return false;
     }
 
     // Search filter
@@ -316,40 +311,6 @@ export default function AdminBookingsPage() {
               className="ps-9 pe-4 py-1.5 text-sm bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/25 focus:outline-none focus:border-[rgba(245,158,11,0.3)] w-52"
             />
           </div>
-        </div>
-
-        {/* Advanced Filters */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-white/50">{isAr ? "تصفية إضافية:" : "Advanced filters:"}</span>
-          <select
-            value={paymentStatusFilter}
-            onChange={(e) => {
-              setPaymentStatusFilter(e.target.value as PaymentStatus);
-              setPage(1);
-            }}
-            className="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[rgba(245,158,11,0.3)]"
-          >
-            <option value="all">{isAr ? "حالة الدفع: الكل" : "Payment: All"}</option>
-            <option value="pending">{isAr ? "معلق" : "Pending"}</option>
-            <option value="pending_verification">{isAr ? "قيد المراجعة" : "Under Review"}</option>
-            <option value="paid">{isAr ? "مدفوع" : "Paid"}</option>
-            <option value="failed">{isAr ? "فشل" : "Failed"}</option>
-          </select>
-
-          <select
-            value={receiptStatusFilter}
-            onChange={(e) => {
-              setReceiptStatusFilter(e.target.value as ReceiptStatus);
-              setPage(1);
-            }}
-            className="px-2 py-1 text-xs bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-[rgba(245,158,11,0.3)]"
-          >
-            <option value="all">{isAr ? "حالة الإيصال: الكل" : "Receipt: All"}</option>
-            <option value="none">{isAr ? "بدون إيصال" : "No Receipt"}</option>
-            <option value="pending_verification">{isAr ? "قيد المراجعة" : "Pending Review"}</option>
-            <option value="verified">{isAr ? "مُتحقق منه" : "Verified"}</option>
-            <option value="rejected">{isAr ? "مرفوض" : "Rejected"}</option>
-          </select>
         </div>
 
         {/* Results count and pagination info */}
