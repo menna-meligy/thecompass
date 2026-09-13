@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, Check } from "lucide-react";
 
 export interface SessionTypeOption {
   id: string;
@@ -20,7 +20,7 @@ interface SlotEditModalProps {
     date: string;
     startTime: string;
     endTime: string;
-    sessionTypeId: string;
+    sessionTypeIds: string[];
   }) => Promise<void>;
   onMarkUnavailable: (date: string) => Promise<void>;
   sessionTypes: SessionTypeOption[];
@@ -39,8 +39,8 @@ export default function SlotEditModal({
 }: SlotEditModalProps) {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
-  const [selectedSessionType, setSelectedSessionType] = useState<string>(
-    sessionTypes[0]?.id || ""
+  const [selectedSessionTypes, setSelectedSessionTypes] = useState<Set<string>>(
+    new Set()
   );
   const [error, setError] = useState<string | null>(null);
 
@@ -53,6 +53,16 @@ export default function SlotEditModal({
       day: "numeric",
     }
   );
+
+  const handleSessionTypeToggle = (sessionTypeId: string) => {
+    const newSet = new Set(selectedSessionTypes);
+    if (newSet.has(sessionTypeId)) {
+      newSet.delete(sessionTypeId);
+    } else {
+      newSet.add(sessionTypeId);
+    }
+    setSelectedSessionTypes(newSet);
+  };
 
   const handleCreateSlot = async () => {
     setError(null);
@@ -72,8 +82,8 @@ export default function SlotEditModal({
       return;
     }
 
-    if (!selectedSessionType) {
-      setError(isAr ? "نوع الجلسة مطلوب" : "Session type is required");
+    if (selectedSessionTypes.size === 0) {
+      setError(isAr ? "اختر نوع جلسة واحد على الأقل" : "Select at least one session type");
       return;
     }
 
@@ -82,7 +92,7 @@ export default function SlotEditModal({
         date,
         startTime,
         endTime,
-        sessionTypeId: selectedSessionType,
+        sessionTypeIds: Array.from(selectedSessionTypes),
       });
       onClose();
     } catch (err) {
@@ -162,23 +172,34 @@ export default function SlotEditModal({
           />
         </div>
 
-        {/* Session Type Dropdown */}
+        {/* Session Type Multi-Select Checkboxes */}
         <div className="mb-6">
-          <label className="block text-white/70 text-sm font-medium mb-2">
-            {isAr ? "نوع الجلسة" : "Session Type"}
+          <label className="block text-white/70 text-sm font-medium mb-3">
+            {isAr ? "اختر أنواع الجلسات (يمكنك اختيار أكثر من واحد)" : "Select Session Types (can select multiple)"}
           </label>
-          <select
-            value={selectedSessionType}
-            onChange={(e) => setSelectedSessionType(e.target.value)}
-            className="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#F59E0B]"
-          >
-            <option value="">{isAr ? "اختر نوع الجلسة" : "Select session type"}</option>
+          <div className="space-y-2 max-h-48 overflow-y-auto bg-white/5 border border-white/20 rounded-lg p-3">
             {sessionTypes.map((type) => (
-              <option key={type.id} value={type.id}>
-                {isAr ? type.labelAr : type.label}
-              </option>
+              <label key={type.id} className="flex items-center gap-3 p-2 hover:bg-white/10 rounded cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedSessionTypes.has(type.id)}
+                  onChange={() => handleSessionTypeToggle(type.id)}
+                  className="w-4 h-4 accent-[#F59E0B]"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-white">
+                    {isAr ? type.labelAr : type.label}
+                  </div>
+                  <div className="text-xs text-white/50">
+                    {type.price} EGP
+                  </div>
+                </div>
+                {selectedSessionTypes.has(type.id) && (
+                  <Check className="w-4 h-4 text-[#F59E0B]" />
+                )}
+              </label>
             ))}
-          </select>
+          </div>
         </div>
 
         {/* Error Message */}

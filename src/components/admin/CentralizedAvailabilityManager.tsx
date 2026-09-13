@@ -109,12 +109,16 @@ export default function CentralizedAvailabilityManager({
     date: string;
     startTime: string;
     endTime: string;
-    sessionTypeId: string;
+    sessionTypeIds: string[];
   }) => {
     setSaving(true);
     try {
-      const option = sessionTypeOptions.find((o) => o.id === data.sessionTypeId);
-      if (!option) throw new Error("Invalid session type");
+      // Create slot with all selected session type assignments
+      const assignments = data.sessionTypeIds
+        .map((typeId) => sessionTypeOptions.find((o) => o.id === typeId))
+        .filter(Boolean);
+
+      if (assignments.length === 0) throw new Error("No session types selected");
 
       const res = await fetch("/api/admin/availability/slots", {
         method: "POST",
@@ -124,8 +128,10 @@ export default function CentralizedAvailabilityManager({
           start_time: data.startTime,
           end_time: data.endTime,
           admin_marked_status: "available",
-          session_id: option.sessionId,
-          workshop_id: option.workshopId,
+          assignments: assignments.map((opt) => ({
+            session_id: opt?.sessionId || null,
+            workshop_id: opt?.workshopId || null,
+          })),
         }),
       });
 

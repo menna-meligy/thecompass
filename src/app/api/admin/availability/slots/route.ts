@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { date, start_time, end_time, admin_marked_status = "available", session_id, workshop_id } = await request.json();
+  const { date, start_time, end_time, admin_marked_status = "available", session_id, workshop_id, assignments } = await request.json();
 
   if (!date || !start_time || !end_time) {
     return NextResponse.json(
@@ -81,15 +81,32 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // If session_id or workshop_id provided, create assignment
-  if ((session_id || workshop_id) && data?.id) {
-    await (supabase as any)
-      .from("slot_assignments")
-      .insert({
+  // Create assignments for all session types
+  if (data?.id) {
+    let assignmentsToCreate: any[] = [];
+
+    // Handle new multi-select format
+    if (assignments && Array.isArray(assignments)) {
+      assignmentsToCreate = assignments.map((a: any) => ({
+        slot_id: data.id,
+        session_id: a.session_id || null,
+        workshop_id: a.workshop_id || null,
+      }));
+    }
+    // Handle legacy single assignment format
+    else if (session_id || workshop_id) {
+      assignmentsToCreate = [{
         slot_id: data.id,
         session_id: session_id || null,
         workshop_id: workshop_id || null,
-      });
+      }];
+    }
+
+    if (assignmentsToCreate.length > 0) {
+      await (supabase as any)
+        .from("slot_assignments")
+        .insert(assignmentsToCreate);
+    }
   }
 
   return NextResponse.json(data);

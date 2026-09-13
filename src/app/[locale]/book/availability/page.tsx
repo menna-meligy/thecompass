@@ -126,8 +126,25 @@ export default function AvailabilityBookingPage() {
     ]) || []),
   ];
 
+  // Get current time in Egyptian timezone (UTC+2/+3)
+  const getEgyptianNow = () => {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Africa/Cairo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(new Date());
+    const date = `${parts.find(p => p.type === 'year')?.value}-${parts.find(p => p.type === 'month')?.value}-${parts.find(p => p.type === 'day')?.value}`;
+    const time = `${parts.find(p => p.type === 'hour')?.value}:${parts.find(p => p.type === 'minute')?.value}`;
+    return { date, time };
+  };
+
   const getSlotsForSessionType = (date: string, sessionTypeId: string) => {
-    const now = new Date();
+    const egyptianNow = getEgyptianNow();
     const option = sessionTypeOptions.find((o) => o.id === sessionTypeId);
     if (!option) return [];
 
@@ -154,9 +171,9 @@ export default function AvailabilityBookingPage() {
 
       if (!matches) return false;
 
-      // Filter out past times
-      const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
-      if (slotEndDateTime < now) return false;
+      // Filter out past times (Egyptian time)
+      if (s.date < egyptianNow.date) return false;
+      if (s.date === egyptianNow.date && s.end_time <= egyptianNow.time) return false;
 
       return true;
     });
