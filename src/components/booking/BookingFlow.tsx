@@ -139,24 +139,27 @@ export default function BookingFlow({
     setUploading(true);
     setBookingError(null);
     try {
+      console.log("Creating booking with:", { slotId: sessionId, userId, payment_method: selectedMethod, amount: price });
       const res = await fetch("/api/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price }),
       });
       const data = await res.json();
+      console.log("Booking response:", { status: res.status, data });
       if (data.booking?.id) {
         setBookingId(data.booking.id);
         setPaymentDeadline(data.payment_deadline || null);
         setStep("proof");
-      } else if (!res.ok) {
+      } else {
         // Handle error response with bilingual support
-        const defaultMsg = isAr
+        const errorMsg = data.message || data.error || (isAr
           ? "لم نتمكن من إكمال حجزك. يرجى المحاولة مرة أخرى."
-          : "Could not complete your booking. Please try again.";
-        setBookingError(defaultMsg);
+          : "Could not complete your booking. Please try again.");
+        setBookingError(errorMsg);
       }
     } catch (error) {
+      console.error("Booking error:", error);
       setBookingError(isAr
         ? "تعذر الاتصال بالخادم، تحقق من اتصالك"
         : "Could not connect, check your connection");
