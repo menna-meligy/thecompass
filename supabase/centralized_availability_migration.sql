@@ -44,8 +44,18 @@ ALTER TABLE public.slot_assignments ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view availability slots" ON public.availability_slots
   FOR SELECT USING (true);
 
-CREATE POLICY "Admins can manage availability slots" ON public.availability_slots
-  FOR ALL USING (
+CREATE POLICY "Admins can insert availability slots" ON public.availability_slots
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Admins can update availability slots" ON public.availability_slots
+  FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Admins can delete availability slots" ON public.availability_slots
+  FOR DELETE USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
@@ -53,8 +63,18 @@ CREATE POLICY "Admins can manage availability slots" ON public.availability_slot
 CREATE POLICY "Anyone can view slot assignments" ON public.slot_assignments
   FOR SELECT USING (true);
 
-CREATE POLICY "Admins can manage slot assignments" ON public.slot_assignments
-  FOR ALL USING (
+CREATE POLICY "Admins can insert slot assignments" ON public.slot_assignments
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Admins can update slot assignments" ON public.slot_assignments
+  FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+CREATE POLICY "Admins can delete slot assignments" ON public.slot_assignments
+  FOR DELETE USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
