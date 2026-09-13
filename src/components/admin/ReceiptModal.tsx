@@ -287,19 +287,6 @@ export default function ReceiptModal({
                         ? "تمت الموافقة على هذا الإيصال"
                         : "This receipt has been approved"}
                     </p>
-                    {payment.approved_at && (
-                      <p className="text-xs text-emerald-300/60 mt-1">
-                        {new Date(payment.approved_at).toLocaleDateString(
-                          isAr ? "ar-EG" : "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -407,32 +394,6 @@ export default function ReceiptModal({
                 {isAr ? "ملاحظات الموافقة" : "Approval Notes"}
               </h3>
 
-              {(payment.admin_approval_notes_ar || payment.admin_approval_notes_en) && (
-                <div className="bg-emerald-500/5 rounded-lg p-3 border border-emerald-500/20 space-y-2">
-                  {payment.admin_approval_notes_ar && (
-                    <div>
-                      <p className="text-xs text-emerald-300/70 mb-1">عربي:</p>
-                      <p className="text-sm text-white whitespace-pre-wrap break-words">
-                        {payment.admin_approval_notes_ar}
-                      </p>
-                    </div>
-                  )}
-                  {payment.admin_approval_notes_en && (
-                    <div>
-                      <p className="text-xs text-emerald-300/70 mb-1">English:</p>
-                      <p className="text-sm text-white whitespace-pre-wrap break-words">
-                        {payment.admin_approval_notes_en}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {!payment.admin_approval_notes_ar && !payment.admin_approval_notes_en && (
-                <p className="text-xs text-white/40">
-                  {isAr ? "لا توجد ملاحظات" : "No notes"}
-                </p>
-              )}
             </div>
           )}
         </div>
