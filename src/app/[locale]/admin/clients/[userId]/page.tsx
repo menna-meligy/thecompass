@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import RoadmapClient from "@/components/roadmap/RoadmapClient";
 import type { AssessmentResult } from "@/lib/compass/types";
 import { DIM_LABELS, ZONE_LABELS } from "@/lib/compass/templates";
+import MentorNotesForm from "@/components/admin/MentorNotesForm";
 
 interface PageProps {
   params: Promise<{ userId: string; locale: string }>;
@@ -54,6 +55,15 @@ export default async function AdminClientRoadmapPage({ params }: PageProps) {
     steady: "text-blue-300",
     thriving: "text-emerald-400",
   };
+
+  // Fetch recent bookings for this client to show in notes section
+  const { data: recentBookings } = await supabase
+    .from("bookings")
+    .select("id, session_id, status, created_at, sessions(*, workshops(*))")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(5);
 
   return (
     <div className="bg-[#0f172a] min-h-screen">
@@ -149,6 +159,64 @@ export default async function AdminClientRoadmapPage({ params }: PageProps) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recent Sessions with Mentor Notes */}
+      {recentBookings && recentBookings.length > 0 && (
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.18)] rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-8 h-0.5 bg-[#F59E0B] rounded-full" />
+              <h2 className="text-white font-bold text-sm uppercase tracking-widest">
+                {isAr ? "الجلسات الأخيرة والملاحظات" : "Recent Sessions &amp; Notes"}
+              </h2>
+            </div>
+
+            <div className="space-y-4">
+              {recentBookings.map((booking) => {
+                const workshopTitle = booking.sessions?.workshops
+                  ? (locale === "ar"
+                      ? booking.sessions.workshops.title_ar
+                      : booking.sessions.workshops.title_en)
+                  : (locale === "ar" ? "جلسة فردية" : "General Session");
+
+                const sessionDate = booking.sessions?.starts_at
+                  ? new Date(booking.sessions.starts_at).toLocaleDateString(
+                      locale === "ar" ? "ar-EG" : "en-US"
+                    )
+                  : "N/A";
+
+                return (
+                  <div
+                    key={booking.id}
+                    className="p-4 rounded-lg bg-[rgba(255,255,255,0.02)] border border-[rgba(245,158,11,0.1)] hover:border-[rgba(245,158,11,0.3)] transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4 mb-3">
+                      <div>
+                        <p className="text-white font-semibold text-sm">
+                          {workshopTitle}
+                        </p>
+                        <p className="text-xs text-white/50 mt-1">
+                          {sessionDate}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Mentor Notes Form for this booking - Client Component */}
+                    <div className="mt-3">
+                      <MentorNotesForm
+                        bookingId={booking.id}
+                        clientId={userId}
+                        clientName={clientName}
+                        locale={locale as "ar" | "en"}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -141,6 +141,13 @@ export default function EnhancedAvailabilityBookingPage() {
   return (
     <div className="min-h-screen bg-[#0f172a] p-6">
       <div className="max-w-4xl mx-auto">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-4 transition"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span>{isAr ? 'رجوع' : 'Back'}</span>
+        </button>
         <h1 className="text-3xl font-black text-white mb-2">
           {isAr ? '📅 اختر موعداً' : '📅 Select a Time Slot'}
         </h1>

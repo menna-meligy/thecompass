@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin } from "lucide-react";
+import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin, ChevronLeft } from "lucide-react";
 import QRCode from "qrcode";
 import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
 import { createClient } from "@/lib/supabase/client";
@@ -267,10 +267,29 @@ export default function BookingFlow({
     }
   }
 
+  function handleBack() {
+    if (step === "proof") {
+      setStep("payment");
+      setProofFile(null);
+      setProofPreview(null);
+      setVerifyStatus("idle");
+      setVerifyErrors([]);
+    } else if (step === "payment") {
+      window.history.back();
+    }
+  }
+
   // ── PAYMENT STEP ─────────────────────────────────────────
   if (step === "payment") {
     return (
       <div>
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-4 transition"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span>{isAr ? 'رجوع' : 'Back'}</span>
+        </button>
         <StepBar />
 
         <div style={{ background: "rgba(30,41,59,0.5)", border: "1px solid rgba(245,158,11,0.12)", borderRadius: "10px", padding: "20px", marginBottom: "20px" }}>
@@ -409,6 +428,13 @@ export default function BookingFlow({
     const canSubmit = !!proofFile && !verifying && verifyStatus !== "ok";
     return (
       <div>
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-4 transition"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          <span>{isAr ? 'رجوع' : 'Back'}</span>
+        </button>
         <StepBar />
 
         <div style={{ marginBottom: "20px" }}>
@@ -527,6 +553,13 @@ export default function BookingFlow({
 
   return (
     <div>
+      <button
+        onClick={() => window.location.href = `/${locale}/book/availability`}
+        className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-4 transition"
+      >
+        <ChevronLeft className="w-5 h-5" />
+        <span>{isAr ? 'رجوع' : 'Back'}</span>
+      </button>
       <StepBar />
 
       {/* Success header */}

@@ -206,7 +206,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
   }, [uid]);
 
   const menteeDisplay = menteeTasks.map((t) => (t.id === "reg-node" ? { ...t, title: regTitle } : t));
-  const doneTasks = menteeDisplay.filter((t) => t.status === "done");
+  const roadmapTasks = menteeDisplay.filter((t) => ["done", "in_progress", "todo"].includes(t.status));
 
   if (!ready) {
     return (
@@ -261,7 +261,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
           backdropFilter: "blur(12px)",
         }}
       >
-        <HorizontalRoadmap doneTasks={doneTasks} sessions={sessionMilestones} locale={locale} />
+        <HorizontalRoadmap doneTasks={roadmapTasks} sessions={sessionMilestones} locale={locale} />
       </div>
 
       {/* ── BOTTOM: Tabs + Kanban ── */}

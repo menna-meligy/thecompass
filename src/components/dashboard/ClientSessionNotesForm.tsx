@@ -74,15 +74,17 @@ export default function ClientSessionNotesForm({
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/client-notes/${bookingId}?client_id=${clientId}&locale=${locale}`,
+          `/api/client-notes?booking_id=${bookingId}&client_id=${clientId}`,
           { method: "GET" }
         );
 
         if (response.ok) {
           const data = await response.json();
+          const { clientNotes = [], mentorNotes = null } = data;
+
           // Find public and private notes
-          const publicN = data.find((n: ClientNote) => n.is_public);
-          const privateN = data.find((n: ClientNote) => !n.is_public);
+          const publicN = clientNotes.find((n: ClientNote) => n.is_public);
+          const privateN = clientNotes.find((n: ClientNote) => !n.is_public);
 
           const publicContent = publicN?.[`content_${locale}`] || "";
           const privateContent = privateN?.[`content_${locale}`] || "";

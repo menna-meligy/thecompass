@@ -16,6 +16,9 @@ const ClientReflectionsCard = dynamic(
 const ClientSessionNotesForm = dynamic(
   () => import("@/components/dashboard/ClientSessionNotesForm")
 );
+const MentorNotesDisplay = dynamic(
+  () => import("@/components/dashboard/MentorNotesDisplay")
+);
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; border: string; label: string; labelAr: string }> = {
   pending:   { bg: "rgba(245,158,11,0.12)",  color: "#F59E0B", border: "rgba(245,158,11,0.35)",  label: "Pending",   labelAr: "قيد الانتظار" },
@@ -317,6 +320,13 @@ export default async function BookingsPage() {
 
                       {/* Notes form */}
                       <ClientSessionNotesForm
+                        bookingId={booking.id}
+                        clientId={user.id}
+                        locale={locale as "ar" | "en"}
+                      />
+
+                      {/* Mentor notes display */}
+                      <MentorNotesDisplay
                         bookingId={booking.id}
                         clientId={user.id}
                         locale={locale as "ar" | "en"}

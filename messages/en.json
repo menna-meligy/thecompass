@@ -51,6 +51,7 @@
   },
   "booking": {
     "title": "Book Your Session",
+    "loading": "Loading...",
     "selectSlot": "Select Your Time",
     "noSlots": "No available time slots",
     "payment": "Payment Method",
