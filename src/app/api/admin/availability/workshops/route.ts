@@ -7,7 +7,6 @@ export async function GET(request: NextRequest) {
   const { data: workshops, error } = await (supabase as any)
     .from("workshops")
     .select("id, title_ar, title_en")
-    .eq("status", "published")
     .order("title_en");
 
   if (error) {
