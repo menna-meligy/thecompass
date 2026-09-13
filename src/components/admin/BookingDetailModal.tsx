@@ -17,7 +17,7 @@ interface BookingDetailModalProps {
       location_or_link?: string;
       workshop?: { title_ar?: string; title_en?: string };
     };
-    payment?: { amount?: number };
+    payment?: { amount?: number; proof_url?: string; method?: string; status?: string };
     status?: string;
   };
 }
@@ -113,6 +113,40 @@ export default function BookingDetailModal({
                     {bookingData.payment?.amount ? `${bookingData.payment.amount} EGP` : "-"}
                   </span>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Receipt */}
+          {bookingData?.payment?.proof_url && (
+            <div>
+              <h3 className="text-sm font-semibold text-blue-300 mb-3">
+                {isAr ? "الإيصال" : "Receipt"}
+              </h3>
+              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="text-xs text-blue-200">
+                    {isAr ? "طريقة الدفع" : "Payment Method"}:{" "}
+                    <span className="font-semibold capitalize">{bookingData.payment.method || "-"}</span>
+                  </span>
+                  <span className="text-xs text-blue-200">
+                    {isAr ? "الحالة" : "Status"}:{" "}
+                    <span className={`font-semibold ${
+                      bookingData.payment.status === "paid"
+                        ? "text-emerald-300"
+                        : bookingData.payment.status === "pending_verification"
+                          ? "text-blue-300"
+                          : "text-red-300"
+                    }`}>
+                      {bookingData.payment.status || "pending"}
+                    </span>
+                  </span>
+                </div>
+                <img
+                  src={bookingData.payment.proof_url}
+                  alt="Receipt"
+                  className="w-full max-h-96 object-contain rounded-md border border-blue-500/30 bg-black/30"
+                />
               </div>
             </div>
           )}
