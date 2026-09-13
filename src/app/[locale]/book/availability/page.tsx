@@ -171,10 +171,6 @@ export default function AvailabilityBookingPage() {
 
       if (!matches) return false;
 
-      // Filter out past times (Egyptian time)
-      if (s.date < egyptianNow.date) return false;
-      if (s.date === egyptianNow.date && s.end_time <= egyptianNow.time) return false;
-
       return true;
     });
   };
