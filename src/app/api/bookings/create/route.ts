@@ -5,6 +5,8 @@ export async function POST(req: Request) {
   try {
     const { slotId, userId, payment_method, amount } = await req.json();
 
+    console.log('📝 BOOKING REQUEST:', { slotId, userId, payment_method, amount });
+
     if (!slotId || !userId) {
       console.error('Missing required params:', { slotId, userId });
       return NextResponse.json({ error: 'Missing params: slotId and userId required' }, { status: 400 });
@@ -16,15 +18,18 @@ export async function POST(req: Request) {
     );
 
     // Ensure user profile exists using upsert (creates if missing, updates if exists)
-    // This is safer than insert because it handles race conditions and always ensures profile exists
-    console.log('Ensuring profile exists for user:', userId);
-    const { error: profileError } = await supabase
+    console.log('📋 Attempting to ensure profile for user:', userId);
+    const { data: upsertData, error: profileError } = await supabase
       .from('profiles')
-      .upsert({
-        id: userId,
-        email: `user-${userId}@albosla.local`,
-        role: 'user'
-      }, { onConflict: 'id' });
+      .upsert(
+        {
+          id: userId,
+          email: `user-${userId}@albosla.local`,
+          role: 'user'
+        },
+        { onConflict: 'id' }
+      )
+      .select();
 
     if (profileError) {
       console.error('Failed to ensure profile:', { userId, error: profileError });
