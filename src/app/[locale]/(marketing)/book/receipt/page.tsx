@@ -38,6 +38,18 @@ export default function ReceiptPage() {
 
   const supabase = createClient();
 
+  useEffect(() => {
+    async function checkAuth() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        router.push(`/${locale}/auth`);
+      }
+    }
+    checkAuth();
+  }, [router, locale, supabase.auth]);
+
   // Calculate time remaining (48 hours from now)
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,6 +78,12 @@ export default function ReceiptPage() {
       return;
     }
 
+    // Verify file size (max 10MB)
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      alert(isAr ? "حجم الملف كبير جداً (الحد الأقصى 10 ميجابايت)" : "File is too large (max 10MB)");
+      return;
+    }
+
     setFile(selectedFile);
 
     // Upload to Supabase
@@ -77,7 +95,9 @@ export default function ReceiptPage() {
         return;
       }
 
-      const fileName = `receipt_${user.id}_${Date.now()}.${selectedFile.name.split(".").pop()}`;
+      const fileExt = selectedFile.name.split(".").pop() || "bin";
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
       const { data, error } = await supabase.storage
         .from("receipts")
         .upload(fileName, selectedFile);
@@ -101,7 +121,8 @@ export default function ReceiptPage() {
       setUploadedReceipt(fileName);
     } catch (error) {
       console.error("Upload failed:", error);
-      alert(isAr ? "فشل رفع الملف" : "File upload failed");
+      alert(isAr ? "فشل رفع الملف، يرجى المحاولة مرة أخرى" : "File upload failed, please try again");
+      setFile(null);
     } finally {
       setUploading(false);
     }
