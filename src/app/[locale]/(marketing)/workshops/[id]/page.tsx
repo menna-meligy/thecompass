@@ -8,6 +8,7 @@ import { CheckCircle2, Users, Target, Compass, ArrowRight, ArrowLeft, Calendar, 
 import type { Session, WorkshopOutlineItem } from "@/types/index";
 import WorkshopGraphic from "@/components/workshops/WorkshopGraphic";
 import SessionAvailabilityCalendar from "@/components/workshops/SessionAvailabilityCalendar";
+import WorkshopAvailabilityCalendar from "@/components/workshops/WorkshopAvailabilityCalendar";
 
 export default async function WorkshopDetailPage(props: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = await props.params;
@@ -200,6 +201,11 @@ export default async function WorkshopDetailPage(props: { params: Promise<{ id: 
                 </span>
                 {t("sessions")}
               </h2>
+
+              {/* Availability Calendar */}
+              <div style={{ marginBottom: "2rem" }}>
+                <WorkshopAvailabilityCalendar workshopId={id} isAr={isRtl} />
+              </div>
 
               {!sessions || sessions.length === 0 ? (
                 <div

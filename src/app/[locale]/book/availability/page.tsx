@@ -7,6 +7,7 @@ import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookingFlow from '@/components/booking/BookingFlow';
 import SessionSelector from '@/components/booking/SessionSelector';
 import SessionIntroduction from '@/components/booking/SessionIntroduction';
+import WorkshopAvailabilityCalendar from '@/components/workshops/WorkshopAvailabilityCalendar';
 import type { SessionOption } from '@/components/booking/SessionSelector';
 import { createClient } from '@/lib/supabase/client';
 
@@ -197,6 +198,11 @@ export default function AvailabilityBookingPage() {
           <div className="mb-8">
             <h2 className="text-2xl font-black text-white mb-2">📅 اختر موعداً</h2>
             <p className="text-white/50 text-sm">{sessionTitle}</p>
+          </div>
+
+          {/* Availability Calendar Component */}
+          <div className="mb-8">
+            <WorkshopAvailabilityCalendar workshopId="career-deciding" isAr={isAr} />
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-6 mb-8">
