@@ -47,10 +47,10 @@ export default function ReceiptModal({
   useEffect(() => {
     if (isOpen) {
       setZoom(1);
-      setNotesAr(payment?.admin_approval_notes_ar || "");
-      setNotesEn(payment?.admin_approval_notes_en || "");
+      setNotesAr("");
+      setNotesEn("");
     }
-  }, [isOpen, payment]);
+  }, [isOpen]);
 
   const handleApprove = async () => {
     setIsApproving(true);
