@@ -85,7 +85,8 @@ export async function POST(request: NextRequest) {
         start_time,
         end_time,
         capacity: 1,
-        status: admin_marked_status === "unavailable" ? "archived" : "published",
+        status: "published",
+        admin_marked_status: admin_marked_status || "available",
         created_by: user.id,
       })
       .select()
@@ -98,11 +99,11 @@ export async function POST(request: NextRequest) {
     data = newSlot;
     slot = newSlot;
   } else {
-    // Use existing slot - update status if marking unavailable
-    if (admin_marked_status === "unavailable") {
+    // Use existing slot - update admin_marked_status
+    if (admin_marked_status) {
       const { data: updated, error: updateError } = await (supabase as any)
         .from("availability_slots")
-        .update({ status: "archived" })
+        .update({ admin_marked_status })
         .eq("id", existingSlot.id)
         .select()
         .single();
