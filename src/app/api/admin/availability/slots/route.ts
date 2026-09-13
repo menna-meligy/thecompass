@@ -116,17 +116,19 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Create assignments for all session types
-  if (slot?.id) {
+  // Create assignments for all session types (only if not marking unavailable)
+  if (slot?.id && admin_marked_status !== "unavailable") {
     let assignmentsToCreate: any[] = [];
 
     // Handle new multi-select format
     if (assignments && Array.isArray(assignments)) {
-      assignmentsToCreate = assignments.map((a: any) => ({
-        slot_id: slot.id,
-        session_id: a.session_id || null,
-        workshop_id: a.workshop_id || null,
-      }));
+      assignmentsToCreate = assignments
+        .map((a: any) => ({
+          slot_id: slot.id,
+          session_id: a.session_id || null,
+          workshop_id: a.workshop_id || null,
+        }))
+        .filter((a) => a.session_id !== null || a.workshop_id !== null);
     }
     // Handle legacy single assignment format
     else if (session_id || workshop_id) {

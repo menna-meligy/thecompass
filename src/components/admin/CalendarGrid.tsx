@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 interface CalendarSlot {
   id: string;
   date: string;
-  admin_marked_status: "available" | "full" | "unavailable";
+  status: "published" | "archived" | "draft";
   start_time: string;
   end_time: string;
 }
@@ -54,14 +54,9 @@ export default function CalendarGrid({
     const daySlots = slotsByDate.get(dateStr);
     if (!daySlots || daySlots.length === 0) return "empty";
 
-    // Check if any slot is unavailable
-    if (daySlots.some((s) => s.admin_marked_status === "unavailable")) {
+    // Check if any slot is archived (unavailable)
+    if (daySlots.some((s) => s.status === "archived")) {
       return "unavailable";
-    }
-
-    // Check if any slot is full
-    if (daySlots.some((s) => s.admin_marked_status === "full")) {
-      return "full";
     }
 
     // Otherwise available
