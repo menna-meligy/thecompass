@@ -10,6 +10,7 @@ export type PaymentStatus =
   | "refunded";
 export type PaymentMethod = "paymob" | "instapay" | "vodafone_cash";
 export type DiscountType = "percent" | "fixed";
+export type AdminMarkedStatus = "available" | "full" | "unavailable";
 
 export interface Badge {
   id: string;

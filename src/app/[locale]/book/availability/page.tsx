@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Calendar, Clock, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookingFlow from '@/components/booking/BookingFlow';
+import SessionSelector from '@/components/booking/SessionSelector';
+import type { SessionOption } from '@/components/booking/SessionSelector';
 import { createClient } from '@/lib/supabase/client';
 
 interface Workshop {
@@ -20,6 +22,7 @@ interface AvailabilitySlot {
   end_time: string;
   capacity: number;
   booked_count: number;
+  admin_marked_status?: 'available' | 'full' | 'unavailable';
   assignments?: Array<{
     id: string;
     workshop_id?: string;
@@ -36,11 +39,10 @@ export default function AvailabilityBookingPage() {
   const supabase = createClient();
 
   // State
-  const [step, setStep] = useState<'workshop' | 'calendar' | 'capacity' | 'booking'>('workshop');
+  const [step, setStep] = useState<'sessionType' | 'calendar' | 'booking'>('sessionType');
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
-  const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
-  const [selectedCapacity, setSelectedCapacity] = useState(1);
+  const [selectedSessionTypeId, setSelectedSessionTypeId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -94,52 +96,76 @@ export default function AvailabilityBookingPage() {
     return `${year}-${month}-${dayStr}`;
   };
 
-  const getSlotsForWorkshop = (date: string, workshopId: string) => {
+  // Build 7 session type options
+  const sessionTypeOptions: SessionOption[] = [
+    {
+      id: 'career-deciding',
+      label: 'Career Deciding Session',
+      labelAr: 'جلسة تحديد المسار الوظيفي',
+      sessionId: 'career-deciding-session',
+      type: 'individual',
+      price: 500,
+    },
+    ...(workshops.flatMap((w) => [
+      {
+        id: `${w.id}-individual`,
+        label: `${w.title_en} - Individual`,
+        labelAr: `${w.title_ar} - فردي`,
+        workshopId: w.id,
+        type: 'individual' as const,
+        price: 500,
+      },
+      {
+        id: `${w.id}-group`,
+        label: `${w.title_en} - Group`,
+        labelAr: `${w.title_ar} - مجموعة`,
+        workshopId: w.id,
+        type: 'group' as const,
+        price: 1200,
+      },
+    ]) || []),
+  ];
+
+  const getSlotsForSessionType = (date: string, sessionTypeId: string) => {
     const now = new Date();
-    return slots.filter(
-      (s) => {
-        // Check date and availability first
-        if (s.date !== date) return false;
-        if (s.booked_count >= s.capacity) return false;
+    const option = sessionTypeOptions.find((o) => o.id === sessionTypeId);
+    if (!option) return [];
 
-        // Check workshop assignment
-        if (!s.assignments?.some((a) => a.workshop_id === workshopId)) return false;
+    return slots.filter((s) => {
+      // Check date first
+      if (s.date !== date) return false;
 
-        // Filter out past times: compare full datetime
-        const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
-        if (slotEndDateTime < now) return false;
+      // Check if slot is available (not marked as unavailable)
+      if (s.admin_marked_status === 'unavailable') return false;
 
-        return true;
-      }
-    );
-  };
+      // Don't show fully booked slots
+      if (s.booked_count >= s.capacity) return false;
 
-  const getIndividualSessions = (date: string) => {
-    const now = new Date();
-    return slots.filter(
-      (s) => {
-        // Check date and availability first
-        if (s.date !== date) return false;
-        if (s.booked_count >= s.capacity) return false;
+      // Check assignment matches session type
+      const matches = s.assignments?.some((a) => {
+        if (option.sessionId === 'career-deciding-session') {
+          return a.session_id === 'career-deciding-session';
+        }
+        if (option.workshopId) {
+          return a.workshop_id === option.workshopId;
+        }
+        return false;
+      });
 
-        // Check for individual session assignment (session_id exists and no workshop_id)
-        if (!s.assignments?.some((a) => a.session_id && !a.workshop_id)) return false;
+      if (!matches) return false;
 
-        // Filter out past times: compare full datetime
-        const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
-        if (slotEndDateTime < now) return false;
+      // Filter out past times
+      const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
+      if (slotEndDateTime < now) return false;
 
-        return true;
-      }
-    );
+      return true;
+    });
   };
 
   const isDateAvailable = (day: number) => {
     const dateStr = formatDateToISO(day);
-    if (selectedWorkshop) {
-      return getSlotsForWorkshop(dateStr, selectedWorkshop.id).length > 0;
-    }
-    return getIndividualSessions(dateStr).length > 0;
+    if (!selectedSessionTypeId) return false;
+    return getSlotsForSessionType(dateStr, selectedSessionTypeId).length > 0;
   };
 
   const isDateInPast = (day: number) => {
@@ -149,14 +175,14 @@ export default function AvailabilityBookingPage() {
     return date < today;
   };
 
-  // Step 1: Workshop Selection
-  if (step === 'workshop') {
+  // Step 1: Session Type Selection
+  if (step === 'sessionType') {
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-black text-white mb-2">{isAr ? '📅 اختر برنامجك' : '📅 Choose Your Program'}</h1>
-            <p className="text-white/50">{isAr ? 'اختر ورشة عمل أو جلسة فردية' : 'Select a workshop or individual session'}</p>
+            <h1 className="text-3xl font-black text-white mb-2">{isAr ? '📅 اختر نوع الجلسة' : '📅 Choose a Session'}</h1>
+            <p className="text-white/50">{isAr ? 'ابدأ رحلتك معنا' : 'Start your journey with us'}</p>
           </div>
 
           {error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6"><p className="text-red-400">{error}</p></div>}
@@ -164,82 +190,17 @@ export default function AvailabilityBookingPage() {
           {loading ? (
             <div className="text-center text-white/50">{t('loading')}</div>
           ) : (
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  setSelectedWorkshop(null);
-                  setSelectedCapacity(1);
+            <div className="space-y-4">
+              <SessionSelector
+                options={sessionTypeOptions}
+                onSelect={(typeId) => {
+                  setSelectedSessionTypeId(typeId);
                   setStep('calendar');
                 }}
-                className="w-full p-6 rounded-lg border-2 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition text-left"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-white mb-1">{isAr ? 'جلسة فردية' : 'Individual Session'}</h3>
-                    <p className="text-emerald-400 font-semibold">500 EGP</p>
-                    <p className="text-white/60 text-sm mt-2">{isAr ? '1 على 1 جلسة تدريب شخصية' : 'One-on-one personal coaching'}</p>
-                  </div>
-                  <div className="ml-4 text-3xl">👤</div>
-                </div>
-              </button>
-
-              {workshops.map((workshop) => (
-                <button
-                  key={workshop.id}
-                  onClick={() => {
-                    setSelectedWorkshop(workshop);
-                    setSelectedCapacity(1);
-                    setStep('capacity');
-                  }}
-                  className="w-full p-6 rounded-lg border-2 border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition text-left"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-white mb-1">{isAr ? workshop.title_ar : workshop.title_en}</h3>
-                      <p className="text-amber-400 font-semibold">1200 EGP</p>
-                      <p className="text-white/60 text-sm mt-2">{isAr ? 'ورشة عمل تفاعلية' : 'Interactive workshop'}</p>
-                    </div>
-                    <div className="ml-4 text-3xl">👥</div>
-                  </div>
-                </button>
-              ))}
+                isAr={isAr}
+              />
             </div>
           )}
-        </div>
-      </div>
-    );
-  }
-
-  // Step 1.5: Capacity Selection
-  if (step === 'capacity' && selectedWorkshop) {
-    return (
-      <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
-        <div className="max-w-2xl mx-auto">
-          <button onClick={() => { setSelectedWorkshop(null); setStep('workshop'); }} className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"><ChevronLeft className="w-5 h-5" /><span>{isAr ? 'رجوع' : 'Back'}</span></button>
-
-          <div className="mb-8">
-            <h1 className="text-3xl font-black text-white mb-2">{isAr ? 'عدد الأشخاص' : 'Number of People'}</h1>
-            <p className="text-white/50">{isAr ? `${selectedWorkshop.title_ar} - اختر عدد المقاعد` : `${selectedWorkshop.title_en} - Select seats`}</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            {[1, 2, 3, 4, 5].map((num) => (
-              <button
-                key={num}
-                onClick={() => {
-                  setSelectedCapacity(num);
-                  setStep('calendar');
-                }}
-                className={`p-6 rounded-lg border-2 font-bold text-lg transition ${
-                  selectedCapacity === num
-                    ? 'bg-amber-500/30 border-amber-500 text-amber-300'
-                    : 'border-white/10 hover:border-amber-500/50 hover:bg-white/5 text-white'
-                }`}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     );
@@ -251,16 +212,17 @@ export default function AvailabilityBookingPage() {
     const dayNames = isAr ? ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const days = Array.from({ length: daysInMonth(currentDate) }, (_, i) => i + 1);
     const emptyDays = Array.from({ length: firstDayOfMonth(currentDate) }, (_, i) => i);
-    const getSlotsForDate = (dateStr: string) => selectedWorkshop ? getSlotsForWorkshop(dateStr, selectedWorkshop.id) : getIndividualSessions(dateStr);
+    const getSlotsForDate = (dateStr: string) => getSlotsForSessionType(dateStr, selectedSessionTypeId);
 
+    const selectedOption = sessionTypeOptions.find((o) => o.id === selectedSessionTypeId);
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <button onClick={() => { setSelectedWorkshop(null); setStep('workshop'); }} className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"><ChevronLeft className="w-5 h-5" /><span>{isAr ? 'رجوع' : 'Back'}</span></button>
+          <button onClick={() => { setSelectedSessionTypeId(''); setStep('sessionType'); }} className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"><ChevronLeft className="w-5 h-5" /><span>{isAr ? 'رجوع' : 'Back'}</span></button>
 
           <div className="mb-8">
             <h1 className="text-2xl font-black text-white mb-1">{isAr ? '📅 اختر موعداً' : '📅 Select a Time'}</h1>
-            <p className="text-white/50 text-sm">{selectedWorkshop ? `${isAr ? selectedWorkshop.title_ar : selectedWorkshop.title_en} • ${selectedCapacity} ${isAr ? 'أشخاص' : 'people'}` : isAr ? 'جلسة فردية' : 'Individual Session'}</p>
+            <p className="text-white/50 text-sm">{selectedOption ? (isAr ? selectedOption.labelAr : selectedOption.label) : ''}</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-6 mb-8">
@@ -278,8 +240,13 @@ export default function AvailabilityBookingPage() {
               {emptyDays.map((_, i) => <div key={`empty-${i}`}></div>)}
               {days.map((day) => {
                 const inPast = isDateInPast(day);
-                const available = isDateAvailable(day);
-                const daySlots = getSlotsForDate(formatDateToISO(day));
+                const dateStr = formatDateToISO(day);
+                const daySlots = getSlotsForDate(dateStr);
+                const available = daySlots.length > 0;
+
+                // Check if any slot is marked unavailable
+                const hasUnavailable = daySlots.some(s => s.admin_marked_status === 'unavailable');
+
                 return (
                   <button
                     key={day}
@@ -287,12 +254,12 @@ export default function AvailabilityBookingPage() {
                     disabled={inPast || !available}
                     className={`p-2 md:p-3 rounded border text-xs md:text-sm transition ${
                       inPast ? 'bg-white/5 border-white/10 text-white/20 cursor-not-allowed' :
-                      available ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 font-bold cursor-pointer' :
+                      hasUnavailable || available ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 font-bold cursor-pointer' :
                       'bg-white/5 border-white/10 text-white/70 cursor-pointer'
                     }`}
                   >
                     <div className="font-semibold">{day}</div>
-                    {available && <div className="text-xs mt-1">{daySlots.length} {isAr ? 'موعد' : 'slot'}</div>}
+                    {available && <div className="text-xs mt-1">✓ {isAr ? 'متاح' : 'Available'}</div>}
                   </button>
                 );
               })}
@@ -302,23 +269,38 @@ export default function AvailabilityBookingPage() {
           <div className="space-y-3">
             <h2 className="text-lg md:text-xl font-bold text-amber-300">{isAr ? `المواعيد - ${currentDate.toLocaleDateString('ar-EG')}` : `Slots - ${currentDate.toLocaleDateString()}`}</h2>
             {getSlotsForDate(formatDateToISO(currentDate.getDate())).length === 0 ? (
-              <p className="text-white/40">{isAr ? 'لا توجد مواعيد' : 'No slots'}</p>
+              <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
+                <p className="text-red-400 font-semibold">{isAr ? '🔴 ممتلئ' : '🔴 Fully Booked'}</p>
+              </div>
             ) : (
-              getSlotsForDate(formatDateToISO(currentDate.getDate())).map((slot) => (
-                <button
-                  key={slot.id}
-                  onClick={() => {
-                    setSelectedSlot(slot);
-                    setStep('booking');
-                  }}
-                  className="w-full p-4 rounded-lg border bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 transition cursor-pointer text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-amber-300" /><span className="font-semibold text-white">{slot.start_time} - {slot.end_time}</span></div>
-                    <span className="text-xs font-semibold text-emerald-400">{isAr ? 'متاح' : 'Available'}</span>
-                  </div>
-                </button>
-              ))
+              getSlotsForDate(formatDateToISO(currentDate.getDate())).map((slot) => {
+                const isUnavailable = slot.admin_marked_status === 'unavailable';
+                const isAvailable = slot.admin_marked_status === 'available';
+                return (
+                  <button
+                    key={slot.id}
+                    onClick={() => {
+                      if (!isUnavailable) {
+                        setSelectedSlot(slot);
+                        setStep('booking');
+                      }
+                    }}
+                    disabled={isUnavailable}
+                    className={`w-full p-4 rounded-lg border transition cursor-pointer text-left ${
+                      isUnavailable
+                        ? 'bg-red-500/10 border-red-500/30 opacity-50 cursor-not-allowed'
+                        : 'bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2"><Clock className="w-4 h-4 text-amber-300" /><span className="font-semibold text-white">{slot.start_time} - {slot.end_time}</span></div>
+                      <span className={`text-xs font-semibold ${isUnavailable ? 'text-red-400' : 'text-emerald-400'}`}>
+                        {isUnavailable ? (isAr ? '🔴 ممتلئ' : '🔴 Full') : (isAr ? '✓ متاح' : '✓ Available')}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })
             )}
           </div>
         </div>
@@ -327,20 +309,16 @@ export default function AvailabilityBookingPage() {
   }
 
   // Step 3: Booking
-  if (step === 'booking' && selectedSlot && userId) {
-    const isWorkshop = !!selectedWorkshop;
-    const title = isWorkshop ? (isAr ? selectedWorkshop?.title_ar : selectedWorkshop?.title_en) : (isAr ? 'جلسة فردية' : 'Individual Session');
-    const price = isWorkshop ? 1200 : 500;
-
+  if (step === 'booking' && selectedSlot && userId && selectedOption) {
     return (
       <BookingFlow
         sessionId={selectedSlot.id}
-        workshopTitle={title || 'Session'}
-        price={price}
+        workshopTitle={isAr ? selectedOption.labelAr : selectedOption.label}
+        price={selectedOption.price}
         userId={userId}
         sessionStartsAt={`${selectedSlot.date}T${selectedSlot.start_time}`}
         sessionEndsAt={`${selectedSlot.date}T${selectedSlot.end_time}`}
-        capacity={selectedCapacity}
+        capacity={1}
         onBack={() => setStep('calendar')}
       />
     );

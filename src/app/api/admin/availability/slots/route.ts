@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { date, start_time, end_time, capacity } = await request.json();
+  const { date, start_time, end_time, admin_marked_status = "available", session_id, workshop_id } = await request.json();
 
-  if (!date || !start_time || !end_time || !capacity) {
+  if (!date || !start_time || !end_time) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
       date,
       start_time,
       end_time,
-      capacity,
+      capacity: 1,
+      admin_marked_status: admin_marked_status || "available",
       created_by: user.id,
     })
     .select()
@@ -78,6 +79,17 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // If session_id or workshop_id provided, create assignment
+  if ((session_id || workshop_id) && data?.id) {
+    await (supabase as any)
+      .from("slot_assignments")
+      .insert({
+        slot_id: data.id,
+        session_id: session_id || null,
+        workshop_id: workshop_id || null,
+      });
   }
 
   return NextResponse.json(data);

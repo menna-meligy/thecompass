@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         capacity,
         booked_count,
         status,
+        admin_marked_status,
         slot_assignments(
           id,
           workshop_id,
