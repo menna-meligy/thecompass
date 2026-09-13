@@ -41,7 +41,7 @@ export default function AvailabilityBookingPage() {
   const supabase = createClient();
 
   // State
-  const [step, setStep] = useState<'intro' | 'calendar' | 'booking'>('intro');
+  const [step, setStep] = useState<'calendar' | 'booking'>('calendar');
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [loading, setLoading] = useState(true);
@@ -163,17 +163,7 @@ export default function AvailabilityBookingPage() {
     return date < today;
   };
 
-  // Step 0: Introduction
-  if (step === 'intro') {
-    return (
-      <SessionIntroduction
-        isAr={isAr}
-        onContinue={() => setStep('calendar')}
-      />
-    );
-  }
-
-  // Step 1: Calendar & Slot Selection
+  // Step 1: Calendar & Slot Selection (with intro)
   if (step === 'calendar') {
     const monthName = new Intl.DateTimeFormat(isAr ? 'ar-EG' : 'en-US', { month: 'long', year: 'numeric' }).format(currentDate);
     const dayNames = isAr ? ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -183,10 +173,34 @@ export default function AvailabilityBookingPage() {
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <button onClick={() => setStep('intro')} className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"><ChevronLeft className="w-5 h-5" /><span>{isAr ? 'رجوع' : 'Back'}</span></button>
+          <div className="mb-10">
+            <h1 className="text-4xl font-black text-white mb-6">🧭 تعرّف على نفسك</h1>
+
+            {/* Benefits - Egyptian Arabic */}
+            {isAr && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
+                <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
+                  <p className="text-amber-300 font-bold mb-2">✨ افهم نفسك</p>
+                  <p className="text-white/70 text-sm">اكتشف نقاط قوتك وضعفك وإيه اللي بيحفزك فعلاً</p>
+                </div>
+                <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
+                  <p className="text-amber-300 font-bold mb-2">🎯 خطّط مسارك</p>
+                  <p className="text-white/70 text-sm">حدّد أهدافك والطريقة اللي توصلك ليها</p>
+                </div>
+                <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
+                  <p className="text-amber-300 font-bold mb-2">⚖️ حقّق التوازن</p>
+                  <p className="text-white/70 text-sm">عيش حياة شغل سعيدة مع حياة شخصية جميلة</p>
+                </div>
+                <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
+                  <p className="text-amber-300 font-bold mb-2">⚡ اتحرك بثقة</p>
+                  <p className="text-white/70 text-sm">من الفهم للتحرك الفعلي في كل جلسة</p>
+                </div>
+              </div>
+            )}
+          </div>
 
           <div className="mb-8">
-            <h1 className="text-2xl font-black text-white mb-1">{isAr ? '📅 اختر موعداً' : '📅 Select a Time'}</h1>
+            <h2 className="text-2xl font-black text-white mb-2">📅 اختر موعداً</h2>
             <p className="text-white/50 text-sm">{sessionTitle}</p>
           </div>
 
