@@ -7,7 +7,6 @@ import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookingFlow from '@/components/booking/BookingFlow';
 import SessionSelector from '@/components/booking/SessionSelector';
 import SessionIntroduction from '@/components/booking/SessionIntroduction';
-import SessionCountdownTimer from '@/components/booking/SessionCountdownTimer';
 import type { SessionOption } from '@/components/booking/SessionSelector';
 import { createClient } from '@/lib/supabase/client';
 
@@ -180,19 +179,19 @@ export default function AvailabilityBookingPage() {
             {isAr && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
                 <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
-                  <p className="text-amber-300 font-bold mb-2">✨ افهم نفسك</p>
+                  <p className="text-amber-300 font-bold mb-2">افهم نفسك</p>
                   <p className="text-white/70 text-sm">اكتشف نقاط قوتك وضعفك وإيه اللي بيحفزك فعلاً</p>
                 </div>
                 <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
-                  <p className="text-amber-300 font-bold mb-2">🎯 خطّط مسارك</p>
+                  <p className="text-amber-300 font-bold mb-2">خطّط مسارك</p>
                   <p className="text-white/70 text-sm">حدّد أهدافك والطريقة اللي توصلك ليها</p>
                 </div>
                 <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
-                  <p className="text-amber-300 font-bold mb-2">⚖️ حقّق التوازن</p>
+                  <p className="text-amber-300 font-bold mb-2">حقّق التوازن</p>
                   <p className="text-white/70 text-sm">عيش حياة شغل سعيدة مع حياة شخصية جميلة</p>
                 </div>
                 <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
-                  <p className="text-amber-300 font-bold mb-2">⚡ اتحرك بثقة</p>
+                  <p className="text-amber-300 font-bold mb-2">اتحرك بثقة</p>
                   <p className="text-white/70 text-sm">من الفهم للتحرك الفعلي في كل جلسة</p>
                 </div>
               </div>
