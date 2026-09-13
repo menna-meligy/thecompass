@@ -19,7 +19,7 @@ export async function POST(
   }
 
   // Check if user is admin
-  const { data: adminData } = await supabase
+  const { data: adminData } = await (supabase as any)
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id)
@@ -31,7 +31,7 @@ export async function POST(
 
   // Update receipt status
   const status = approved ? "approved" : "rejected";
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("pending_receipts")
     .update({ status, approved_at: new Date().toISOString() })
     .eq("id", id)

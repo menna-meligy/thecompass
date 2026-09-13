@@ -105,7 +105,7 @@ export default function ReceiptPage() {
       if (error) throw error;
 
       // Store receipt metadata in database
-      const { error: dbError } = await supabase.from("pending_receipts").insert({
+      const { error: dbError } = await (supabase as any).from("pending_receipts").insert({
         user_id: user.id,
         slot_date: slotDate,
         slot_time: slotTime,

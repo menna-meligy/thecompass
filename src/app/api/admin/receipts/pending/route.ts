@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Check if user is admin
-  const { data: adminData } = await supabase
+  const { data: adminData } = await (supabase as any)
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id)
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch pending receipts
-  const { data: receipts, error } = await supabase
+  const { data: receipts, error } = await (supabase as any)
     .from("pending_receipts")
     .select("*")
     .eq("status", "pending")
