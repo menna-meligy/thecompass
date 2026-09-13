@@ -347,11 +347,18 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {/* Video/Image placeholder */}
-            <div className="rounded-2xl overflow-hidden" style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.15)",aspectRatio:"16/9",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <div style={{textAlign:"center",color:"rgba(245,158,11,0.4)",fontSize:"0.9rem"}}>
-                {isRtl ? "الفيديو هنا" : "Video placeholder"}
-              </div>
+            {/* YouTube Shorts Embed */}
+            <div className="rounded-2xl overflow-hidden" style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.15)",aspectRatio:"9/16",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/QnCNGdB4-bU?feature=share"
+                title="Menna's Introduction"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{borderRadius:"8px"}}
+              />
             </div>
             {/* Text content */}
             <div>

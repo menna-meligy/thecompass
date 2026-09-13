@@ -477,8 +477,20 @@ export default function BookingFlow({
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onFileChange} />
 
         {verifyStatus === "ok" && (
-          <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", color: "#86EFAC", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-            <Check className="h-4 w-4 flex-shrink-0" />{t("verifiedOk")}
+          <div style={{ marginBottom: "16px" }}>
+            <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", color: "#86EFAC", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+              <Check className="h-4 w-4 flex-shrink-0" />{t("verifiedOk")}
+            </div>
+            <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.25)", color: "rgba(255,255,255,0.75)", fontSize: "0.83rem", lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontWeight: 600, color: "#60A5FA", marginBottom: "6px" }}>
+                {isAr ? "✓ سيتم التحقق اليدوي" : "✓ Manual Verification Required"}
+              </p>
+              <p style={{ margin: 0, fontSize: "0.8rem" }}>
+                {isAr
+                  ? "شكراً لتحويلك! سيقوم فريقنا بمراجعة الإيصال والتأكد من الدفع خلال 24 ساعة. سنرسل لك تأكيد بريدي عند انتهاء التحقق."
+                  : "Thank you for your transfer! Our team will review your receipt and verify payment within 24 hours. We'll send you an email confirmation once verified."}
+              </p>
+            </div>
           </div>
         )}
         {verifyStatus === "invalid" && (() => {
