@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import WorkshopCard from "@/components/workshops/WorkshopCard";
 import ArticleCard from "@/components/content/ArticleCard";
@@ -10,6 +9,7 @@ import { getLocalizedField } from "@/lib/utils";
 import { BookOpen, Users, Star, ChevronRight, Award } from "lucide-react";
 import JourneyRoad from "@/components/home/JourneyRoad";
 import CareerCompass from "@/components/home/CareerCompass";
+import CTAButton from "@/components/home/CTAButton";
 
 export default async function HomePage() {
   const t = await getTranslations("home");
@@ -19,10 +19,6 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (user) {
-    redirect(`/${locale}/dashboard/bookings`);
-  }
 
   const [{ data: workshops }, { data: announcements }] =
     await Promise.all([
@@ -165,13 +161,12 @@ export default async function HomePage() {
 
           {/* CTAs */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: "1.5rem", justifyContent: "center", marginTop: "0.5rem" }}>
-            <Link
-              href={`/${locale}/auth`}
-              className="inline-flex items-center justify-center px-10 py-4 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-all duration-200 hover:-translate-y-0.5 shadow-[0_8px_24px_rgba(245,158,11,0.30)] hover:shadow-[0_14px_36px_rgba(245,158,11,0.45)]"
-              style={{ borderRadius: "12px", minWidth: "196px" }}
-            >
-              {t("heroButton")}
-            </Link>
+            <CTAButton
+              user={user}
+              locale={locale}
+              isPrimary={true}
+              label={t("heroButton")}
+            />
             <Link
               href={`/${locale}/workshops`}
               className="inline-flex items-center justify-center px-10 py-4 text-[#F59E0B] font-semibold text-base hover:bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.35)] hover:border-[#F59E0B] transition-all duration-200 hover:-translate-y-0.5"
@@ -440,13 +435,12 @@ export default async function HomePage() {
               : "Join hundreds of clients who transformed their paths with The Compass"}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href={`/${locale}/auth`}
-              className="inline-flex items-center justify-center px-10 py-4 bg-[#F59E0B] text-[#0f172a] font-black text-base hover:bg-[#FBBF24] transition-all duration-200 hover:-translate-y-0.5 shadow-[0_8px_24px_rgba(245,158,11,0.30)] hover:shadow-[0_14px_36px_rgba(245,158,11,0.45)]"
-              style={{ borderRadius: "12px", minWidth: "196px" }}
-            >
-              {isRtl ? "سجّل دلوقتي مجاناً" : "Sign Up Free"}
-            </Link>
+            <CTAButton
+              user={user}
+              locale={locale}
+              isPrimary={true}
+              label={isRtl ? "سجّل دلوقتي مجاناً" : "Sign Up Free"}
+            />
             <Link
               href={`/${locale}/workshops`}
               className="inline-flex items-center justify-center px-10 py-4 text-[#F59E0B] font-semibold text-base hover:bg-[rgba(245,158,11,0.10)] border border-[rgba(245,158,11,0.35)] hover:border-[#F59E0B] transition-all duration-200 hover:-translate-y-0.5"
