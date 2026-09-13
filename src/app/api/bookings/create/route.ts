@@ -129,7 +129,8 @@ export async function POST(req: Request) {
         status: 'pending',
         created_at: now,
         metadata: sessionAnswers ? { session_answers: sessionAnswers } : null,
-      });
+      })
+      .select();
 
     if (bookingError) {
       console.error('BOOKING_ERROR:', {
