@@ -33,31 +33,8 @@ export async function GET(request: Request) {
 
     if (error) {
       console.error("Supabase error:", error);
-      // Return mock data for testing if Supabase fails
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const mockSlots = [
-        {
-          id: 'slot-1',
-          date: tomorrow.toISOString().split('T')[0],
-          start_time: '10:00',
-          end_time: '11:00',
-          capacity: 1,
-          booked_count: 0,
-          status: 'published',
-          assignments: [{
-            id: 'assign-1',
-            workshop_id: 'workshop-1',
-            session_id: null,
-            workshop: {
-              id: 'workshop-1',
-              title_ar: 'ورشة التطوير الشخصي',
-              title_en: 'Personal Development Workshop'
-            }
-          }]
-        }
-      ];
-      return NextResponse.json(mockSlots);
+      // Return empty array on error - don't show dummy data
+      return NextResponse.json([]);
     }
 
     // Filter out past slots (Egypt timezone: UTC+2/+3)
@@ -98,30 +75,7 @@ export async function GET(request: Request) {
     return NextResponse.json(formattedSlots);
   } catch (error) {
     console.error("API error:", error);
-    // Return mock data for testing on error
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const mockSlots = [
-      {
-        id: 'slot-1',
-        date: tomorrow.toISOString().split('T')[0],
-        start_time: '10:00',
-        end_time: '11:00',
-        capacity: 1,
-        booked_count: 0,
-        status: 'published',
-        assignments: [{
-          id: 'assign-1',
-          workshop_id: 'workshop-1',
-          session_id: null,
-          workshop: {
-            id: 'workshop-1',
-            title_ar: 'ورشة التطوير الشخصي',
-            title_en: 'Personal Development Workshop'
-          }
-        }]
-      }
-    ];
-    return NextResponse.json(mockSlots);
+    // Return empty array on error - don't show dummy data
+    return NextResponse.json([]);
   }
 }
