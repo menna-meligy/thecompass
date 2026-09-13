@@ -419,21 +419,7 @@ VALUES
   )
 ON CONFLICT (id) DO NOTHING;
 
--- Demo sessions (only for "Start Ahead. Stay Ahead" - dummy workshop sessions removed)
-INSERT INTO public.sessions (id, workshop_id, type, price, capacity, starts_at, ends_at, location_or_link, status)
-VALUES
-  (
-    'b1b2c3d4-0003-0003-0003-000000000003',
-    'a1b2c3d4-0002-0002-0002-000000000002',
-    'group',
-    700,
-    12,
-    NOW() + INTERVAL '10 days',
-    NOW() + INTERVAL '10 days' + INTERVAL '2 hours',
-    'القاهرة - مصر الجديدة',
-    'published'
-  )
-ON CONFLICT (id) DO NOTHING;
+-- Demo sessions removed - sessions will be created via admin availability management
 
 -- Demo vlogs
 

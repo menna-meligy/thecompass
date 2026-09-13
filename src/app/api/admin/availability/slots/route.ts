@@ -103,9 +103,18 @@ export async function POST(request: NextRequest) {
     }
 
     if (assignmentsToCreate.length > 0) {
-      await (supabase as any)
+      const { error: assignmentError } = await (supabase as any)
         .from("slot_assignments")
         .insert(assignmentsToCreate);
+
+      if (assignmentError) {
+        // Delete the slot if assignments fail
+        await (supabase as any)
+          .from("availability_slots")
+          .delete()
+          .eq("id", data.id);
+        return NextResponse.json({ error: assignmentError.message }, { status: 500 });
+      }
     }
   }
 

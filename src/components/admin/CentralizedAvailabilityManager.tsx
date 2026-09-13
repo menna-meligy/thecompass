@@ -77,7 +77,7 @@ export default function CentralizedAvailabilityManager({
       id: "career-deciding",
       label: "Career Deciding Session",
       labelAr: "جلسة تحديد المسار الوظيفي",
-      sessionId: "career-deciding-session",
+      sessionId: undefined,
       type: "individual",
       price: 500,
     },
@@ -135,7 +135,10 @@ export default function CentralizedAvailabilityManager({
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to create slot");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to create slot");
+      }
       await loadData();
       setModalDate(null);
     } catch (err) {
