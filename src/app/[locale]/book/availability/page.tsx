@@ -98,13 +98,17 @@ export default function AvailabilityBookingPage() {
     const now = new Date();
     return slots.filter(
       (s) => {
-        if (s.date !== date || s.booked_count >= s.capacity) return false;
+        // Check date and availability first
+        if (s.date !== date) return false;
+        if (s.booked_count >= s.capacity) return false;
+
+        // Check workshop assignment
         if (!s.assignments?.some((a) => a.workshop_id === workshopId)) return false;
-        // Filter out past times: if the date is today, check that the end time hasn't passed
-        if (s.date === formatDateToISO(now.getDate())) {
-          const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
-          if (slotEndDateTime < now) return false;
-        }
+
+        // Filter out past times: compare full datetime
+        const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
+        if (slotEndDateTime < now) return false;
+
         return true;
       }
     );
@@ -114,13 +118,17 @@ export default function AvailabilityBookingPage() {
     const now = new Date();
     return slots.filter(
       (s) => {
-        if (s.date !== date || s.booked_count >= s.capacity) return false;
+        // Check date and availability first
+        if (s.date !== date) return false;
+        if (s.booked_count >= s.capacity) return false;
+
+        // Check for individual session assignment (session_id exists and no workshop_id)
         if (!s.assignments?.some((a) => a.session_id && !a.workshop_id)) return false;
-        // Filter out past times: if the date is today, check that the end time hasn't passed
-        if (s.date === formatDateToISO(now.getDate())) {
-          const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
-          if (slotEndDateTime < now) return false;
-        }
+
+        // Filter out past times: compare full datetime
+        const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
+        if (slotEndDateTime < now) return false;
+
         return true;
       }
     );
