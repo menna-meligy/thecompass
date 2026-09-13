@@ -92,20 +92,34 @@ export default function AvailabilityBookingPage() {
   };
 
   const getSlotsForWorkshop = (date: string, workshopId: string) => {
+    const now = new Date();
     return slots.filter(
-      (s) =>
-        s.date === date &&
-        s.booked_count < s.capacity &&
-        s.assignments?.some((a) => a.workshop_id === workshopId)
+      (s) => {
+        if (s.date !== date || s.booked_count >= s.capacity) return false;
+        if (!s.assignments?.some((a) => a.workshop_id === workshopId)) return false;
+        // Filter out past times: if the date is today, check that the end time hasn't passed
+        if (s.date === formatDateToISO(now.getDate())) {
+          const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
+          if (slotEndDateTime < now) return false;
+        }
+        return true;
+      }
     );
   };
 
   const getIndividualSessions = (date: string) => {
+    const now = new Date();
     return slots.filter(
-      (s) =>
-        s.date === date &&
-        s.booked_count < s.capacity &&
-        s.assignments?.some((a) => a.session_id && !a.workshop_id)
+      (s) => {
+        if (s.date !== date || s.booked_count >= s.capacity) return false;
+        if (!s.assignments?.some((a) => a.session_id && !a.workshop_id)) return false;
+        // Filter out past times: if the date is today, check that the end time hasn't passed
+        if (s.date === formatDateToISO(now.getDate())) {
+          const slotEndDateTime = new Date(`${s.date}T${s.end_time}`);
+          if (slotEndDateTime < now) return false;
+        }
+        return true;
+      }
     );
   };
 
