@@ -128,6 +128,27 @@ export async function POST(req: Request) {
       );
     }
 
+    // Increment booked_count for the slot to mark it as booked
+    console.log('📊 Incrementing booked_count for slot:', slotId);
+    const { error: slotUpdateError } = await (supabase as any)
+      .rpc('increment_slot_bookings', { slot_id: slotId });
+
+    if (slotUpdateError) {
+      // Fallback: manual increment if RPC not available
+      const { data: slot } = await supabase
+        .from('availability_slots')
+        .select('booked_count')
+        .eq('id', slotId)
+        .single();
+
+      if (slot) {
+        await supabase
+          .from('availability_slots')
+          .update({ booked_count: slot.booked_count + 1 })
+          .eq('id', slotId);
+      }
+    }
+
     // Create payment
     const { data: paymentData, error: paymentError } = await supabase
       .from('payments')
