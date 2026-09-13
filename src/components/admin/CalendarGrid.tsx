@@ -9,6 +9,13 @@ interface CalendarSlot {
   admin_marked_status: "available" | "full" | "unavailable";
   start_time: string;
   end_time: string;
+  assignments?: Array<{
+    id: string;
+    session_id?: string;
+    workshop_id?: string;
+    session?: { workshop?: { title_ar: string; title_en: string } };
+    workshop?: { title_ar: string; title_en: string };
+  }>;
 }
 
 interface CalendarGridProps {
@@ -237,8 +244,28 @@ export default function CalendarGrid({
 
               {/* Tooltip on hover */}
               {daySlots.length > 0 && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#0a0f1a] rounded-lg p-2 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50 border border-white/20">
-                  {daySlots.map((s) => `${s.start_time}-${s.end_time}`).join(", ")}
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-[#0a0f1a] rounded-lg p-3 text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 border border-white/20 whitespace-normal max-w-xs">
+                  {daySlots.map((slot) => (
+                    <div key={slot.id} className="mb-2 pb-2 border-b border-white/10 last:mb-0 last:pb-0 last:border-b-0">
+                      <div className="font-semibold text-amber-300">
+                        {slot.start_time} - {slot.end_time}
+                      </div>
+                      {slot.assignments && slot.assignments.length > 0 ? (
+                        <div className="text-white/70 mt-1">
+                          {slot.assignments.map((a) => {
+                            const title = isAr
+                              ? (a.workshop?.title_ar || a.session?.workshop?.title_ar || 'Unknown')
+                              : (a.workshop?.title_en || a.session?.workshop?.title_en || 'Unknown');
+                            return <div key={a.id}>{title}</div>;
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-white/40 mt-1 text-xs italic">
+                          {isAr ? 'بدون تعيينات' : 'No assignments'}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               )}
             </button>
