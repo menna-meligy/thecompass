@@ -202,7 +202,12 @@ export default function AvailabilityBookingPage() {
 
           {/* Availability Calendar Component */}
           <div className="mb-8">
-            <WorkshopAvailabilityCalendar workshopId="career-deciding" isAr={isAr} />
+            <WorkshopAvailabilityCalendar
+              workshopId="career-deciding"
+              isAr={isAr}
+              workshopTitle={isAr ? "جلسة تعريفية مع المنتور" : "Career Deciding Session"}
+              sessionPrice={500}
+            />
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-6 mb-8">

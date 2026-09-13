@@ -24,12 +24,14 @@ interface WorkshopAvailabilityCalendarProps {
   workshopId: string;
   isAr: boolean;
   sessionPrice?: number;
+  workshopTitle?: string;
 }
 
 export default function WorkshopAvailabilityCalendar({
   workshopId,
   isAr,
   sessionPrice = 500,
+  workshopTitle = "Workshop",
 }: WorkshopAvailabilityCalendarProps) {
   const locale = useLocale();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -256,7 +258,7 @@ export default function WorkshopAvailabilityCalendar({
             {getTimeSlotsForDate(selectedDate).map((slot) => (
               <Link
                 key={slot.id}
-                href={`/${locale}/book/${slot.id}`}
+                href={`/${locale}/book/receipt?date=${selectedDate}&time=${encodeURIComponent(slot.start_time)}&endTime=${encodeURIComponent(slot.end_time)}&price=${sessionPrice}&title=${encodeURIComponent(workshopTitle)}`}
                 className="block p-3 rounded-lg bg-green-500/10 border border-green-500/30 hover:bg-green-500/20 transition text-white"
               >
                 <div className="flex items-center justify-between">
