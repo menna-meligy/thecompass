@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import WorkshopCard from "@/components/workshops/WorkshopCard";
 import ArticleCard from "@/components/content/ArticleCard";
@@ -14,6 +15,14 @@ export default async function HomePage() {
   const t = await getTranslations("home");
   const locale = await getLocale();
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    redirect(`/${locale}/dashboard/bookings`);
+  }
 
   const [{ data: workshops }, { data: announcements }] =
     await Promise.all([
@@ -352,7 +361,7 @@ export default async function HomePage() {
               <iframe
                 width="100%"
                 height="100%"
-                src="https://www.youtube.com/embed/QnCNGdB4-bU?feature=share"
+                src="https://drive.google.com/file/d/1ugvcP3yB1vPyM35QtwH4GA8joBVv7Lgi/preview"
                 title="Menna's Introduction"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
