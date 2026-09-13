@@ -17,28 +17,34 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Ensure user profile exists using upsert (creates if missing, updates if exists)
-    console.log('📋 Attempting to ensure profile for user:', userId);
-    const { data: upsertData, error: profileError } = await supabase
+    // Try to ensure user profile exists - insert if missing, ignore if exists
+    console.log('📋 Checking if profile exists for user:', userId);
+    const { data: existingProfile } = await supabase
       .from('profiles')
-      .upsert(
-        {
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (!existingProfile) {
+      console.log('Profile missing - attempting to create');
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
           id: userId,
           email: `user-${userId}@albosla.local`,
           role: 'user'
-        },
-        { onConflict: 'id' }
-      )
-      .select();
+        });
 
-    if (profileError) {
-      console.error('Failed to ensure profile:', { userId, error: profileError });
-      return NextResponse.json(
-        { error: 'Failed to initialize user profile', message: profileError.message },
-        { status: 400 }
-      );
+      if (insertError) {
+        console.error('❌ Failed to create profile:', { userId, error: insertError });
+        // Don't fail here - if profile insert fails, the booking insert will fail with a clearer error
+        // This logs the issue for debugging
+      } else {
+        console.log('✅ Profile created for user:', userId);
+      }
+    } else {
+      console.log('✅ Profile already exists for user:', userId);
     }
-    console.log('Profile ensured for user:', userId);
 
     const bookingId = crypto.randomUUID();
     const now = new Date().toISOString();
