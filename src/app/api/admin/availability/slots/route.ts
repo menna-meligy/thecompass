@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
         start_time,
         end_time,
         capacity: 1,
-        admin_marked_status: admin_marked_status || "available",
+        status: admin_marked_status === "unavailable" ? "archived" : "published",
         created_by: user.id,
       })
       .select()
@@ -98,8 +98,22 @@ export async function POST(request: NextRequest) {
     data = newSlot;
     slot = newSlot;
   } else {
-    // Use existing slot
-    data = existingSlot;
+    // Use existing slot - update status if marking unavailable
+    if (admin_marked_status === "unavailable") {
+      const { data: updated, error: updateError } = await (supabase as any)
+        .from("availability_slots")
+        .update({ status: "archived" })
+        .eq("id", existingSlot.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        return NextResponse.json({ error: updateError.message }, { status: 500 });
+      }
+      data = updated;
+    } else {
+      data = existingSlot;
+    }
   }
 
   // Create assignments for all session types

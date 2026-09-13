@@ -159,10 +159,14 @@ export default function CentralizedAvailabilityManager({
           start_time: "00:00",
           end_time: "23:59",
           admin_marked_status: "unavailable",
+          assignments: [], // No assignments for unavailable days
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to mark day unavailable");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to mark day unavailable");
+      }
       await loadData();
       setModalDate(null);
     } catch (err) {
