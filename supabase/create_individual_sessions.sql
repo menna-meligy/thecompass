@@ -4,7 +4,7 @@
 
 BEGIN;
 
--- First, create individual sessions for each published workshop if they don't exist
+-- First, create individual sessions for each workshop if they don't exist
 INSERT INTO public.sessions (
   workshop_id,
   type,
@@ -27,8 +27,7 @@ SELECT
   'جلسة فردية' || ' - ' || w.title_ar,
   NOW()
 FROM public.workshops w
-WHERE w.status = 'published'
-  AND NOT EXISTS (
+WHERE NOT EXISTS (
     SELECT 1 FROM public.sessions s
     WHERE s.workshop_id = w.id
       AND s.type = 'individual'
@@ -38,10 +37,18 @@ ON CONFLICT DO NOTHING;
 
 -- Verify the sessions were created
 SELECT
-  'Sessions created:' as status,
+  'Individual sessions created:' as status,
   COUNT(*) as count
 FROM public.sessions
 WHERE type = 'individual'
   AND status = 'published';
+
+-- Also ensure old August slots are removed/unpublished (before September 1)
+UPDATE public.availability_slots
+SET status = 'archived'
+WHERE date < '2026-09-01'
+  AND status = 'published';
+
+SELECT 'Old slots archived' as status;
 
 COMMIT;
