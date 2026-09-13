@@ -7,6 +7,7 @@ import { topicLabel } from "@/lib/topics";
 import { CheckCircle2, Users, Target, Compass, ArrowRight, ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
 import type { Session, WorkshopOutlineItem } from "@/types/index";
 import WorkshopGraphic from "@/components/workshops/WorkshopGraphic";
+import SessionAvailabilityCalendar from "@/components/workshops/SessionAvailabilityCalendar";
 
 export default async function WorkshopDetailPage(props: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = await props.params;
@@ -211,7 +212,7 @@ export default async function WorkshopDetailPage(props: { params: Promise<{ id: 
                   </p>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                   {(sessions as Session[]).map((session) => {
                     const date = new Date(session.starts_at);
                     const isFullyBooked =
@@ -235,64 +236,70 @@ export default async function WorkshopDetailPage(props: { params: Promise<{ id: 
                         : null;
 
                     return (
-                      <div
-                        key={session.id}
-                        style={{
-                          border: `1px solid ${accentColor}26`,
-                          background: "linear-gradient(160deg, rgba(30,41,59,0.6), rgba(15,23,42,0.5))",
-                          borderRadius: "14px",
-                          padding: "16px 18px",
-                          textAlign: isRtl ? "right" : "left",
-                        }}
-                      >
-                        {/* Type + price */}
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "12px" }}>
-                          <span
-                            style={{
-                              fontSize: "0.68rem", fontWeight: 800, padding: "4px 10px", borderRadius: "999px",
-                              background: isGroup ? "rgba(52,211,153,0.12)" : "rgba(129,140,248,0.14)",
-                              color: isGroup ? "#34d399" : "#a5b4fc",
-                              border: `1px solid ${isGroup ? "rgba(52,211,153,0.3)" : "rgba(129,140,248,0.3)"}`,
-                            }}
-                          >
-                            {isGroup ? (isRtl ? `الورشة الكاملة (${sessions?.length} جلسات)` : `Full Workshop (${sessions?.length} sessions)`) : (isRtl ? "جلسة فردية" : "1-on-1")}
-                          </span>
-                          <span style={{ display: "flex", alignItems: "baseline", gap: "4px", color: accentColor, fontWeight: 900 }}>
-                            <span style={{ fontSize: "1.4rem", lineHeight: 1 }}>{priceNum ?? t("free")}</span>
-                            {priceNum && <span style={{ fontSize: "0.7rem", fontWeight: 700, opacity: 0.85 }}>{isRtl ? "ج.م" : "EGP"}</span>}
-                          </span>
-                        </div>
-
-                        {/* Date + time */}
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.82)", marginBottom: "4px", flexDirection: isRtl ? "row-reverse" : "row", justifyContent: isRtl ? "flex-end" : "flex-start" }}>
-                          <Calendar className="h-3.5 w-3.5" style={{ color: accentColor, flexShrink: 0 }} />
-                          <span style={{ fontSize: "0.9rem", fontWeight: 700 }}>{dayLabel}</span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.45)", marginBottom: session.location_or_link ? "4px" : "14px", flexDirection: isRtl ? "row-reverse" : "row", justifyContent: isRtl ? "flex-end" : "flex-start" }}>
-                          <Clock className="h-3.5 w-3.5" style={{ flexShrink: 0 }} />
-                          <span style={{ fontSize: "0.8rem" }}>{timeLabel}</span>
-                        </div>
-
-                        {session.location_or_link && (
-                          <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.4)", marginBottom: "14px", flexDirection: isRtl ? "row-reverse" : "row", justifyContent: isRtl ? "flex-end" : "flex-start" }}>
-                            <MapPin className="h-3.5 w-3.5" style={{ flexShrink: 0 }} />
-                            <span style={{ fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>{session.location_or_link}</span>
+                      <div key={session.id}>
+                        <div
+                          style={{
+                            border: `1px solid ${accentColor}26`,
+                            background: "linear-gradient(160deg, rgba(30,41,59,0.6), rgba(15,23,42,0.5))",
+                            borderRadius: "14px",
+                            padding: "16px 18px",
+                            textAlign: isRtl ? "right" : "left",
+                          }}
+                        >
+                          {/* Type + price */}
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px", marginBottom: "12px" }}>
+                            <span
+                              style={{
+                                fontSize: "0.68rem", fontWeight: 800, padding: "4px 10px", borderRadius: "999px",
+                                background: isGroup ? "rgba(52,211,153,0.12)" : "rgba(129,140,248,0.14)",
+                                color: isGroup ? "#34d399" : "#a5b4fc",
+                                border: `1px solid ${isGroup ? "rgba(52,211,153,0.3)" : "rgba(129,140,248,0.3)"}`,
+                              }}
+                            >
+                              {isGroup ? (isRtl ? `الورشة الكاملة (${sessions?.length} جلسات)` : `Full Workshop (${sessions?.length} sessions)`) : (isRtl ? "جلسة فردية" : "1-on-1")}
+                            </span>
+                            <span style={{ display: "flex", alignItems: "baseline", gap: "4px", color: accentColor, fontWeight: 900 }}>
+                              <span style={{ fontSize: "1.4rem", lineHeight: 1 }}>{priceNum ?? t("free")}</span>
+                              {priceNum && <span style={{ fontSize: "0.7rem", fontWeight: 700, opacity: 0.85 }}>{isRtl ? "ج.م" : "EGP"}</span>}
+                            </span>
                           </div>
-                        )}
 
-                        {isFullyBooked ? (
-                          <div style={{ textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(148,163,184,0.08)", color: "rgba(255,255,255,0.4)", fontSize: "0.8rem", fontWeight: 700 }}>
-                            {t("fullyBooked")}
+                          {/* Date + time */}
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.82)", marginBottom: "4px", flexDirection: isRtl ? "row-reverse" : "row", justifyContent: isRtl ? "flex-end" : "flex-start" }}>
+                            <Calendar className="h-3.5 w-3.5" style={{ color: accentColor, flexShrink: 0 }} />
+                            <span style={{ fontSize: "0.9rem", fontWeight: 700 }}>{dayLabel}</span>
                           </div>
-                        ) : (
-                          <Link
-                            href={`/${locale}/book/${session.id}`}
-                            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", width: "100%", padding: "11px", borderRadius: "10px", background: accentColor, color: "#0f172a", fontSize: "0.88rem", fontWeight: 900, textDecoration: "none" }}
-                          >
-                            {t("book")}
-                            {isRtl ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
-                          </Link>
-                        )}
+                          <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.45)", marginBottom: session.location_or_link ? "4px" : "14px", flexDirection: isRtl ? "row-reverse" : "row", justifyContent: isRtl ? "flex-end" : "flex-start" }}>
+                            <Clock className="h-3.5 w-3.5" style={{ flexShrink: 0 }} />
+                            <span style={{ fontSize: "0.8rem" }}>{timeLabel}</span>
+                          </div>
+
+                          {session.location_or_link && (
+                            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "rgba(255,255,255,0.4)", marginBottom: "14px", flexDirection: isRtl ? "row-reverse" : "row", justifyContent: isRtl ? "flex-end" : "flex-start" }}>
+                              <MapPin className="h-3.5 w-3.5" style={{ flexShrink: 0 }} />
+                              <span style={{ fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", direction: "ltr" }}>{session.location_or_link}</span>
+                            </div>
+                          )}
+
+                          {isFullyBooked ? (
+                            <div style={{ textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(148,163,184,0.08)", color: "rgba(255,255,255,0.4)", fontSize: "0.8rem", fontWeight: 700 }}>
+                              {t("fullyBooked")}
+                            </div>
+                          ) : (
+                            <Link
+                              href={`/${locale}/book/${session.id}`}
+                              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", width: "100%", padding: "11px", borderRadius: "10px", background: accentColor, color: "#0f172a", fontSize: "0.88rem", fontWeight: 900, textDecoration: "none" }}
+                            >
+                              {t("book")}
+                              {isRtl ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
+                            </Link>
+                          )}
+                        </div>
+
+                        {/* Availability Calendar */}
+                        <div style={{ marginTop: "12px" }}>
+                          <SessionAvailabilityCalendar sessionId={session.id} isAr={isRtl} />
+                        </div>
                       </div>
                     );
                   })}
