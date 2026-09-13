@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Ensure user profile exists (safeguard for users whose profile creation failed)
+    // Ensure user profile exists - create if missing (safeguard for users whose profile creation failed)
     const { data: profile } = await supabase
       .from('profiles')
       .select('id')
@@ -23,12 +23,24 @@ export async function POST(req: Request) {
       .single();
 
     if (!profile) {
-      // Profile doesn't exist - this would cause the foreign key constraint error
-      console.error('User profile not found:', userId);
-      return NextResponse.json(
-        { error: 'User profile not found. Please contact support.' },
-        { status: 400 }
-      );
+      // Profile doesn't exist - try to create it
+      console.log('Profile missing for user:', userId, '- attempting to create');
+      const { error: createProfileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: '', // Email not available here, but it's not critical
+          role: 'user'
+        });
+
+      if (createProfileError) {
+        console.error('Failed to create profile:', { userId, error: createProfileError });
+        return NextResponse.json(
+          { error: 'Failed to initialize user profile. Please contact support.' },
+          { status: 400 }
+        );
+      }
+      console.log('Profile created successfully for user:', userId);
     }
 
     const bookingId = crypto.randomUUID();
