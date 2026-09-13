@@ -91,9 +91,9 @@ export function Navbar({ user }: NavbarProps) {
           <div className="hidden md:grid items-center h-16" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
 
             {/* ── Logo — LEFT ── */}
-            <Link
-              href={`/${locale}`}
-              className="flex items-center gap-2 group justify-self-start"
+            <button
+              onClick={() => router.push(`/${locale}`)}
+              className="flex items-center gap-2 group justify-self-start bg-none border-none p-0 cursor-pointer hover:opacity-80 transition-opacity"
               aria-label="البوصلة"
             >
               <img
@@ -101,7 +101,7 @@ export function Navbar({ user }: NavbarProps) {
                 alt="البوصلة"
                 className="h-11 w-auto transition-transform duration-300 group-hover:scale-105"
               />
-            </Link>
+            </button>
 
             {/* ── Desktop nav links — CENTER ── */}
             <div className="flex items-center gap-8">
@@ -235,9 +235,13 @@ export function Navbar({ user }: NavbarProps) {
 
           {/* ── Mobile header row (visible only on mobile) ── */}
           <div className="md:hidden flex items-center justify-between h-16">
-            <Link href={`/${locale}`} aria-label="البوصلة">
+            <button
+              onClick={() => router.push(`/${locale}`)}
+              className="bg-none border-none p-0 cursor-pointer hover:opacity-80 transition-opacity"
+              aria-label="البوصلة"
+            >
               <img src="/logo.svg" alt="البوصلة" className="h-10 w-auto" />
-            </Link>
+            </button>
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="p-2 text-[#F59E0B] hover:bg-[rgba(245,158,11,0.1)] transition-colors"
