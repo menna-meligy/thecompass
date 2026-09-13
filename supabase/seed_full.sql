@@ -383,38 +383,9 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE O
 -- Note: Run this after creating your admin user in Supabase Auth
 -- Replace the UUIDs below with actual auth user IDs
 
--- Real workshops
+-- Real workshops (only "Start Ahead. Stay Ahead" - dummy workshops removed)
 INSERT INTO public.workshops (id, title_ar, title_en, description_ar, description_en, topic, image_url, target_audience_en, target_audience_ar, spots_available, outline_en, outline_ar, end_goals_en, end_goals_ar, created_by)
 VALUES
-  (
-    'a1b2c3d4-0001-0001-0001-000000000001',
-    'العب صح. اتقبل',
-    'Play it Right. Get Accepted',
-    'المنح مش حظ. دي لعبة، وفي ناس بتكسبها كل مرة، مش عشان أذكى، لكن عشان فاهمة قواعد اللعبة. لو إنت مبتتقبلش رغم إنك شايف ناس بمجهود أقل بيوصلوا، المشكلة مش فيك… المشكلة في إزاي بتقدّم نفسك.',
-    'Scholarships aren''t luck. They''re a game with rules. And there are people who win every time, not because they''re smarter, but because they understand how to play. If you keep getting rejected while others with less effort get through, the problem isn''t you. It''s how you''re presenting yourself.',
-    'scholarships',
-    'https://images.unsplash.com/photo-1627556704302-624286467c65?w=800',
-    'Anyone who wants to apply for scholarships or study abroad opportunities',
-    'أي حد عايز يقدم على منح أو فرص دراسة بالخارج',
-    5,
-    '[
-      {"session": "Session 1", "title": "Self-Discovery", "bullets": ["Why do you want to study abroad?", "What are your real motivations?", "Finding the best country + field for you"]},
-      {"session": "Session 2", "title": "Your Personalized Scholarship Catalog", "bullets": ["We build you a full catalog of suitable scholarships", "All available options based on your field and goals", "Review the list and pick your target"]},
-      {"session": "Session 3", "title": "Mentor from the Same Experience", "bullets": ["A mentor who got a similar scholarship in your field", "They tell you everything required", "Easiest path to get there", "Clear materials to start with"]},
-      {"session": "Session 4", "title": "First Application Review", "bullets": ["You write your first application draft", "Mentor reviews your SOP (Statement of Purpose)", "Mentor reviews your Recommendation Letters"]},
-      {"session": "Session 5", "title": "Final Review & Edits", "bullets": ["Improving every weak point", "Final version review", "Preparation before the deadline"]}
-    ]'::jsonb,
-    '[
-      {"session": "الجلسة 1", "title": "اكتشاف نفسك", "bullets": ["إنت عايز تسافر ليه؟", "إيه دوافعك الحقيقية؟", "أنسب دولة + مجال ليك"]},
-      {"session": "الجلسة 2", "title": "قائمة منح مخصصة ليك", "bullets": ["بنجهز لك كتالوج منح كامل مناسب ليك", "كل الخيارات المتاحة حسب مجالك وهدفك", "بنراجع القائمة ونختار الهدف"]},
-      {"session": "الجلسة 3", "title": "Mentor من نفس التجربة", "bullets": ["أخد منحة شبه اللي إنت مقدم عليها في نفس مجالك", "يقولك كل المطلوب", "أسهل طريقة توصله", "يديك materials واضحة تبدأ بيها"]},
-      {"session": "الجلسة 4", "title": "أول مراجعة للابلكيشن", "bullets": ["تكتب أول نسخة من الـ Application", "الـ Mentor يراجع SOP (خطاب الحافز)", "الـ Mentor يراجع Recommendation Letters"]},
-      {"session": "الجلسة 5", "title": "مراجعة نهائية وتعديلات", "bullets": ["تحسين كل نقطة ضعيفة", "مراجعة النسخة النهائية", "تجهيزك قبل الديدلاين"]}
-    ]'::jsonb,
-    '["Personalized scholarship & opportunities catalog", "Clear, organized monthly application plan", "Continuous review of your applications and submissions", "CV writing training and academic letters coaching", "Connection with universities matching your specialty and goals", "Practical training on reaching out to professors and building academic relationships", "Live Q&A sessions", "Free updates on academic opportunities, conferences, and events"]'::jsonb,
-    '["كتالوج منح وفرص مخصص لك", "خطة تقديم شهرية واضحة ومنظمة", "مراجعة مستمرة للأبلكيشن والتقديمات", "تدريب على كتابة السيرة الذاتية والرسائل الأكاديمية", "ربطك بالجامعات المناسبة لتخصصك وأهدافك", "تدريب عملي على التواصل مع الأساتذة وبناء العلاقات الأكاديمية", "جلسات أسئلة وأجوبة مباشرة (Q&A)", "إطلاعك على الفرص والمؤتمرات والفعاليات الأكاديمية مجاناً"]'::jsonb,
-    NULL
-  ),
   (
     'a1b2c3d4-0002-0002-0002-000000000002',
     'ابدأ قبل. استمر أمام',
@@ -445,61 +416,12 @@ VALUES
     '["Know yourself and your interests with full clarity", "A determined major and suitable path chosen for you", "Real activities that strengthen your CV", "A deep early understanding of the job market"]'::jsonb,
     '["عارف نفسك واهتماماتك بوضوح", "محدد تخصص ومسار مناسب ليك", "عندك Activities حقيقية تقوي الـ CV", "فاهم سوق العمل بدري جداً"]'::jsonb,
     NULL
-  ),
-  (
-    'a1b2c3d4-0003-0003-0003-000000000003',
-    'اكسر الحلقة',
-    'Break the Loop',
-    'لو ركبت قطر عايز تنزل منه، لكن مؤثر عليك خوفك إن اللي بعده ممكن يتوهك أكتر، كل يوم زي اللي قبله وحياتك بتعدي بسرعة! هنا تقدر تستكشف مسار تاني لآخره من غير ما تخاطر باللي معاك.',
-    'If you''re on a train you want to get off, but fear what comes next might get you more lost. Every day is the same, life passing fast. Here you can explore a completely different path without risking what you already have.',
-    'career-change',
-    'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800',
-    'Anyone feeling stuck in their current career path and wanting to explore a change',
-    'أي حد حاسس إنه عالق في مساره الحالي وعايز يغير',
-    5,
-    '[
-      {"session": "Session 1", "title": "Self-Awareness & Skill Assessment", "bullets": ["Who you really are, not who circumstances made you", "Your real interests and thinking style", "What gives you energy vs. what drains you", "Skills you already have (including transferable ones)", "Most suitable fields based on all of this"]},
-      {"session": "Session 2", "title": "Market Exploration", "bullets": ["Real research, not theory", "What the market actually needs right now", "Fields that suit you AND have real opportunities", "What each field requires to get started"]},
-      {"session": "Session 3", "title": "Gradual Transition Plan", "bullets": ["Step-by-step plan, no jumping into the unknown", "Balance between your current job and the new beginning", "Clear milestones to follow"]},
-      {"session": "Mentor Sessions (×3)", "title": "Support During Execution", "bullets": ["A real mentor already working in the field you chose", "Session 1: Taking the first step, starting right", "Session 2: Course correction, fixing any confusion early", "Session 3: Market entry, getting you into your first work environment"]}
-    ]'::jsonb,
-    '[
-      {"session": "الجلسة 1", "title": "الوعي الذاتي وتحليل المهارات", "bullets": ["إنت مين بجد، مش إنت اللي الظروف حطتك فيه", "اهتماماتك الحقيقية وطريقة تفكيرك", "الحاجات اللي بتديك طاقة vs اللي بتستنزفك", "المهارات اللي معاك بالفعل (والـ transferable منها)", "أنسب مجالات ليك بناءً على ده"]},
-      {"session": "الجلسة 2", "title": "استكشاف السوق", "bullets": ["مرحلة بحث حقيقي، مش كلام نظري", "السوق محتاج إيه فعلاً", "المجالات اللي مناسبة لك + ليها فرص", "كل مجال محتاج إيه عشان تبدأ فيه"]},
-      {"session": "الجلسة 3", "title": "خطة انتقال تدريجية", "bullets": ["خطة خطوة بخطوة، مش هترمي نفسك في المجهول", "توازن بين شغلك الحالي والبداية الجديدة", "Milestones واضحة تمشي عليها"]},
-      {"session": "جلسات Mentor (×3)", "title": "دعم أثناء التنفيذ", "bullets": ["Mentor حقيقي في المجال اللي اخترته", "الجلسة 1: أول خطوة، تبدأ فعلياً صح", "الجلسة 2: تعديل المسار، نصلّح أي لخبطة بدري", "الجلسة 3: الدخول للسوق، نوصّلك لأول بيئة شغل"]}
-    ]'::jsonb,
-    '["A clear, confirmed career decision, not a maybe or a trial", "A new determined path with actual steps (a Roadmap to walk)", "A real beginning in the field: first executive step or entering a work environment", "Confidence that you''re moving in the right direction, not just moving"]'::jsonb,
-    '["قرار مهني واضح ومؤكد، مش احتمال ولا تجربة", "مسار جديد محدد بخطوات فعلية (Roadmap تمشي عليه)", "بداية حقيقية في المجال: أول خطوة تنفيذية أو دخول بيئة شغل", "ثقة إنك ماشي في الاتجاه الصح، مش ماشي وخلاص"]'::jsonb,
-    NULL
   )
 ON CONFLICT (id) DO NOTHING;
 
--- Demo sessions
+-- Demo sessions (only for "Start Ahead. Stay Ahead" - dummy workshop sessions removed)
 INSERT INTO public.sessions (id, workshop_id, type, price, capacity, starts_at, ends_at, location_or_link, status)
 VALUES
-  (
-    'b1b2c3d4-0001-0001-0001-000000000001',
-    'a1b2c3d4-0001-0001-0001-000000000001',
-    'group',
-    1150,
-    5,
-    NOW() + INTERVAL '7 days',
-    NOW() + INTERVAL '7 days' + INTERVAL '2 hours',
-    'https://meet.google.com/demo',
-    'published'
-  ),
-  (
-    'b1b2c3d4-0002-0002-0002-000000000002',
-    'a1b2c3d4-0001-0001-0001-000000000001',
-    'individual',
-    250,
-    1,
-    NOW() + INTERVAL '14 days',
-    NOW() + INTERVAL '14 days' + INTERVAL '1 hour',
-    'https://meet.google.com/demo-individual',
-    'published'
-  ),
   (
     'b1b2c3d4-0003-0003-0003-000000000003',
     'a1b2c3d4-0002-0002-0002-000000000002',
@@ -509,28 +431,6 @@ VALUES
     NOW() + INTERVAL '10 days',
     NOW() + INTERVAL '10 days' + INTERVAL '2 hours',
     'القاهرة - مصر الجديدة',
-    'published'
-  ),
-  (
-    'b1b2c3d4-0004-0004-0004-000000000004',
-    'a1b2c3d4-0003-0003-0003-000000000003',
-    'group',
-    1500,
-    20,
-    NOW() + INTERVAL '21 days',
-    NOW() + INTERVAL '21 days' + INTERVAL '3 hours',
-    'https://zoom.us/demo',
-    'published'
-  ),
-  (
-    'b1b2c3d4-0005-0005-0005-000000000005',
-    'a1b2c3d4-0003-0003-0003-000000000003',
-    'individual',
-    300,
-    1,
-    NOW() + INTERVAL '5 days',
-    NOW() + INTERVAL '5 days' + INTERVAL '90 minutes',
-    'https://meet.google.com/comm-individual',
     'published'
   )
 ON CONFLICT (id) DO NOTHING;
@@ -1883,31 +1783,4 @@ VALUES
 --   type 'individual' = "جلسة فردية" (single session)
 -- ============================================================
 
--- ── Break the Loop / اكسر الحلقة ─────────────────────────────
--- Full workshop (6 sessions): 1500 EGP  |  Single session: 300 EGP
-UPDATE public.sessions
-   SET price = 1500
- WHERE workshop_id = 'a1b2c3d4-0003-0003-0003-000000000003'
-   AND type = 'group';
-
-UPDATE public.sessions
-   SET price = 300
- WHERE workshop_id = 'a1b2c3d4-0003-0003-0003-000000000003'
-   AND type = 'individual';
-
--- ── Play it Right. Get Accepted / العب صح. اتقبل ─────────────
--- Full workshop (5 sessions): 1150 EGP  |  Single session: 250 EGP
--- Limited to 5 seats (العدد محدود.. متاح 5 أماكن فقط)
-UPDATE public.sessions
-   SET price = 1150, capacity = 5
- WHERE workshop_id = 'a1b2c3d4-0001-0001-0001-000000000001'
-   AND type = 'group';
-
-UPDATE public.sessions
-   SET price = 250
- WHERE workshop_id = 'a1b2c3d4-0001-0001-0001-000000000001'
-   AND type = 'individual';
-
-UPDATE public.workshops
-   SET spots_available = 5
- WHERE id = 'a1b2c3d4-0001-0001-0001-000000000001';
+-- Pricing for active workshops only (dummy workshops removed)

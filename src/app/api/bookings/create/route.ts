@@ -74,6 +74,30 @@ export async function POST(req: Request) {
     const bookingId = crypto.randomUUID();
     const now = new Date().toISOString();
 
+    // Validate that the slot is not in the past
+    const { data: slotData, error: slotFetchError } = await supabase
+      .from('availability_slots')
+      .select('starts_at')
+      .eq('id', slotId)
+      .maybeSingle();
+
+    if (slotFetchError || !slotData) {
+      const message = isAr
+        ? 'لم نتمكن من العثور على هذه الجلسة. يرجى إعادة المحاولة.'
+        : 'Could not find this session. Please try again.';
+      return NextResponse.json({ error: message }, { status: 404 });
+    }
+
+    // Check if slot is in the past
+    const slotStartTime = new Date(slotData.starts_at).getTime();
+    const currentTime = new Date(now).getTime();
+    if (slotStartTime < currentTime) {
+      const message = isAr
+        ? 'هذه الجلسة انتهت بالفعل. لا يمكنك الحجز للجلسات السابقة.'
+        : 'This session has already passed. You cannot book past sessions.';
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+
     // Create booking using slot_id for availability slots
     // For backwards compatibility, also try to get session_id from slot assignments
     const { data: slotAssignment } = await supabase
