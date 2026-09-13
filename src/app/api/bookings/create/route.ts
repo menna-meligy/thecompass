@@ -12,6 +12,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing params: slotId and userId required' }, { status: 400 });
     }
 
+    // Validate userId is a proper UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.error('❌ Invalid userId format:', userId);
+      return NextResponse.json(
+        { error: 'Invalid user ID format. Please log out and log back in.' },
+        { status: 400 }
+      );
+    }
+
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
