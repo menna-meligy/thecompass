@@ -6,7 +6,8 @@ export async function POST(req: Request) {
     const { slotId, userId, payment_method, amount } = await req.json();
 
     if (!slotId || !userId) {
-      return NextResponse.json({ error: 'Missing params' }, { status: 400 });
+      console.error('Missing required params:', { slotId, userId });
+      return NextResponse.json({ error: 'Missing params: slotId and userId required' }, { status: 400 });
     }
 
     const supabase = createClient(
@@ -15,25 +16,40 @@ export async function POST(req: Request) {
     );
 
     const bookingId = crypto.randomUUID();
+    const now = new Date().toISOString();
 
-    // Create booking
-    const { error: bookingError } = await supabase
+    // Create booking with time_slot_id instead of session_id
+    const { data: bookingData, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         id: bookingId,
         user_id: userId,
-        session_id: slotId,
+        time_slot_id: slotId,
         status: 'pending',
-        created_at: new Date().toISOString(),
-      });
+        created_at: now,
+      })
+      .select()
+      .single();
 
     if (bookingError) {
-      console.log('BOOKING_ERROR:', JSON.stringify(bookingError));
-      return NextResponse.json({ error: 'booking_failed', message: 'Booking error' }, { status: 400 });
+      console.error('BOOKING_ERROR:', {
+        message: bookingError.message,
+        code: bookingError.code,
+        details: bookingError.details,
+        hint: bookingError.hint,
+      });
+      return NextResponse.json(
+        {
+          error: 'booking_failed',
+          message: bookingError.message || 'Failed to create booking',
+          code: bookingError.code
+        },
+        { status: 400 }
+      );
     }
 
     // Create payment
-    const { error: paymentError } = await supabase
+    const { data: paymentData, error: paymentError } = await supabase
       .from('payments')
       .insert({
         booking_id: bookingId,
@@ -42,25 +58,38 @@ export async function POST(req: Request) {
         currency: 'EGP',
         method: payment_method || 'instapay',
         status: 'pending',
-        created_at: new Date().toISOString(),
-      });
+        created_at: now,
+      })
+      .select()
+      .single();
 
     if (paymentError) {
-      console.log('PAYMENT_ERROR:', JSON.stringify(paymentError));
-      return NextResponse.json({
-        error: 'payment_failed',
-        message: paymentError.message || 'Payment creation failed',
+      console.error('PAYMENT_ERROR:', {
+        message: paymentError.message,
         code: paymentError.code,
-        details: paymentError.details
-      }, { status: 400 });
+        details: paymentError.details,
+        hint: paymentError.hint,
+      });
+      return NextResponse.json(
+        {
+          error: 'payment_failed',
+          message: paymentError.message || 'Failed to create payment',
+          code: paymentError.code
+        },
+        { status: 400 }
+      );
     }
 
     return NextResponse.json({
       booking: { id: bookingId },
+      payment: { id: paymentData?.id },
       success: true
     });
   } catch (err) {
-    console.log('ERROR:', err);
-    return NextResponse.json({ error: 'error', message: String(err) }, { status: 500 });
+    console.error('BOOKING_CREATE_ERROR:', err);
+    return NextResponse.json(
+      { error: 'error', message: String(err) },
+      { status: 500 }
+    );
   }
 }
