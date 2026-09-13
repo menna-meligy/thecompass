@@ -139,7 +139,7 @@ export default function EnhancedAvailabilityBookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f172a] p-6">
+    <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
       <div className="max-w-4xl mx-auto">
         {/* Page Header */}
         <div className="mb-8">
@@ -174,16 +174,16 @@ export default function EnhancedAvailabilityBookingPage() {
         )}
 
         {/* Calendar */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-8">
+        <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-6 mb-8">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4 md:mb-6">
             <button
               onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
-              className="p-2 hover:bg-white/10 rounded"
+              className="p-1 md:p-2 hover:bg-white/10 rounded"
             >
-              <ChevronLeft className="w-5 h-5 text-amber-400" />
+              <ChevronLeft className="w-4 md:w-5 h-4 md:h-5 text-amber-400" />
             </button>
-            <h2 className="text-lg font-bold text-white">{monthName}</h2>
+            <h2 className="text-base md:text-lg font-bold text-white">{monthName}</h2>
             <button
               onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))}
               className="p-2 hover:bg-white/10 rounded"
@@ -193,16 +193,16 @@ export default function EnhancedAvailabilityBookingPage() {
           </div>
 
           {/* Day names */}
-          <div className="grid grid-cols-7 gap-2 mb-4">
+          <div className="grid grid-cols-7 gap-1 md:gap-2 mb-2 md:mb-4">
             {dayNames.map((day) => (
-              <div key={day} className="text-center text-white/50 text-xs font-semibold py-2">
+              <div key={day} className="text-center text-white/50 text-xs font-semibold py-1 md:py-2">
                 {day}
               </div>
             ))}
           </div>
 
           {/* Calendar grid */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1 md:gap-2">
             {emptyDays.map((_, i) => (
               <div key={`empty-${i}`}></div>
             ))}
@@ -232,11 +232,11 @@ export default function EnhancedAvailabilityBookingPage() {
                   key={day}
                   onClick={() => !inPast && available && setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
                   disabled={inPast || !available}
-                  className={`p-3 rounded border ${bgColor} ${borderColor} ${textColor} ${cursor} transition hover:${available && !inPast ? 'bg-emerald-500/30' : ''}`}
+                  className={`p-2 md:p-3 rounded border text-xs md:text-sm ${bgColor} ${borderColor} ${textColor} ${cursor} transition`}
                 >
-                  <div className="font-semibold">{day}</div>
+                  <div className="font-semibold text-sm md:text-base">{day}</div>
                   {available && (
-                    <div className="text-xs mt-1">
+                    <div className="text-xs mt-0.5 md:mt-1">
                       {daySlots.length} {isAr ? 'موعد' : 'slot'}
                     </div>
                   )}
@@ -248,14 +248,14 @@ export default function EnhancedAvailabilityBookingPage() {
 
         {/* Slots for selected date */}
         {currentDate && (
-          <div className="space-y-3">
-            <h2 className="text-xl font-bold text-amber-300">
+          <div className="space-y-2 md:space-y-3">
+            <h2 className="text-lg md:text-xl font-bold text-amber-300">
               {isAr
                 ? `المواعيد المتاحة - ${currentDate.toLocaleDateString('ar-EG')}`
                 : `Available Slots - ${currentDate.toLocaleDateString()}`}
             </h2>
             {getSlotsForDate(formatDateToISO(currentDate.getDate())).length === 0 ? (
-              <p className="text-white/40">
+              <p className="text-white/40 text-sm md:text-base">
                 {isAr ? 'لا توجد مواعيد متاحة' : 'No available slots'}
               </p>
             ) : (
@@ -267,21 +267,21 @@ export default function EnhancedAvailabilityBookingPage() {
                   <button
                     key={slot.id}
                     onClick={() => setSelectedSlot(slot)}
-                    className="w-full p-4 rounded-lg border bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 transition cursor-pointer"
+                    className="w-full p-3 md:p-4 rounded-lg border bg-emerald-500/10 border-emerald-500/30 hover:bg-emerald-500/20 transition cursor-pointer text-left"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Clock className="w-4 h-4 text-amber-300" />
-                          <span className="font-semibold text-white">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 md:gap-3 mb-1 md:mb-2">
+                          <Clock className="w-4 h-4 text-amber-300 flex-shrink-0" />
+                          <span className="font-semibold text-white text-sm md:text-base">
                             {slot.start_time} - {slot.end_time}
                           </span>
                         </div>
-                        <p className="text-white/70 text-sm">{title}</p>
+                        <p className="text-white/70 text-xs md:text-sm">{title}</p>
                       </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 text-white/70 text-sm mb-1">
-                          <Users className="w-4 h-4" />
+                      <div className="flex items-center justify-between md:flex-col md:text-right gap-2 md:gap-1">
+                        <div className="flex items-center gap-1 text-white/70 text-xs md:text-sm">
+                          <Users className="w-3 h-3 md:w-4 md:h-4" />
                           <span>
                             {slot.booked_count}/{slot.capacity}
                           </span>
