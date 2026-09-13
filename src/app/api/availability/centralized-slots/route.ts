@@ -60,8 +60,17 @@ export async function GET(request: Request) {
       return NextResponse.json(mockSlots);
     }
 
+    // Filter out past slots (Egypt timezone: UTC+2/+3)
+    const egyptTime = new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo' });
+    const now = new Date(egyptTime);
+
+    const filteredSlots = (slots || []).filter((slot: any) => {
+      const slotDateTime = new Date(`${slot.date}T${slot.start_time}`);
+      return slotDateTime > now;
+    });
+
     // Return slots with assignments renamed for frontend consistency
-    const formattedSlots = (slots || []).map((slot: any) => ({
+    const formattedSlots = filteredSlots.map((slot: any) => ({
       ...slot,
       assignments: slot.slot_assignments,
     }));
