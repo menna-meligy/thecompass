@@ -298,7 +298,11 @@ export default async function WorkshopDetailPage(props: { params: Promise<{ id: 
 
                         {/* Availability Calendar */}
                         <div style={{ marginTop: "12px" }}>
-                          <SessionAvailabilityCalendar sessionId={session.id} isAr={isRtl} />
+                          <SessionAvailabilityCalendar
+                            sessionId={session.id}
+                            workshopId={id}
+                            isAr={isRtl}
+                          />
                         </div>
                       </div>
                     );

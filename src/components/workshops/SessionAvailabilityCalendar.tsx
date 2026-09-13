@@ -19,12 +19,14 @@ interface AvailabilitySlot {
 }
 
 interface SessionAvailabilityCalendarProps {
-  sessionId: string;
+  sessionId?: string;
+  workshopId?: string;
   isAr: boolean;
 }
 
 export default function SessionAvailabilityCalendar({
   sessionId,
+  workshopId,
   isAr,
 }: SessionAvailabilityCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -33,7 +35,7 @@ export default function SessionAvailabilityCalendar({
 
   useEffect(() => {
     loadSlots();
-  }, [sessionId]);
+  }, [sessionId, workshopId]);
 
   const loadSlots = async () => {
     try {
@@ -41,11 +43,17 @@ export default function SessionAvailabilityCalendar({
       const res = await fetch("/api/availability/centralized-slots");
       if (res.ok) {
         const allSlots = await res.json();
-        // Filter slots for this session
-        const sessionSlots = allSlots.filter((slot: AvailabilitySlot) =>
-          slot.assignments?.some((a) => a.session_id === sessionId)
-        );
-        setSlots(sessionSlots);
+        // Filter slots for this session or workshop
+        const filteredSlots = allSlots.filter((slot: AvailabilitySlot) => {
+          if (sessionId) {
+            return slot.assignments?.some((a) => a.session_id === sessionId);
+          } else if (workshopId) {
+            return slot.assignments?.some((a) => a.workshop_id === workshopId);
+          }
+          // If neither specified, show all slots
+          return true;
+        });
+        setSlots(filteredSlots.length > 0 ? filteredSlots : allSlots);
       }
     } catch (error) {
       console.error("Failed to load slots:", error);
