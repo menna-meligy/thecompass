@@ -187,10 +187,6 @@ export default function AvailabilityBookingPage() {
                   <p className="text-white/70 text-sm">حدّد أهدافك والطريقة اللي توصلك ليها</p>
                 </div>
                 <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
-                  <p className="text-amber-300 font-bold mb-2">حقّق التوازن</p>
-                  <p className="text-white/70 text-sm">عيش حياة شغل سعيدة مع حياة شخصية جميلة</p>
-                </div>
-                <div className="p-4 bg-white/5 border border-white/10 rounded-lg hover:border-amber-500/30 transition">
                   <p className="text-amber-300 font-bold mb-2">اتحرك بثقة</p>
                   <p className="text-white/70 text-sm">من الفهم للتحرك الفعلي في كل جلسة</p>
                 </div>
