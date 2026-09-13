@@ -175,6 +175,8 @@ export default function AvailabilityBookingPage() {
     return date < today;
   };
 
+  const selectedOption = sessionTypeOptions.find((o) => o.id === selectedSessionTypeId);
+
   // Step 1: Session Type Selection
   if (step === 'sessionType') {
     return (
@@ -214,7 +216,6 @@ export default function AvailabilityBookingPage() {
     const emptyDays = Array.from({ length: firstDayOfMonth(currentDate) }, (_, i) => i);
     const getSlotsForDate = (dateStr: string) => getSlotsForSessionType(dateStr, selectedSessionTypeId);
 
-    const selectedOption = sessionTypeOptions.find((o) => o.id === selectedSessionTypeId);
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
