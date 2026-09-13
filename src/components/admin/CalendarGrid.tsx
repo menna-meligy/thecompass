@@ -67,9 +67,9 @@ export default function CalendarGrid({
     switch (status) {
       case "available":
         return "bg-green-500";
-      case "full":
       case "unavailable":
         return "bg-red-500";
+      case "empty":
       default:
         return "bg-gray-400";
     }
@@ -80,9 +80,9 @@ export default function CalendarGrid({
       switch (status) {
         case "available":
           return "متاح";
-        case "full":
         case "unavailable":
           return "ممتلئ";
+        case "empty":
         default:
           return "";
       }
@@ -90,9 +90,9 @@ export default function CalendarGrid({
       switch (status) {
         case "available":
           return "Available";
-        case "full":
         case "unavailable":
           return "Full";
+        case "empty":
         default:
           return "";
       }
@@ -221,11 +221,9 @@ export default function CalendarGrid({
               key={day}
               onClick={() => onDateClick(dStr)}
               className={`aspect-square rounded-lg p-2 transition-all relative group ${
-                status === "available"
-                  ? "bg-white/5 hover:bg-white/10 border border-white/10"
-                  : status === "full" || status === "unavailable"
-                    ? "bg-red-500/10 hover:bg-red-500/20 border border-red-500/30"
-                    : "bg-white/5 hover:bg-white/10 border border-white/10"
+                status === "unavailable"
+                  ? "bg-red-500/10 hover:bg-red-500/20 border border-red-500/30"
+                  : "bg-white/5 hover:bg-white/10 border border-white/10"
               }`}
             >
               <div className="h-full flex flex-col items-center justify-center">
