@@ -87,8 +87,8 @@ export async function POST(req: Request) {
       .insert({
         id: bookingId,
         user_id: userId,
-        session_id: slotAssignment?.session_id || slotId, // Use session_id from assignment if available
-        slot_id: slotId, // Add the slot_id for slot-based bookings
+        session_id: slotAssignment?.session_id || null, // Only set if slot has a session assignment
+        slot_id: slotId, // Use slot_id for availability slot bookings
         status: 'pending',
         created_at: now,
       })
