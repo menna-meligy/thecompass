@@ -119,19 +119,17 @@ export async function POST(req: Request) {
       .eq('slot_id', slotId)
       .maybeSingle();
 
-    const { data: bookingData, error: bookingError } = await supabase
+    const { error: bookingError } = await supabase
       .from('bookings')
       .insert({
         id: bookingId,
         user_id: userId,
-        session_id: slotAssignment?.session_id || null, // Only set if slot has a session assignment
-        slot_id: slotId, // Use slot_id for availability slot bookings
+        session_id: slotAssignment?.session_id || null,
+        slot_id: slotId,
         status: 'pending',
         created_at: now,
         metadata: sessionAnswers ? { session_answers: sessionAnswers } : null,
-      })
-      .select()
-      .single();
+      });
 
     if (bookingError) {
       console.error('BOOKING_ERROR:', {
@@ -141,7 +139,6 @@ export async function POST(req: Request) {
         hint: bookingError.hint,
       });
 
-      // Provide user-friendly error messages in the appropriate language
       let userMessage = isAr
         ? 'فشل في إنشاء الحجز. يرجى المحاولة مرة أخرى.'
         : 'Failed to create booking. Please try again.';
