@@ -8,7 +8,7 @@ import { CheckCircle2, Users, Target, Compass, ArrowRight, ArrowLeft, Calendar, 
 import type { Session, WorkshopOutlineItem } from "@/types/index";
 import WorkshopGraphic from "@/components/workshops/WorkshopGraphic";
 
-export default async function WorkshopDetailPage(props: PageProps<"/[locale]/workshops/[id]">) {
+export default async function WorkshopDetailPage(props: { params: Promise<{ id: string; locale: string }> }) {
   const { id } = await props.params;
   const t = await getTranslations("workshops");
   const locale = await getLocale();
