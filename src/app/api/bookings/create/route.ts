@@ -15,38 +15,25 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Ensure user profile exists - create if missing (safeguard for users whose profile creation failed)
-    const { data: profile } = await supabase
+    // Ensure user profile exists using upsert (creates if missing, updates if exists)
+    // This is safer than insert because it handles race conditions and always ensures profile exists
+    console.log('Ensuring profile exists for user:', userId);
+    const { error: profileError } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('id', userId)
-      .single();
+      .upsert({
+        id: userId,
+        email: `user-${userId}@albosla.local`,
+        role: 'user'
+      }, { onConflict: 'id' });
 
-    if (!profile) {
-      // Profile doesn't exist - try to create it
-      console.log('Profile missing for user:', userId, '- attempting to create');
-
-      // Get user's email from auth.users
-      const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
-      const userEmail = authUser?.user?.email || `user-${userId}@albosla.local`;
-
-      const { error: createProfileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email: userEmail,
-          role: 'user'
-        });
-
-      if (createProfileError) {
-        console.error('Failed to create profile:', { userId, error: createProfileError });
-        return NextResponse.json(
-          { error: 'Failed to initialize user profile. Please contact support.' },
-          { status: 400 }
-        );
-      }
-      console.log('Profile created successfully for user:', userId, 'email:', userEmail);
+    if (profileError) {
+      console.error('Failed to ensure profile:', { userId, error: profileError });
+      return NextResponse.json(
+        { error: 'Failed to initialize user profile', message: profileError.message },
+        { status: 400 }
+      );
     }
+    console.log('Profile ensured for user:', userId);
 
     const bookingId = crypto.randomUUID();
     const now = new Date().toISOString();
