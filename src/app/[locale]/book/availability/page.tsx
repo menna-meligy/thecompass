@@ -6,6 +6,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookingFlow from '@/components/booking/BookingFlow';
 import SessionSelector from '@/components/booking/SessionSelector';
+import SessionQuestionnaire, { SessionAnswers } from '@/components/booking/SessionQuestionnaire';
+import SessionCountdownTimer from '@/components/booking/SessionCountdownTimer';
 import type { SessionOption } from '@/components/booking/SessionSelector';
 import { createClient } from '@/lib/supabase/client';
 
@@ -39,7 +41,7 @@ export default function AvailabilityBookingPage() {
   const supabase = createClient();
 
   // State
-  const [step, setStep] = useState<'sessionType' | 'calendar' | 'booking'>('sessionType');
+  const [step, setStep] = useState<'questionnaire' | 'sessionType' | 'calendar' | 'booking'>('questionnaire');
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [selectedSessionTypeId, setSelectedSessionTypeId] = useState<string>('');
@@ -48,6 +50,7 @@ export default function AvailabilityBookingPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
   const [userId, setUserId] = useState<string>('');
+  const [sessionAnswers, setSessionAnswers] = useState<SessionAnswers | null>(null);
 
   useEffect(() => {
     async function initUser() {
@@ -63,9 +66,27 @@ export default function AvailabilityBookingPage() {
 
   useEffect(() => {
     fetchData();
-    // Poll for updates every 3 seconds to see real-time admin changes
-    const interval = setInterval(fetchData, 3000);
-    return () => clearInterval(interval);
+
+    // Set up real-time subscription to availability_slots changes
+    const channel = supabase
+      .channel('availability_slots_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'availability_slots'
+      }, () => {
+        // Refresh slots when any changes occur
+        fetchData();
+      })
+      .subscribe();
+
+    // Also poll periodically as fallback
+    const interval = setInterval(fetchData, 5000);
+
+    return () => {
+      clearInterval(interval);
+      channel.unsubscribe();
+    };
   }, []);
 
   async function fetchData() {
@@ -190,11 +211,34 @@ export default function AvailabilityBookingPage() {
 
   const selectedOption = sessionTypeOptions.find((o) => o.id === selectedSessionTypeId);
 
+  // Step 0: Session Questionnaire
+  if (step === 'questionnaire') {
+    return (
+      <SessionQuestionnaire
+        isAr={isAr}
+        onComplete={(answers) => {
+          setSessionAnswers(answers);
+          setStep('sessionType');
+        }}
+        onBack={() => router.back()}
+      />
+    );
+  }
+
   // Step 1: Session Type Selection
   if (step === 'sessionType') {
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-2xl mx-auto">
+          {/* Back button */}
+          <button
+            onClick={() => setStep('questionnaire')}
+            className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            <span>{isAr ? 'رجوع' : 'Back'}</span>
+          </button>
+
           <div className="mb-8">
             <h1 className="text-3xl font-black text-white mb-2">{isAr ? '📅 اختر نوع الجلسة' : '📅 Choose a Session'}</h1>
             <p className="text-white/50">{isAr ? 'ابدأ رحلتك معنا' : 'Start your journey with us'}</p>
@@ -324,17 +368,63 @@ export default function AvailabilityBookingPage() {
 
   // Step 3: Booking
   if (step === 'booking' && selectedSlot && userId && selectedOption) {
+    const sessionStartDateTime = `${selectedSlot.date}T${selectedSlot.start_time}`;
+
     return (
-      <BookingFlow
-        sessionId={selectedSlot.id}
-        workshopTitle={isAr ? selectedOption.labelAr : selectedOption.label}
-        price={selectedOption.price}
-        userId={userId}
-        sessionStartsAt={`${selectedSlot.date}T${selectedSlot.start_time}`}
-        sessionEndsAt={`${selectedSlot.date}T${selectedSlot.end_time}`}
-        capacity={1}
-        onBack={() => setStep('calendar')}
-      />
+      <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Countdown timer */}
+          <div className="mb-8">
+            <SessionCountdownTimer sessionStartsAt={sessionStartDateTime} isAr={isAr} />
+          </div>
+
+          {/* Booking flow */}
+          <BookingFlow
+            sessionId={selectedSlot.id}
+            workshopTitle={isAr ? selectedOption.labelAr : selectedOption.label}
+            price={selectedOption.price}
+            userId={userId}
+            sessionStartsAt={sessionStartDateTime}
+            sessionEndsAt={`${selectedSlot.date}T${selectedSlot.end_time}`}
+            capacity={1}
+            onBack={() => setStep('calendar')}
+            sessionAnswers={sessionAnswers}
+          />
+
+          {/* Session info */}
+          {sessionAnswers && (
+            <div className="mt-8 p-6 bg-white/5 border border-white/10 rounded-lg">
+              <h3 className="text-lg font-bold text-white mb-4">
+                {isAr ? '📝 معلومات الجلسة' : '📝 Session Information'}
+              </h3>
+              <div className="space-y-3 text-sm">
+                {sessionAnswers.experience_level && (
+                  <div className="flex justify-between">
+                    <span className="text-white/70">
+                      {isAr ? 'مستوى الخبرة:' : 'Experience Level:'}
+                    </span>
+                    <span className="text-white font-medium">
+                      {sessionAnswers.experience_level === 'beginner'
+                        ? (isAr ? 'بادئ جديد' : 'Beginner')
+                        : sessionAnswers.experience_level === 'intermediate'
+                        ? (isAr ? 'متوسط' : 'Intermediate')
+                        : (isAr ? 'متقدم' : 'Advanced')}
+                    </span>
+                  </div>
+                )}
+                {sessionAnswers.career_goals && (
+                  <div>
+                    <p className="text-white/70 mb-1">
+                      {isAr ? 'الأهداف الوظيفية:' : 'Career Goals:'}
+                    </p>
+                    <p className="text-white/90">{sessionAnswers.career_goals}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     );
   }
 

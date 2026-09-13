@@ -24,6 +24,14 @@ const VODAFONE_LINK = process.env.NEXT_PUBLIC_VODAFONE_LINK || "https://web.voda
 
 type Step = "payment" | "proof" | "confirmed";
 
+interface SessionAnswers {
+  experience_level: string;
+  career_goals: string;
+  main_challenge: string;
+  learning_style: string;
+  time_commitment: string;
+}
+
 interface Props {
   sessionId: string;
   workshopTitle: string;
@@ -34,6 +42,7 @@ interface Props {
   sessionLocation?: string | null;
   capacity?: number;
   onBack?: () => void;
+  sessionAnswers?: SessionAnswers | null;
 }
 
 export default function BookingFlow({
@@ -46,6 +55,7 @@ export default function BookingFlow({
   sessionLocation,
   capacity = 1,
   onBack,
+  sessionAnswers = null,
 }: Props) {
   const t = useTranslations("booking");
   const locale = useLocale();
@@ -143,11 +153,19 @@ export default function BookingFlow({
     setUploading(true);
     setBookingError(null);
     try {
-      console.log("Creating booking with:", { slotId: sessionId, userId, payment_method: selectedMethod, amount: price, locale: isAr ? 'ar' : 'en' });
+      const payload = {
+        slotId: sessionId,
+        userId,
+        payment_method: selectedMethod,
+        amount: price,
+        locale: isAr ? 'ar' : 'en',
+        ...(sessionAnswers && { sessionAnswers }),
+      };
+      console.log("Creating booking with:", payload);
       const res = await fetch("/api/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price, locale: isAr ? 'ar' : 'en' }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       console.log("Booking response:", { status: res.status, data });

@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { slotId, userId, payment_method, amount, locale = 'en' } = await req.json();
+    const { slotId, userId, payment_method, amount, locale = 'en', sessionAnswers = null } = await req.json();
     const isAr = locale === 'ar';
 
     console.log('📝 BOOKING REQUEST:', { slotId, userId, payment_method, amount, locale });
@@ -128,6 +128,7 @@ export async function POST(req: Request) {
         slot_id: slotId, // Use slot_id for availability slot bookings
         status: 'pending',
         created_at: now,
+        metadata: sessionAnswers ? { session_answers: sessionAnswers } : null,
       })
       .select()
       .single();
