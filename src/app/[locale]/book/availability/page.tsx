@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { Calendar, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookingFlow from '@/components/booking/BookingFlow';
 import SessionSelector from '@/components/booking/SessionSelector';
-import SessionQuestionnaire, { SessionAnswers } from '@/components/booking/SessionQuestionnaire';
+import SessionIntroduction from '@/components/booking/SessionIntroduction';
 import SessionCountdownTimer from '@/components/booking/SessionCountdownTimer';
 import type { SessionOption } from '@/components/booking/SessionSelector';
 import { createClient } from '@/lib/supabase/client';
@@ -41,16 +41,14 @@ export default function AvailabilityBookingPage() {
   const supabase = createClient();
 
   // State
-  const [step, setStep] = useState<'questionnaire' | 'sessionType' | 'calendar' | 'booking'>('questionnaire');
+  const [step, setStep] = useState<'intro' | 'calendar' | 'booking'>('intro');
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
-  const [selectedSessionTypeId, setSelectedSessionTypeId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
   const [userId, setUserId] = useState<string>('');
-  const [sessionAnswers, setSessionAnswers] = useState<SessionAnswers | null>(null);
 
   useEffect(() => {
     async function initUser() {
@@ -117,35 +115,9 @@ export default function AvailabilityBookingPage() {
     return `${year}-${month}-${dayStr}`;
   };
 
-  // Build 7 session type options
-  const sessionTypeOptions: SessionOption[] = [
-    {
-      id: 'career-deciding',
-      label: 'Career Deciding Session',
-      labelAr: 'جلسة تحديد المسار الوظيفي',
-      sessionId: 'career-deciding-session',
-      type: 'individual',
-      price: 500,
-    },
-    ...(workshops.flatMap((w) => [
-      {
-        id: `${w.id}-individual`,
-        label: `${w.title_en} - Individual`,
-        labelAr: `${w.title_ar} - فردي`,
-        workshopId: w.id,
-        type: 'individual' as const,
-        price: 500,
-      },
-      {
-        id: `${w.id}-group`,
-        label: `${w.title_en} - Group`,
-        labelAr: `${w.title_ar} - مجموعة`,
-        workshopId: w.id,
-        type: 'group' as const,
-        price: 1200,
-      },
-    ]) || []),
-  ];
+  // Individual training session
+  const sessionTitle = isAr ? 'جلسة تدريب فردي مع المنتور' : 'Individual Training Session with Mentor';
+  const sessionPrice = 500;
 
   // Get current time in Egyptian timezone (UTC+2/+3)
   const getEgyptianNow = () => {
@@ -164,11 +136,7 @@ export default function AvailabilityBookingPage() {
     return { date, time };
   };
 
-  const getSlotsForSessionType = (date: string, sessionTypeId: string) => {
-    const egyptianNow = getEgyptianNow();
-    const option = sessionTypeOptions.find((o) => o.id === sessionTypeId);
-    if (!option) return [];
-
+  const getSlotsForDate = (date: string) => {
     return slots.filter((s) => {
       // Check date first
       if (s.date !== date) return false;
@@ -179,27 +147,13 @@ export default function AvailabilityBookingPage() {
       // Don't show fully booked slots
       if (s.booked_count >= s.capacity) return false;
 
-      // Check assignment matches session type
-      const matches = s.assignments?.some((a) => {
-        if (option.sessionId === 'career-deciding-session') {
-          return a.session_id === 'career-deciding-session';
-        }
-        if (option.workshopId) {
-          return a.workshop_id === option.workshopId;
-        }
-        return false;
-      });
-
-      if (!matches) return false;
-
       return true;
     });
   };
 
   const isDateAvailable = (day: number) => {
     const dateStr = formatDateToISO(day);
-    if (!selectedSessionTypeId) return false;
-    return getSlotsForSessionType(dateStr, selectedSessionTypeId).length > 0;
+    return getSlotsForDate(dateStr).length > 0;
   };
 
   const isDateInPast = (day: number) => {
@@ -209,78 +163,31 @@ export default function AvailabilityBookingPage() {
     return date < today;
   };
 
-  const selectedOption = sessionTypeOptions.find((o) => o.id === selectedSessionTypeId);
-
-  // Step 0: Session Questionnaire
-  if (step === 'questionnaire') {
+  // Step 0: Introduction
+  if (step === 'intro') {
     return (
-      <SessionQuestionnaire
+      <SessionIntroduction
         isAr={isAr}
-        onComplete={(answers) => {
-          setSessionAnswers(answers);
-          setStep('sessionType');
-        }}
-        onBack={() => router.back()}
+        onContinue={() => setStep('calendar')}
       />
     );
   }
 
-  // Step 1: Session Type Selection
-  if (step === 'sessionType') {
-    return (
-      <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
-        <div className="max-w-2xl mx-auto">
-          {/* Back button */}
-          <button
-            onClick={() => setStep('questionnaire')}
-            className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span>{isAr ? 'رجوع' : 'Back'}</span>
-          </button>
-
-          <div className="mb-8">
-            <h1 className="text-3xl font-black text-white mb-2">{isAr ? '📅 اختر نوع الجلسة' : '📅 Choose a Session'}</h1>
-            <p className="text-white/50">{isAr ? 'ابدأ رحلتك معنا' : 'Start your journey with us'}</p>
-          </div>
-
-          {error && <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6"><p className="text-red-400">{error}</p></div>}
-
-          {loading ? (
-            <div className="text-center text-white/50">{t('loading')}</div>
-          ) : (
-            <div className="space-y-4">
-              <SessionSelector
-                options={sessionTypeOptions}
-                onSelect={(typeId) => {
-                  setSelectedSessionTypeId(typeId);
-                  setStep('calendar');
-                }}
-                isAr={isAr}
-              />
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Step 2: Calendar & Slot Selection
+  // Step 1: Calendar & Slot Selection
   if (step === 'calendar') {
     const monthName = new Intl.DateTimeFormat(isAr ? 'ar-EG' : 'en-US', { month: 'long', year: 'numeric' }).format(currentDate);
     const dayNames = isAr ? ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const days = Array.from({ length: daysInMonth(currentDate) }, (_, i) => i + 1);
     const emptyDays = Array.from({ length: firstDayOfMonth(currentDate) }, (_, i) => i);
-    const getSlotsForDate = (dateStr: string) => getSlotsForSessionType(dateStr, selectedSessionTypeId);
 
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          <button onClick={() => { setSelectedSessionTypeId(''); setStep('sessionType'); }} className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"><ChevronLeft className="w-5 h-5" /><span>{isAr ? 'رجوع' : 'Back'}</span></button>
+          <button onClick={() => setStep('intro')} className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-6"><ChevronLeft className="w-5 h-5" /><span>{isAr ? 'رجوع' : 'Back'}</span></button>
 
           <div className="mb-8">
             <h1 className="text-2xl font-black text-white mb-1">{isAr ? '📅 اختر موعداً' : '📅 Select a Time'}</h1>
-            <p className="text-white/50 text-sm">{selectedOption ? (isAr ? selectedOption.labelAr : selectedOption.label) : ''}</p>
+            <p className="text-white/50 text-sm">{sessionTitle}</p>
           </div>
 
           <div className="bg-white/5 border border-white/10 rounded-lg p-3 md:p-6 mb-8">
@@ -366,8 +273,8 @@ export default function AvailabilityBookingPage() {
     );
   }
 
-  // Step 3: Booking
-  if (step === 'booking' && selectedSlot && userId && selectedOption) {
+  // Step 2: Booking
+  if (step === 'booking' && selectedSlot && userId) {
     const sessionStartDateTime = `${selectedSlot.date}T${selectedSlot.start_time}`;
 
     return (
@@ -381,48 +288,14 @@ export default function AvailabilityBookingPage() {
           {/* Booking flow */}
           <BookingFlow
             sessionId={selectedSlot.id}
-            workshopTitle={isAr ? selectedOption.labelAr : selectedOption.label}
-            price={selectedOption.price}
+            workshopTitle={sessionTitle}
+            price={sessionPrice}
             userId={userId}
             sessionStartsAt={sessionStartDateTime}
             sessionEndsAt={`${selectedSlot.date}T${selectedSlot.end_time}`}
             capacity={1}
             onBack={() => setStep('calendar')}
-            sessionAnswers={sessionAnswers}
           />
-
-          {/* Session info */}
-          {sessionAnswers && (
-            <div className="mt-8 p-6 bg-white/5 border border-white/10 rounded-lg">
-              <h3 className="text-lg font-bold text-white mb-4">
-                {isAr ? '📝 معلومات الجلسة' : '📝 Session Information'}
-              </h3>
-              <div className="space-y-3 text-sm">
-                {sessionAnswers.experience_level && (
-                  <div className="flex justify-between">
-                    <span className="text-white/70">
-                      {isAr ? 'مستوى الخبرة:' : 'Experience Level:'}
-                    </span>
-                    <span className="text-white font-medium">
-                      {sessionAnswers.experience_level === 'beginner'
-                        ? (isAr ? 'بادئ جديد' : 'Beginner')
-                        : sessionAnswers.experience_level === 'intermediate'
-                        ? (isAr ? 'متوسط' : 'Intermediate')
-                        : (isAr ? 'متقدم' : 'Advanced')}
-                    </span>
-                  </div>
-                )}
-                {sessionAnswers.career_goals && (
-                  <div>
-                    <p className="text-white/70 mb-1">
-                      {isAr ? 'الأهداف الوظيفية:' : 'Career Goals:'}
-                    </p>
-                    <p className="text-white/90">{sessionAnswers.career_goals}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
