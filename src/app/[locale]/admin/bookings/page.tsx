@@ -45,10 +45,6 @@ interface BookingRow {
     method?: string;
     proof_url?: string;
     gateway_txn_id?: string;
-    admin_approved?: boolean;
-    approved_at?: string;
-    admin_approval_notes_ar?: string;
-    admin_approval_notes_en?: string;
     created_at?: string;
   };
 }
@@ -108,7 +104,7 @@ export default function AdminBookingsPage() {
       const { data: bookingsData, error } = await supabase
         .from("bookings")
         .select(
-          "id, user_id, status, created_at, payment_deadline, user:profiles(full_name, email, phone), session:sessions(starts_at, ends_at, location_or_link, price, type, workshop:workshops(title_ar, title_en)), payment:payments(id, status, amount, method, proof_url, gateway_txn_id, admin_approved, approved_at, admin_approval_notes_ar, admin_approval_notes_en, created_at)"
+          "id, user_id, status, created_at, payment_deadline, user:profiles(full_name, email, phone), session:sessions(starts_at, ends_at, location_or_link, price, type, workshop:workshops(title_ar, title_en)), payment:payments(id, status, amount, method, proof_url, gateway_txn_id, created_at)"
         )
         .order("created_at", { ascending: false })
         .limit(pageSize)

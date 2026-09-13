@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
   const { error: updateError } = await (supabase as any)
     .from("payments")
     .update({
-      admin_approved: approved,
+      status: approved ? "paid" : "failed",
       admin_approval_notes_ar: notes_ar || null,
       admin_approval_notes_en: notes_en || null,
       approved_by: approved ? user.id : null,

@@ -12,10 +12,6 @@ interface PaymentData {
   status?: string;
   proof_url?: string;
   gateway_txn_id?: string;
-  admin_approved?: boolean;
-  approved_at?: string;
-  admin_approval_notes_ar?: string;
-  admin_approval_notes_en?: string;
   created_at?: string;
 }
 
@@ -130,11 +126,11 @@ export default function ReceiptModal({
 
   if (!isOpen || !payment) return null;
 
-  const isAlreadyApproved = payment.admin_approved || payment.status === "paid";
+  const isAlreadyApproved = payment.status === "paid";
   const receiptStatus =
     payment.status === "pending_verification"
       ? "pending"
-      : payment.status === "paid" || payment.admin_approved
+      : payment.status === "paid"
         ? "approved"
         : payment.status === "failed"
           ? "rejected"
