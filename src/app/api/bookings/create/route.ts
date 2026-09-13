@@ -69,10 +69,20 @@ export async function POST(req: Request) {
         details: bookingError.details,
         hint: bookingError.hint,
       });
+
+      // Provide user-friendly error messages
+      let userMessage = 'Failed to create booking. Please try again.';
+
+      if (bookingError.code === '23503' || bookingError.message?.includes('foreign key')) {
+        userMessage = 'There was an issue with your account. Please log out and log back in, then try again.';
+      } else if (bookingError.message?.includes('violates unique constraint')) {
+        userMessage = 'This session is already booked. Please choose a different time.';
+      }
+
       return NextResponse.json(
         {
           error: 'booking_failed',
-          message: bookingError.message || 'Failed to create booking',
+          message: userMessage,
           code: bookingError.code
         },
         { status: 400 }
