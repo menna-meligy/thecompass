@@ -294,11 +294,6 @@ export default function AvailabilityBookingPage() {
     return (
       <div className="min-h-screen bg-[#0f172a] p-4 md:p-6">
         <div className="max-w-4xl mx-auto">
-          {/* Countdown timer */}
-          <div className="mb-8">
-            <SessionCountdownTimer sessionStartsAt={sessionStartDateTime} isAr={isAr} />
-          </div>
-
           {/* Booking flow */}
           <BookingFlow
             sessionId={selectedSlot.id}

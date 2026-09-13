@@ -8,6 +8,7 @@ import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import PaymentCountdownTimer from "./PaymentCountdownTimer";
+import SessionCountdownTimer from "./SessionCountdownTimer";
 
 const INSTAPAY_NUMBER = process.env.NEXT_PUBLIC_INSTAPAY_NUMBER || "01093026726";
 const VODAFONE_NUMBER = process.env.NEXT_PUBLIC_VODAFONE_CASH_NUMBER || "01223810409";
@@ -621,6 +622,13 @@ export default function BookingFlow({
           {t("confirmDesc")}
         </p>
       </div>
+
+      {/* Countdown timer - show only after booking is confirmed */}
+      {sessionStartsAt && (
+        <div style={{ marginBottom: "20px" }}>
+          <SessionCountdownTimer sessionStartsAt={sessionStartsAt} isAr={isAr} />
+        </div>
+      )}
 
       {/* Appointment details card */}
       {(dateStr || sessionLocation) && (
