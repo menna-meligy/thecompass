@@ -34,45 +34,61 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Try to ensure user profile exists - insert if missing, ignore if exists
-    console.log('📋 Checking if profile exists for user:', userId);
-    const { data: existingProfile } = await supabase
+    // Ensure user profile exists - use upsert to handle both new and existing users
+    console.log('📋 Ensuring profile exists for user:', userId);
+    const { error: profileError } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('id', userId)
-      .maybeSingle();
+      .upsert({
+        id: userId,
+        email: `user-${userId}@albosla.local`,
+        role: 'user'
+      });
 
-    if (!existingProfile) {
-      console.log('Profile missing - attempting to create');
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email: `user-${userId}@albosla.local`,
-          role: 'user'
-        });
-
-      if (insertError) {
-        console.error('❌ Failed to create profile:', { userId, error: insertError });
-        // Don't fail here - if profile insert fails, the booking insert will fail with a clearer error
-        // This logs the issue for debugging
-      } else {
-        console.log('✅ Profile created for user:', userId);
-      }
+    if (profileError) {
+      console.error('❌ Failed to ensure profile:', {
+        userId,
+        error: {
+          message: profileError.message,
+          code: profileError.code,
+          details: profileError.details,
+          hint: profileError.hint
+        }
+      });
+      // Profile creation/update failed - this MUST be fixed before booking can proceed
+      const message = isAr
+        ? 'حدثت مشكلة في حسابك. يرجى التواصل مع الدعم الفني.'
+        : 'There was an issue with your account. Please contact support.';
+      return NextResponse.json(
+        {
+          error: 'profile_creation_failed',
+          message,
+          code: profileError.code,
+          details: profileError.details
+        },
+        { status: 400 }
+      );
     } else {
-      console.log('✅ Profile already exists for user:', userId);
+      console.log('✅ Profile ensured for user:', userId);
     }
 
     const bookingId = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    // Create booking - use session_id if time_slot_id not available
+    // Create booking using slot_id for availability slots
+    // For backwards compatibility, also try to get session_id from slot assignments
+    const { data: slotAssignment } = await supabase
+      .from('slot_assignments')
+      .select('session_id')
+      .eq('slot_id', slotId)
+      .maybeSingle();
+
     const { data: bookingData, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         id: bookingId,
         user_id: userId,
-        session_id: slotId,
+        session_id: slotAssignment?.session_id || slotId, // Use session_id from assignment if available
+        slot_id: slotId, // Add the slot_id for slot-based bookings
         status: 'pending',
         created_at: now,
       })
