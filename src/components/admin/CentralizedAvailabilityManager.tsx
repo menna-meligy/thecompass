@@ -120,6 +120,10 @@ export default function CentralizedAvailabilityManager({
 
       if (assignments.length === 0) throw new Error("No session types selected");
 
+      // Calculate capacity: individual sessions = 1, group sessions = 8
+      const hasGroupSession = assignments.some((opt) => opt?.type === "group");
+      const capacity = hasGroupSession ? 8 : 1;
+
       const res = await fetch("/api/admin/availability/slots", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -128,6 +132,7 @@ export default function CentralizedAvailabilityManager({
           start_time: data.startTime,
           end_time: data.endTime,
           admin_marked_status: "available",
+          capacity,
           assignments: assignments.map((opt) => ({
             session_id: opt?.sessionId || null,
             workshop_id: opt?.workshopId || null,

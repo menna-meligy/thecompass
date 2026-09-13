@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { date, start_time, end_time, admin_marked_status = "available", session_id, workshop_id, assignments } = await request.json();
+  const { date, start_time, end_time, admin_marked_status = "available", capacity = 1, session_id, workshop_id, assignments } = await request.json();
 
   if (!date || !start_time || !end_time) {
     return NextResponse.json(
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
         date,
         start_time,
         end_time,
-        capacity: 1,
+        capacity,
         status: "published",
         admin_marked_status: admin_marked_status || "available",
         created_by: user.id,
