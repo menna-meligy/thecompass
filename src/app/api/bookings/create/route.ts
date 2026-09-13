@@ -25,11 +25,16 @@ export async function POST(req: Request) {
     if (!profile) {
       // Profile doesn't exist - try to create it
       console.log('Profile missing for user:', userId, '- attempting to create');
+
+      // Get user's email from auth.users
+      const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(userId);
+      const userEmail = authUser?.user?.email || `user-${userId}@albosla.local`;
+
       const { error: createProfileError } = await supabase
         .from('profiles')
         .insert({
           id: userId,
-          email: '', // Email not available here, but it's not critical
+          email: userEmail,
           role: 'user'
         });
 
@@ -40,7 +45,7 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
-      console.log('Profile created successfully for user:', userId);
+      console.log('Profile created successfully for user:', userId, 'email:', userEmail);
     }
 
     const bookingId = crypto.randomUUID();
