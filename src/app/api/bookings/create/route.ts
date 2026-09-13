@@ -18,13 +18,13 @@ export async function POST(req: Request) {
     const bookingId = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    // Create booking with time_slot_id instead of session_id
+    // Create booking - use session_id if time_slot_id not available
     const { data: bookingData, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         id: bookingId,
         user_id: userId,
-        time_slot_id: slotId,
+        session_id: slotId,
         status: 'pending',
         created_at: now,
       })
