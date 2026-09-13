@@ -3,21 +3,28 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { slotId, userId, payment_method, amount } = await req.json();
+    const { slotId, userId, payment_method, amount, locale = 'en' } = await req.json();
+    const isAr = locale === 'ar';
 
-    console.log('📝 BOOKING REQUEST:', { slotId, userId, payment_method, amount });
+    console.log('📝 BOOKING REQUEST:', { slotId, userId, payment_method, amount, locale });
 
     if (!slotId || !userId) {
       console.error('Missing required params:', { slotId, userId });
-      return NextResponse.json({ error: 'Missing params: slotId and userId required' }, { status: 400 });
+      const message = isAr
+        ? 'المعاملات المطلوبة مفقودة. يرجى إعادة المحاولة.'
+        : 'Missing required information. Please try again.';
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     // Validate userId is a proper UUID format
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(userId)) {
       console.error('❌ Invalid userId format:', userId);
+      const message = isAr
+        ? 'معرف المستخدم غير صالح. يرجى تسجيل الخروج والدخول مرة أخرى.'
+        : 'Invalid user ID. Please log out and log back in.';
       return NextResponse.json(
-        { error: 'Invalid user ID format. Please log out and log back in.' },
+        { error: message },
         { status: 400 }
       );
     }
@@ -80,13 +87,19 @@ export async function POST(req: Request) {
         hint: bookingError.hint,
       });
 
-      // Provide user-friendly error messages
-      let userMessage = 'Failed to create booking. Please try again.';
+      // Provide user-friendly error messages in the appropriate language
+      let userMessage = isAr
+        ? 'فشل في إنشاء الحجز. يرجى المحاولة مرة أخرى.'
+        : 'Failed to create booking. Please try again.';
 
       if (bookingError.code === '23503' || bookingError.message?.includes('foreign key')) {
-        userMessage = 'There was an issue with your account. Please log out and log back in, then try again.';
+        userMessage = isAr
+          ? 'حدثت مشكلة في حسابك. يرجى تسجيل الخروج والدخول مرة أخرى ثم حاول مرة أخرى.'
+          : 'There was an issue with your account. Please log out and log back in, then try again.';
       } else if (bookingError.message?.includes('violates unique constraint')) {
-        userMessage = 'This session is already booked. Please choose a different time.';
+        userMessage = isAr
+          ? 'هذه الجلسة محجوزة بالفعل. يرجى اختيار وقت مختلف.'
+          : 'This session is already booked. Please choose a different time.';
       }
 
       return NextResponse.json(

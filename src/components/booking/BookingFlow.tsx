@@ -139,11 +139,11 @@ export default function BookingFlow({
     setUploading(true);
     setBookingError(null);
     try {
-      console.log("Creating booking with:", { slotId: sessionId, userId, payment_method: selectedMethod, amount: price });
+      console.log("Creating booking with:", { slotId: sessionId, userId, payment_method: selectedMethod, amount: price, locale: isAr ? 'ar' : 'en' });
       const res = await fetch("/api/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price }),
+        body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price, locale: isAr ? 'ar' : 'en' }),
       });
       const data = await res.json();
       console.log("Booking response:", { status: res.status, data });
