@@ -74,14 +74,15 @@ export async function POST(req: Request) {
     const bookingId = crypto.randomUUID();
     const now = new Date().toISOString();
 
-    // Validate that the slot is not in the past
+    // Validate that the slot exists and is not in the past
     const { data: slotData, error: slotFetchError } = await supabase
       .from('availability_slots')
-      .select('starts_at')
+      .select('date, start_time, end_time')
       .eq('id', slotId)
-      .maybeSingle();
+      .single();
 
     if (slotFetchError || !slotData) {
+      console.error('❌ Slot not found or error:', { slotId, error: slotFetchError });
       const message = isAr
         ? 'لم نتمكن من العثور على هذه الجلسة. يرجى إعادة المحاولة.'
         : 'Could not find this session. Please try again.';
@@ -89,14 +90,17 @@ export async function POST(req: Request) {
     }
 
     // Check if slot is in the past
-    const slotStartTime = new Date(slotData.starts_at).getTime();
-    const currentTime = new Date(now).getTime();
-    if (slotStartTime < currentTime) {
+    const slotDateTime = new Date(`${slotData.date}T${slotData.start_time}`);
+    const currentDateTime = new Date(now);
+    if (slotDateTime < currentDateTime) {
+      console.log('⏰ Slot in past:', { slotDate: slotData.date, slotTime: slotData.start_time });
       const message = isAr
         ? 'هذه الجلسة انتهت بالفعل. لا يمكنك الحجز للجلسات السابقة.'
         : 'This session has already passed. You cannot book past sessions.';
       return NextResponse.json({ error: message }, { status: 400 });
     }
+
+    console.log('✅ Slot found and valid:', { slotId, date: slotData.date, time: slotData.start_time });
 
     // Create booking using slot_id for availability slots
     // For backwards compatibility, also try to get session_id from slot assignments
