@@ -128,7 +128,6 @@ export async function POST(req: Request) {
         slot_id: slotId,
         status: 'pending',
         created_at: now,
-        metadata: sessionAnswers ? { session_answers: sessionAnswers } : null,
       })
       .select();
 
