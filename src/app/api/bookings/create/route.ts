@@ -77,16 +77,25 @@ export async function POST(req: Request) {
     // Validate that the slot exists and is not in the past
     const { data: slotData, error: slotFetchError } = await supabase
       .from('availability_slots')
-      .select('date, start_time, end_time')
+      .select('date, start_time, end_time, capacity, booked_count')
       .eq('id', slotId)
       .single();
 
     if (slotFetchError || !slotData) {
       console.error('❌ Slot not found or error:', { slotId, error: slotFetchError });
       const message = isAr
-        ? 'لم نتمكن من العثور على هذه الجلسة. يرجى إعادة المحاولة.'
-        : 'Could not find this session. Please try again.';
+        ? 'عذراً، هذه الجلسة لم تعد متاحة. يرجى اختيار جلسة أخرى.'
+        : 'Sorry, this session is no longer available. Please select another one.';
       return NextResponse.json({ error: message }, { status: 404 });
+    }
+
+    // Check if slot is still available (not full)
+    if (slotData.booked_count >= slotData.capacity) {
+      console.log('🚫 Slot is full:', { slotId, booked: slotData.booked_count, capacity: slotData.capacity });
+      const message = isAr
+        ? 'عذراً، هذه الجلسة امتلأت للتو. يرجى اختيار جلسة أخرى.'
+        : 'Sorry, this session just filled up. Please select another one.';
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     // Check if slot is in the past
@@ -95,8 +104,8 @@ export async function POST(req: Request) {
     if (slotDateTime < currentDateTime) {
       console.log('⏰ Slot in past:', { slotDate: slotData.date, slotTime: slotData.start_time });
       const message = isAr
-        ? 'هذه الجلسة انتهت بالفعل. لا يمكنك الحجز للجلسات السابقة.'
-        : 'This session has already passed. You cannot book past sessions.';
+        ? 'عذراً، هذه الجلسة انتهت بالفعل. يرجى اختيار جلسة قادمة.'
+        : 'Sorry, this session has already passed. Please select an upcoming one.';
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
