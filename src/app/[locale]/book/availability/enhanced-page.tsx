@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Calendar, Clock, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookingFlow from '@/components/booking/BookingFlow';
+import { createClient } from '@/lib/supabase/client';
 
 interface AvailabilitySlot {
   id: string;
@@ -25,27 +26,26 @@ export default function EnhancedAvailabilityBookingPage() {
   const locale = useLocale();
   const t = useTranslations('booking');
   const isAr = locale === 'ar';
+  const supabase = createClient();
 
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
-  const [userId] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('userId');
-      if (stored) return stored;
-      // Generate a proper UUID v4 format
-      const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        const r = Math.random() * 16 | 0;
-        const v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-      localStorage.setItem('userId', uuid);
-      return uuid;
+  const [userId, setUserId] = useState<string>('');
+
+  useEffect(() => {
+    async function initUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push(`/${locale}/auth`);
+        return;
+      }
+      setUserId(user.id);
     }
-    return '';
-  });
+    initUser();
+  }, [router, locale, supabase.auth]);
 
   useEffect(() => {
     fetchSlots();
