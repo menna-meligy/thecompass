@@ -364,7 +364,7 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
         >
           <Compass className="h-4 w-4 text-[#F59E0B]" />
           <span className="text-[#F59E0B] text-sm font-bold">
-            {isRtl ? "الوجهة: 7yat a7lamk" : "Destination: your dream life"}
+            {isRtl ? "الوجهة: حياة أحلامك" : "Destination: your dream life"}
           </span>
         </div>
       </div>
