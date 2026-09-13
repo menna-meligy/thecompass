@@ -54,29 +54,30 @@ export async function POST(req: NextRequest) {
     // Upload file to Supabase Storage
     const fileName = `${paymentId}-${Date.now()}-${file.name}`;
     const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('receipts')
+      .from('proofs')
       .upload(`${userId}/${fileName}`, file, {
         cacheControl: '3600',
         upsert: false,
       });
 
     if (uploadError) {
+      console.error('Upload error:', uploadError);
       return NextResponse.json(
-        { error: uploadError.message },
+        { error: `Upload failed: ${uploadError.message}` },
         { status: 400 }
       );
     }
 
     // Get public URL
     const { data: urlData } = supabase.storage
-      .from('receipts')
+      .from('proofs')
       .getPublicUrl(`${userId}/${fileName}`);
 
     // Update payment with receipt URL and set status to pending_verification
     const { data: updatedPayment, error: updateError } = await supabase
       .from('payments')
       .update({
-        receipt_image_url: urlData.publicUrl,
+        proof_url: urlData.publicUrl,
         status: 'pending_verification',
       })
       .eq('id', paymentId)
