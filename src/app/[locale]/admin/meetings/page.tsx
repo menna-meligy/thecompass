@@ -12,14 +12,14 @@ interface Meeting {
   session_id: string;
   status: string;
   created_at: string;
-  user?: { full_name: string | null; email: string };
-  session?: {
-    starts_at?: string;
-    ends_at?: string;
-    location_or_link?: string | null;
+  user: { full_name: string | null; email: string };
+  session: {
+    starts_at: string;
+    ends_at: string;
+    location_or_link: string | null;
     workshop?: { title_ar?: string; title_en?: string };
   };
-  payment?: Array<{
+  payment: Array<{
     status?: string;
   }>;
 }
@@ -78,7 +78,7 @@ export default function MeetingsCalendarPage() {
           if (result.error) return result;
           // Filter for paid meetings
           const filtered = result.data?.filter(
-            (m: any) => m.payment && m.payment.status === "paid"
+            (m: any) => m.payment && Array.isArray(m.payment) && m.payment.length > 0 && m.payment[0]?.status === "paid"
           ) || [];
           return { data: filtered, error: null };
         });
