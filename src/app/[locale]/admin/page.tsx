@@ -221,7 +221,8 @@ export default async function AdminDashboardPage() {
       {/* Quick links */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { href: `/${locale}/admin/workshops/new`, labelAr: "جلسة جديدة", labelEn: "New session", icon: <BookOpen className="h-4 w-4" /> },
+          // /admin/workshops/new has never existed; the create form lives at .../new/edit.
+          { href: `/${locale}/admin/workshops/new/edit`, labelAr: "ورشة جديدة", labelEn: "New workshop", icon: <BookOpen className="h-4 w-4" /> },
           { href: `/${locale}/admin/bookings`, labelAr: "كل الحجوزات", labelEn: "All bookings", icon: <Calendar className="h-4 w-4" /> },
           { href: `/${locale}/admin/clients`, labelAr: "العملاء", labelEn: "Clients", icon: <Users className="h-4 w-4" /> },
           { href: `/${locale}/admin/availability`, labelAr: "إدارة التوفر", labelEn: "Availability", icon: <Clock className="h-4 w-4" /> },

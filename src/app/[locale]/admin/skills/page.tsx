@@ -172,15 +172,9 @@ export default async function AdminSkillsPage() {
             ? `${allSkills.length} مهارة، ${totalActive} نشطة`
             : `${allSkills.length} skills, ${totalActive} active`
         }
-        action={
-          <Link
-            href={`/${locale}/admin/skills/new`}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-[#0a0f1a] bg-[#F59E0B] hover:bg-amber-400 transition-colors"
-          >
-            <Plus className="h-4 w-4" />
-            {isAr ? "مهارة جديدة" : "New Skill"}
-          </Link>
-        }
+        // No create route exists for skills yet, so there's no button to show —
+        // linking to /admin/skills/new only ever produced a 404.
+
       />
 
       {/* Stats bar */}

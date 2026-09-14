@@ -49,7 +49,7 @@ const QUICK_CREATE_ITEMS = [
   // These point at the list pages, which is where the create UI actually lives —
   // the ".../new" routes they used to link to have never existed and 404'd.
   { labelAr: "موعد جديد", labelEn: "New availability", href: (l: string) => `/${l}/admin/availability` },
-  { labelAr: "ورشة جديدة", labelEn: "New workshop", href: (l: string) => `/${l}/admin/workshops` },
+  { labelAr: "ورشة جديدة", labelEn: "New workshop", href: (l: string) => `/${l}/admin/workshops/new/edit` },
   { labelAr: "إعلان جديد", labelEn: "New announcement", href: (l: string) => `/${l}/admin/announcements` },
   { labelAr: "خصم جديد", labelEn: "New discount", href: (l: string) => `/${l}/admin/discounts` },
 ];
