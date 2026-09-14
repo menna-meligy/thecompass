@@ -37,6 +37,9 @@ async function login(browser, who, label) {
     if (m.type() === "error") log(`   [${label} console] ${m.text().slice(0, 160)}`);
   });
   await page.goto(`${SITE}/ar/auth`, { waitUntil: "domcontentloaded" });
+  // The submit button stays disabled until React hydrates, so waiting for it to
+  // become enabled is exactly "the client-side handler is attached".
+  await page.waitForSelector('form button[type="submit"]:not([disabled])', { timeout: 45000 });
   await page.fill('input[type="email"]', who.email);
   await page.fill('input[type="password"]', who.password);
   await Promise.all([
@@ -141,7 +144,7 @@ async function main() {
     await client.page.screenshot({ path: path.join(SHOTS, `${kind}-5-payment.png`), fullPage: true });
 
     await client.page.getByRole("button", { name: /تم التحويل|I Transferred/ }).click();
-    await client.page.waitForSelector('input[type="file"]', { timeout: 30000 });
+    await client.page.waitForSelector('input[type="file"]', { state: "attached", timeout: 30000 });
     check("booking created, reached receipt step", true);
 
     // ── 4. Slot is still open until the receipt lands ───────────────────────

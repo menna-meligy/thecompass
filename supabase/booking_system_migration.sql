@@ -5,7 +5,8 @@
 -- what is bookable, and makes "slot taken" an atomic, race-safe operation that
 -- fires the moment a client uploads a receipt (before admin approval).
 --
--- Safe to re-run (idempotent).
+-- Safe to re-run (idempotent) — but ALWAYS run slot_commitment_migration.sql
+-- after it, since that file supersedes the two functions defined here.
 -- ============================================================================
 
 -- ── 1. slot_assignments: which OFFERING a slot is open for ──────────────────
@@ -34,6 +35,21 @@ alter table public.slot_assignments
 
 alter table public.slot_assignments
   alter column offering_type set not null;
+
+-- The old model identified an assignment by session_id or workshop_id, so it
+-- required one of them. The Career Deciding Session belongs to neither — it is
+-- identified by offering_type alone — which is why career slots could never be
+-- created. Replace the rule with one that matches the model.
+alter table public.slot_assignments
+  drop constraint if exists slot_assignments_check;
+alter table public.slot_assignments
+  drop constraint if exists slot_assignments_offering_shape_check;
+alter table public.slot_assignments
+  add constraint slot_assignments_offering_shape_check
+  check (
+    (offering_type = 'career' and workshop_id is null)
+    or (offering_type in ('individual', 'group') and workshop_id is not null)
+  );
 
 -- Legacy rows could describe the same offering twice on one slot (one row keyed
 -- by session_id, another by workshop_id). Collapse them before adding the index.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -43,6 +43,11 @@ export function AuthForm() {
     return raw && raw.startsWith("/") && !raw.startsWith("//") ? raw : null;
   })();
   const [mode, setMode] = useState<AuthMode>("login");
+  // Until React has hydrated, submitting posts the form the browser-native way —
+  // which sends the password up in the query string. Hold the button until the
+  // client-side handler is actually attached.
+  const [ready, setReady] = useState(false);
+  useEffect(() => setReady(true), []);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -183,7 +188,7 @@ export function AuthForm() {
             error={loginForm.formState.errors.password?.message}
             {...loginForm.register("password")}
           />
-          <Button type="submit" loading={loading} className="w-full" size="lg">
+          <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
             {t("login")}
           </Button>
         </form>
@@ -208,7 +213,7 @@ export function AuthForm() {
             error={registerForm.formState.errors.password?.message}
             {...registerForm.register("password")}
           />
-          <Button type="submit" loading={loading} className="w-full" size="lg">
+          <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
             {t("register")}
           </Button>
         </form>
@@ -222,7 +227,7 @@ export function AuthForm() {
             error={magicForm.formState.errors.email?.message}
             {...magicForm.register("email")}
           />
-          <Button type="submit" loading={loading} className="w-full" size="lg">
+          <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
             {t("sendMagicLink")}
           </Button>
         </form>
