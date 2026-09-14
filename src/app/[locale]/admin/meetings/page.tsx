@@ -12,16 +12,16 @@ interface Meeting {
   session_id: string;
   status: string;
   created_at: string;
-  user?: { full_name?: string; email?: string };
+  user?: { full_name: string | null; email: string };
   session?: {
     starts_at?: string;
     ends_at?: string;
     location_or_link?: string;
     workshop?: { title_ar?: string; title_en?: string };
   };
-  payment?: {
+  payment?: Array<{
     status?: string;
-  };
+  }>;
 }
 
 function getDaysInMonth(year: number, month: number): number {
