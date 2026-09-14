@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Upload, Clock, CheckCircle2, AlertCircle } from "lucide-react";
+import { Upload, Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface TimeRemaining {
@@ -17,6 +17,8 @@ interface ValidationError {
   type: "date" | "price" | "generic";
   message: string;
 }
+
+const SUPPORT_PHONE = "01223810409";
 
 export default function ReceiptPage() {
   const searchParams = useSearchParams();
@@ -33,6 +35,7 @@ export default function ReceiptPage() {
 
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [validating, setValidating] = useState(false);
   const [uploadedReceipt, setUploadedReceipt] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
@@ -55,37 +58,6 @@ export default function ReceiptPage() {
     }
     checkAuth();
   }, [router, locale, supabase.auth]);
-
-  // Validate date and price on mount
-  useEffect(() => {
-    const errors: ValidationError[] = [];
-
-    if (slotDate) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const slotDateObj = new Date(slotDate);
-
-      if (slotDateObj.getTime() !== today.getTime()) {
-        errors.push({
-          type: "date",
-          message: isAr
-            ? "يجب أن يكون التاريخ هو تاريخ اليوم"
-            : "The booking date must be today",
-        });
-      }
-    }
-
-    if (price && parseFloat(price) !== 500) {
-      errors.push({
-        type: "price",
-        message: isAr
-          ? "السعر غير صحيح. يجب أن يكون 500 ج.م"
-          : "The price is incorrect. It should be 500 EGP",
-      });
-    }
-
-    setValidationErrors(errors);
-  }, [slotDate, price, isAr]);
 
   // Calculate time remaining (24 hours from now)
   useEffect(() => {
@@ -122,10 +94,70 @@ export default function ReceiptPage() {
     }
 
     setFile(selectedFile);
+    setValidating(true);
+    setValidationErrors([]);
 
-    // Upload to Supabase
-    setUploading(true);
     try {
+      // Perform OCR validation on image files
+      if (selectedFile.type.startsWith("image/")) {
+        const { parseReceipt, validateReceipt, ocrReceipt } = await import("@/lib/payments/receipt");
+
+        try {
+          const ocrText = await ocrReceipt(selectedFile);
+          const parsed = parseReceipt(ocrText);
+          const expectedAmount = parseFloat(price || "0");
+          const errors = validateReceipt(parsed, { expectedAmount });
+
+          if (errors.length > 0) {
+            // Map error codes to display messages
+            const messageMap: Record<string, { ar: string; en: string }> = {
+              amount_unreadable: {
+                ar: "لم نتمكن من قراءة المبلغ من الإيصال. يرجى التأكد من وضوح الصورة.",
+                en: "Could not read amount from receipt. Please ensure image is clear."
+              },
+              amount_mismatch: {
+                ar: "المبلغ على الإيصال لا يطابق سعر الحجز. يرجى الاتصال بالدعم.",
+                en: "Receipt amount does not match booking price. Please contact support."
+              },
+              date_unreadable: {
+                ar: "لم نتمكن من قراءة التاريخ من الإيصال. يرجى التأكد من وضوح الصورة.",
+                en: "Could not read date from receipt. Please ensure image is clear."
+              },
+              date_too_old: {
+                ar: "الإيصال قديم جداً (يجب أن يكون من اليوم أو أمس). يرجى التحقق من التاريخ.",
+                en: "Receipt is too old (must be from today or yesterday). Please verify."
+              },
+              date_future: {
+                ar: "تاريخ الإيصال في المستقبل. يرجى التحقق من التاريخ.",
+                en: "Receipt date is in the future. Please verify."
+              },
+              reference_missing: {
+                ar: "لم نتمكن من العثور على رقم التحويل. يرجى التأكد من وضوح الإيصال.",
+                en: "Could not find transaction reference. Please ensure receipt is clear."
+              }
+            };
+
+            // Show validation errors with support contact
+            setValidationErrors(errors.map(code => ({
+              type: "generic" as const,
+              message: isAr ? messageMap[code]?.ar || code : messageMap[code]?.en || code
+            })));
+
+            setFile(null);
+            setValidating(false);
+            return;
+          }
+        } catch (ocrError) {
+          console.warn("OCR validation warning (continuing with upload):", ocrError);
+          // Continue with upload even if OCR fails - admin will review manually
+        }
+      }
+
+      // Clear validation errors and proceed with upload
+      setValidationErrors([]);
+      setValidating(false);
+      setUploading(true);
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push(`/${locale}/auth`);
@@ -162,6 +194,7 @@ export default function ReceiptPage() {
       setFile(null);
     } finally {
       setUploading(false);
+      setValidating(false);
     }
   };
 
@@ -249,25 +282,32 @@ export default function ReceiptPage() {
         {/* Validation Errors */}
         {validationErrors.length > 0 && (
           <div className="mb-6 space-y-3">
-            {validationErrors.map((error, idx) => (
-              <div
-                key={idx}
-                className="bg-red-500/10 border border-red-500/30 rounded-lg p-4"
-              >
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-red-300 text-sm">
-                    {error.message}
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-red-300 text-sm font-semibold mb-2">
+                    {isAr ? "⚠️ مشكلة في التحقق من الإيصال" : "⚠️ Receipt Verification Failed"}
                   </p>
+                  <ul className="space-y-1 text-sm">
+                    {validationErrors.map((error, idx) => (
+                      <li key={idx} className="text-red-200 flex items-start gap-2">
+                        <span className="text-red-400 font-bold mt-0.5">•</span>
+                        <span>{error.message}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
-            ))}
+            </div>
+
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-              <p className="text-amber-300 text-sm">
-                {isAr
-                  ? "إذا كانت هناك مشكلة، سيتواصل معك الفريق قريباً"
-                  : "If there are any issues, our support team will contact you shortly"}
+              <p className="text-amber-300 text-sm font-semibold mb-1.5">
+                {isAr ? "📞 الرجاء الاتصال بفريق الدعم:" : "📞 Please contact support:"}
               </p>
+              <a href={`tel:${SUPPORT_PHONE}`} className="text-sm font-mono font-bold text-amber-300 hover:text-amber-200">
+                {SUPPORT_PHONE}
+              </a>
             </div>
           </div>
         )}
@@ -305,30 +345,43 @@ export default function ReceiptPage() {
             {isAr ? "رفع الإيصال" : "Upload Receipt"}
           </h2>
 
-          <div className="border-2 border-dashed border-[rgba(245,158,11,0.3)] rounded-xl p-8 text-center mb-4 hover:border-[rgba(245,158,11,0.5)] transition cursor-pointer">
+          <div className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition cursor-pointer ${
+            validating ? "border-amber-400/50 bg-amber-400/5" : "border-[rgba(245,158,11,0.3)] hover:border-[rgba(245,158,11,0.5)]"
+          }`}>
             <input
               type="file"
               accept="image/*,.pdf"
               onChange={handleFileUpload}
-              disabled={uploading}
+              disabled={uploading || validating}
               className="hidden"
               id="receipt-upload"
             />
             <label htmlFor="receipt-upload" className="cursor-pointer block">
-              <Upload className="w-8 h-8 text-[#F59E0B] mx-auto mb-3" />
-              <p className="text-white font-semibold mb-1">
-                {isAr ? "اضغط لاختيار ملف" : "Click to select a file"}
-              </p>
-              <p className="text-white/50 text-sm">
-                {isAr ? "أو اسحب الملف هنا" : "or drag and drop"}
-              </p>
+              {validating ? (
+                <>
+                  <Loader2 className="w-8 h-8 text-[#F59E0B] mx-auto mb-3 animate-spin" />
+                  <p className="text-white font-semibold mb-1">
+                    {isAr ? "جاري التحقق من الإيصال..." : "Verifying receipt..."}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-[#F59E0B] mx-auto mb-3" />
+                  <p className="text-white font-semibold mb-1">
+                    {isAr ? "اضغط لاختيار ملف" : "Click to select a file"}
+                  </p>
+                  <p className="text-white/50 text-sm">
+                    {isAr ? "أو اسحب الملف هنا" : "or drag and drop"}
+                  </p>
+                </>
+              )}
               <p className="text-white/30 text-xs mt-2">
                 {isAr ? "صور أو PDF فقط" : "Images or PDF only"}
               </p>
             </label>
           </div>
 
-          {file && (
+          {file && !validationErrors.length && (
             <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
               <p className="text-green-300 text-sm">
                 {isAr ? "✓ تم تحديد الملف: " : "✓ File selected: "} {file.name}
