@@ -74,6 +74,15 @@ export async function POST(req: NextRequest) {
       .from('proofs')
       .getPublicUrl(`${userId}/${fileName}`);
 
+    if (!urlData?.publicUrl) {
+      return NextResponse.json(
+        { error: 'Failed to generate public URL for receipt' },
+        { status: 400 }
+      );
+    }
+
+    console.log('Generated public URL:', urlData.publicUrl);
+
     // Update payment with receipt URL and set status to pending_verification
     const { data: updatedPayment, error: updateError } = await supabase
       .from('payments')
@@ -86,9 +95,17 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (updateError) {
+      console.error('Payment update error:', updateError);
       return NextResponse.json(
-        { error: updateError.message },
+        { error: `Failed to update payment: ${updateError.message}` },
         { status: 400 }
+      );
+    }
+
+    if (!updatedPayment) {
+      return NextResponse.json(
+        { error: 'Payment not found after update' },
+        { status: 404 }
       );
     }
 

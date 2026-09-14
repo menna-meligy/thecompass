@@ -10,15 +10,15 @@ interface Payment {
   amount: number;
   currency: string;
   status: string;
-  receipt_image_url?: string;
+  proof_url?: string;
   created_at: string;
-  admin_notes_en?: string;
-  admin_notes_ar?: string;
+  admin_approval_notes_en?: string;
+  admin_approval_notes_ar?: string;
   booking?: {
     id: string;
     user_id: string;
-    slot_id: string;
-    scheduled_at: string;
+    session_id: string;
+    created_at: string;
   };
   user?: {
     full_name: string;
@@ -135,7 +135,7 @@ export default function PaymentApprovalPanel({
                       <p className="text-white/50 text-xs">{payment.created_at.split('T')[0]}</p>
                     </div>
                   </div>
-                  {payment.receipt_image_url && (
+                  {payment.proof_url && (
                     <p className="text-blue-400 text-xs">
                       {isAr ? '📷 صورة مرفقة' : '📷 Receipt attached'}
                     </p>
@@ -154,13 +154,13 @@ export default function PaymentApprovalPanel({
           </h3>
 
           {/* Receipt Image Preview */}
-          {selectedPayment.receipt_image_url && (
+          {selectedPayment.proof_url && (
             <div>
               <p className="text-white/50 text-sm mb-2">
                 {isAr ? 'إثبات الدفع:' : 'Receipt:'}
               </p>
               <button
-                onClick={() => setImageModal(selectedPayment.receipt_image_url || null)}
+                onClick={() => setImageModal(selectedPayment.proof_url || null)}
                 className="flex items-center gap-2 text-blue-400 hover:text-blue-300 text-sm"
               >
                 <Eye className="w-4 h-4" />
