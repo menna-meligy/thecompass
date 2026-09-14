@@ -61,11 +61,19 @@ export default function ReceiptPage() {
 
   // Calculate time remaining (24 hours from now)
   useEffect(() => {
+    // Set deadline once when component mounts
+    const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     const interval = setInterval(() => {
       const now = new Date();
-      const deadline = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
       const diff = deadline.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        setTimeRemaining({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        clearInterval(interval);
+        return;
+      }
+
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -76,6 +84,7 @@ export default function ReceiptPage() {
 
     return () => clearInterval(interval);
   }, []);
+
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
