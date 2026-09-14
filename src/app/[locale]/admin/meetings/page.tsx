@@ -16,7 +16,7 @@ interface Meeting {
   session?: {
     starts_at?: string;
     ends_at?: string;
-    location_or_link?: string;
+    location_or_link?: string | null;
     workshop?: { title_ar?: string; title_en?: string };
   };
   payment?: Array<{
