@@ -211,52 +211,84 @@ export default function BookingDetailModal({
             </div>
           )}
 
-          {/* Receipt */}
-          {bookingData?.payment?.proof_url && (
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-blue-300">
-                  {isAr ? "الإيصال" : "Receipt"}
-                </h3>
+          {/* Receipt Status */}
+          <div>
+            <h3 className="text-sm font-semibold text-blue-300 mb-3">
+              {isAr ? "حالة الإيصال" : "Receipt Status"}
+            </h3>
+            {bookingData?.payment?.proof_url ? (
+              <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4 space-y-3">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+                    <span className="text-sm font-semibold text-emerald-300">
+                      {isAr ? "✓ تم رفع الإيصال" : "✓ Receipt Uploaded"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-xs px-2 py-1 rounded font-semibold ${
+                      bookingData.payment.status === "paid"
+                        ? "bg-emerald-500/20 text-emerald-300"
+                        : bookingData.payment.status === "pending_verification"
+                          ? "bg-blue-500/20 text-blue-300"
+                          : "bg-red-500/20 text-red-300"
+                    }`}>
+                      {bookingData.payment.status === "paid"
+                        ? (isAr ? "موافق عليه ✓" : "Approved ✓")
+                        : bookingData.payment.status === "pending_verification"
+                          ? (isAr ? "قيد المراجعة" : "Pending Review")
+                          : (isAr ? "مرفوض" : "Rejected")}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/60">
+                      {isAr ? "طريقة الدفع" : "Payment Method"}:
+                    </span>
+                    <span className="font-semibold text-white capitalize">
+                      {bookingData.payment.method || "-"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-white/60">
+                      {isAr ? "المبلغ" : "Amount"}:
+                    </span>
+                    <span className="font-semibold text-white">
+                      {bookingData.payment.amount ? `${bookingData.payment.amount} EGP` : "-"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Receipt Image */}
+                <div className="border border-blue-500/20 rounded-md overflow-hidden">
+                  <img
+                    src={bookingData.payment.proof_url}
+                    alt="Receipt"
+                    className="w-full max-h-80 object-contain bg-black/30"
+                  />
+                </div>
+
+                {/* Verify Button */}
                 <button
                   onClick={verifyReceipt}
                   disabled={verifying}
-                  className="px-2.5 py-1 rounded text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30 disabled:opacity-50 transition-colors"
+                  className="w-full px-3 py-2 rounded text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30 hover:bg-blue-500/30 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
                 >
                   {verifying ? (
                     <>
-                      <Loader2 className="h-3 w-3 inline animate-spin me-1" />
-                      {isAr ? "جاري التحقق..." : "Verifying..."}
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      {isAr ? "جاري التحقق من التاريخ والمبلغ..." : "Verifying date and amount..."}
                     </>
                   ) : (
-                    isAr ? "تحقق من الإيصال" : "Verify Receipt"
+                    <>
+                      {isAr ? "🔍 تحقق من التاريخ والمبلغ" : "🔍 Verify Date & Amount"}
+                    </>
                   )}
                 </button>
-              </div>
-              <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-blue-200">
-                    {isAr ? "طريقة الدفع" : "Payment Method"}:{" "}
-                    <span className="font-semibold capitalize">{bookingData.payment.method || "-"}</span>
-                  </span>
-                  <span className="text-xs text-blue-200">
-                    {isAr ? "الحالة" : "Status"}:{" "}
-                    <span className={`font-semibold ${
-                      bookingData.payment.status === "paid"
-                        ? "text-emerald-300"
-                        : bookingData.payment.status === "pending_verification"
-                          ? "text-blue-300"
-                          : "text-red-300"
-                    }`}>
-                      {bookingData.payment.status || "pending"}
-                    </span>
-                  </span>
-                </div>
-                <img
-                  src={bookingData.payment.proof_url}
-                  alt="Receipt"
-                  className="w-full max-h-96 object-contain rounded-md border border-blue-500/30 bg-black/30"
-                />
+
+                {/* Verification Result */}
                 {verificationResult && (
                   <div className={`p-3 rounded-md border-l-4 ${
                     verificationResult.dateMatches && verificationResult.amountMatches
@@ -284,8 +316,14 @@ export default function BookingDetailModal({
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+                <p className="text-sm text-amber-300">
+                  {isAr ? "لم يتم رفع إيصال بعد" : "No receipt uploaded yet"}
+                </p>
+              </div>
+            )}
+          </div>
 
           {/* Client Notes */}
           <div>

@@ -49,20 +49,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: bookingError?.message || "Failed to create booking" }, { status: 500 });
   }
 
-  // Increment time slot booked count
-  if (time_slot_id) {
-    const { data: slot } = await supabase
-      .from("time_slots")
-      .select("booked_count")
-      .eq("id", time_slot_id)
-      .single();
-    if (slot) {
-      await supabase
-        .from("time_slots")
-        .update({ booked_count: (slot.booked_count ?? 0) + 1 })
-        .eq("id", time_slot_id);
-    }
-  }
+  // DO NOT increment time slot booked count here
+  // Only increment it when payment is confirmed (approved by admin)
+  // This prevents slots from being locked during the payment window
 
   // Create payment record
   const { data: payment, error: paymentError } = await supabase

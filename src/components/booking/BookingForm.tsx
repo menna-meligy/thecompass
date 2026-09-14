@@ -114,7 +114,11 @@ export function BookingForm({ session, slots, userId }: BookingFormProps) {
             ? "تم إنشاء الحجز! يرجى رفع إيصال الدفع لإكمال العملية"
             : "Booking created! Please upload payment proof to complete"}
         </div>
-        <ProofUpload bookingId={bookingId} onUpload={setProofUrl} />
+        <ProofUpload
+          bookingId={bookingId}
+          onUpload={setProofUrl}
+          expectedAmount={finalPrice}
+        />
         {proofUrl && (
           <Button onClick={submitProof} loading={loading} className="w-full" size="lg">
             {t("confirm")}

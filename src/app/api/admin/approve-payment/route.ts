@@ -28,6 +28,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing booking_id" }, { status: 400 });
   }
 
+  // Get booking details first (needed for slot update)
+  const { data: bookingData } = await supabase
+    .from("bookings")
+    .select("id, time_slot_id")
+    .eq("id", booking_id)
+    .single();
+
   await supabase
     .from("payments")
     .update({ status: "paid" })
@@ -37,6 +44,21 @@ export async function POST(request: NextRequest) {
     .from("bookings")
     .update({ status: "confirmed" })
     .eq("id", booking_id);
+
+  // Increment time slot booked count (only when payment is confirmed)
+  if (bookingData?.time_slot_id) {
+    const { data: slot } = await supabase
+      .from("time_slots")
+      .select("booked_count")
+      .eq("id", bookingData.time_slot_id)
+      .single();
+    if (slot) {
+      await supabase
+        .from("time_slots")
+        .update({ booked_count: (slot.booked_count ?? 0) + 1 })
+        .eq("id", bookingData.time_slot_id);
+    }
+  }
 
   // Fetch the booking with session info to create roadmap milestone
   const { data: booking } = await (supabase as any)

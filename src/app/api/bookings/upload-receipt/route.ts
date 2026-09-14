@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { parseReceipt, validateReceipt } from '@/lib/payments/receipt';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -89,6 +90,32 @@ export async function POST(req: NextRequest) {
         { error: updateError.message },
         { status: 400 }
       );
+    }
+
+    // Get booking and session info for validation
+    const { data: booking } = await supabase
+      .from('bookings')
+      .select('id, session_id')
+      .eq('id', payment.booking_id)
+      .single();
+
+    if (booking) {
+      const { data: session } = await supabase
+        .from('sessions')
+        .select('price')
+        .eq('id', booking.session_id)
+        .single();
+
+      if (session) {
+        // Record validation metadata for admin review
+        await supabase
+          .from('payments')
+          .update({
+            receipt_validated_at: new Date().toISOString(),
+            receipt_validation_status: 'pending_manual_review',
+          })
+          .eq('id', paymentId);
+      }
     }
 
     return NextResponse.json({
