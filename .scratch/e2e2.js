@@ -43,6 +43,16 @@ async function login(browser, who, label) {
 const feed = async (offering) =>
   (await fetch(`${SITE}/api/availability/centralized-slots?offering=${encodeURIComponent(offering)}`)).json();
 
+/** Poll the feed until it agrees with `want`, or give up after ~20s. */
+async function feedUntil(offering, want) {
+  let last = await feed(offering);
+  for (let i = 0; i < 20 && !want(last); i++) {
+    await new Promise((r) => setTimeout(r, 1000));
+    last = await feed(offering);
+  }
+  return last;
+}
+
 async function openDay(page, day) {
   await page.goto(`${SITE}/ar/admin/availability`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("text=/مواعيدك|Your availability/", { timeout: 45000 });
@@ -97,7 +107,7 @@ async function main() {
     await admin.page.waitForTimeout(3500);
     await admin.page.screenshot({ path: path.join(SHOTS, "block-2-closed.png"), fullPage: true });
 
-    f = await feed("career");
+    f = await feedUntil("career", (d) => (d.blockedDates || []).includes(blockDate));
     const stillOpen = (f.slots || []).some((s) => s.date === blockDate);
     const listedBlocked = (f.blockedDates || []).includes(blockDate);
     check("closed day has no bookable times", !stillOpen);
@@ -118,7 +128,7 @@ async function main() {
     await openDay(admin.page, blockDay);
     await admin.page.getByRole("button", { name: /افتح اليوم تاني|Re-open this day/ }).click();
     await admin.page.waitForTimeout(3000);
-    f = await feed("career");
+    f = await feedUntil("career", (d) => !(d.blockedDates || []).includes(blockDate));
     check("re-opened day is no longer blocked", !(f.blockedDates || []).includes(blockDate));
 
     // ── B. Reject a receipt, slot comes back ────────────────────────────────
@@ -156,7 +166,7 @@ async function main() {
     await client.page.waitForSelector("text=/الدفع مرفوض|Payment rejected|تم التحقق|Verified|شكراً|Thank/", { timeout: 180000 });
     await client.page.waitForTimeout(2500);
 
-    f = await feed("career");
+    f = await feedUntil("career", (d) => !(d.slots || []).some((s) => s.id === rejSlot.id));
     check("slot held after the receipt", !(f.slots || []).some((s) => s.id === rejSlot.id));
 
     step("B2", "Closing a day with a held booking is refused");
@@ -173,12 +183,12 @@ async function main() {
     await admin.page.goto(`${SITE}/ar/admin/receipts`, { waitUntil: "domcontentloaded" });
     await admin.page.waitForSelector("text=/إيصالات العملاء|Client receipts/", { timeout: 45000 });
     await admin.page.waitForTimeout(2500);
-    const card = admin.page.locator("div").filter({ hasText: reference }).last();
+    const card = admin.page.locator("div.rounded-2xl").filter({ hasText: reference }).first();
     await card.getByRole("button", { name: /ارفض|Reject/ }).first().click();
     await admin.page.waitForTimeout(4500);
     await admin.page.screenshot({ path: path.join(SHOTS, "block-5-rejected.png"), fullPage: true });
 
-    f = await feed("career");
+    f = await feedUntil("career", (d) => (d.slots || []).some((s) => s.id === rejSlot.id));
     const backOnSale = (f.slots || []).some((s) => s.id === rejSlot.id);
     check("rejected booking frees the slot again", backOnSale, `${rejDate} ${r1}`);
 

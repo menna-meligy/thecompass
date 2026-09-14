@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { parseOfferingKey, type OfferingType } from "@/lib/offerings";
+import { capacityFor, parseOfferingKey, type OfferingType } from "@/lib/offerings";
 import { isPastSlot, normaliseDate, shortTime, cairoNow } from "@/lib/schedule-dates";
 
 export const runtime = "nodejs";
@@ -104,18 +104,30 @@ export async function GET(request: NextRequest) {
             (a.workshop_id ?? null) === offering.workshopId,
         );
       })
-      .map((row) => ({
+      .map((row) => {
+        // Seats must be true for the offering the client is looking at. An
+        // untaken window carries the admin's maximum (a group's 8), but booking
+        // it as a 1-on-1 collapses it to one — so advertise the offering's own
+        // capacity until something has actually committed the window.
+        const effectiveCapacity = row.committed_offering_type
+          ? row.capacity
+          : offering
+            ? capacityFor(offering.offeringType)
+            : row.capacity;
+
+        return {
         id: row.id,
         date: normaliseDate(row.date),
         start_time: shortTime(row.start_time),
         end_time: shortTime(row.end_time),
-        capacity: row.capacity,
+        capacity: effectiveCapacity,
         booked_count: row.booked_count,
-        seats_left: Math.max(0, row.capacity - row.booked_count),
+        seats_left: Math.max(0, effectiveCapacity - row.booked_count),
         offerings: (row.slot_assignments ?? [])
           .filter((a) => a.offering_type)
           .map((a) => ({ offering_type: a.offering_type, workshop_id: a.workshop_id })),
-      }));
+        };
+      });
 
     return NextResponse.json({ slots, blockedDates });
   } catch (err) {

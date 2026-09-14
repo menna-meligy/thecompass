@@ -96,7 +96,6 @@ export default function CalendarGrid({ slots, onDateClick, isAr }: Props) {
           const closed = daySlots.some((s) => s.is_day_block);
           const times = daySlots.filter((s) => !s.is_day_block);
           const openTimes = times.filter((s) => s.booked_count < s.capacity).length;
-          const takenTimes = times.length - openTimes;
           const past = isPastDate(dateStr);
 
           const tone = closed
@@ -127,9 +126,11 @@ export default function CalendarGrid({ slots, onDateClick, isAr }: Props) {
               {closed ? (
                 <span className="text-[0.58rem] leading-none">{isAr ? "مقفول" : "closed"}</span>
               ) : times.length > 0 ? (
+                // A "0 / 1" fraction reads backwards in RTL, so say it in words.
                 <span className="text-[0.58rem] leading-none">
-                  {openTimes}
-                  {takenTimes > 0 && <span className="opacity-60"> / {times.length}</span>}
+                  {openTimes === 0
+                    ? isAr ? "محجوز" : "booked"
+                    : isAr ? `${openTimes} متاح` : `${openTimes} open`}
                 </span>
               ) : null}
             </button>
