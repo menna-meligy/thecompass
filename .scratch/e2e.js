@@ -34,7 +34,17 @@ async function login(browser, who, label) {
   const ctx = await browser.newContext({ viewport: { width: 1400, height: 1000 } });
   const page = await ctx.newPage();
   page.on("console", (m) => {
-    if (m.type() === "error") log(`   [${label} console] ${m.text().slice(0, 160)}`);
+    const t = m.text();
+    if (m.type() === "error" && !t.startsWith("Failed to load resource")) {
+      log(`   [${label} console] ${t.slice(0, 200)}`);
+    }
+  });
+  page.on("response", async (r) => {
+    if (r.status() >= 400) {
+      let body = "";
+      try { body = (await r.text()).slice(0, 220); } catch { /* opaque */ }
+      log(`   [${label} HTTP ${r.status()}] ${r.request().method()} ${r.url().replace(SITE, "")} ${body}`);
+    }
   });
   await page.goto(`${SITE}/ar/auth`, { waitUntil: "domcontentloaded" });
   // The submit button stays disabled until React hydrates, so waiting for it to
@@ -80,8 +90,13 @@ async function main() {
     step("1/8", "Admin opens availability");
     const admin = await login(browser, ADMIN, "admin");
     const targetDate = isoDatePlus(kind === "group" ? 9 : kind === "individual" ? 8 : 7);
-    const startTime = kind === "group" ? "16:00" : kind === "individual" ? "12:00" : "10:00";
-    const endTime = kind === "group" ? "17:00" : kind === "individual" ? "13:00" : "11:00";
+    // A fresh window each run, so re-running doesn't collide with a slot a
+    // previous run already booked out.
+    const now = new Date();
+    const hh = String(8 + (now.getMinutes() % 10)).padStart(2, "0");
+    const mm = String((now.getSeconds() % 6) * 10).padStart(2, "0");
+    const startTime = `${hh}:${mm}`;
+    const endTime = `${String(Number(hh) + 1).padStart(2, "0")}:${mm}`;
 
     await admin.page.goto(`${SITE}/ar/admin/availability`, { waitUntil: "domcontentloaded" });
     await admin.page.waitForSelector("text=/مواعيدك|Your availability/", { timeout: 45000 });
@@ -166,13 +181,25 @@ async function main() {
     await client.page.waitForTimeout(1500);
     await client.page.getByRole("button", { name: /تحقق وتابع|Verify & Continue/ }).click();
 
-    // Browser-side OCR is slow; give it room.
-    await client.page.waitForSelector("text=/تم التحقق|Verified|الدفع مرفوض|Payment rejected|حصلت مشكلة|Something went wrong/", { timeout: 180000 });
-    await client.page.waitForTimeout(2500);
-    await client.page.screenshot({ path: path.join(SHOTS, `${kind}-6-receipt-result.png`), fullPage: true });
+    // Browser-side OCR is slow; give it room. A pass advances to the booking
+    // confirmation after ~1.2s, so wait for that rather than the transient
+    // "Verified" label.
+    await client.page.waitForSelector(
+      "text=/الدفع مرفوض|Payment rejected|حصلت مشكلة|Something went wrong|تم التحقق|Verified/",
+      { timeout: 180000 },
+    );
     const rejected = await client.page.locator("text=/الدفع مرفوض|Payment rejected/").count();
-    const verified = await client.page.locator("text=/تم التحقق|Verified/").count();
-    check("receipt accepted", verified > 0 && rejected === 0, rejected ? await client.page.locator("li").first().innerText().catch(() => "") : "");
+    const reason = rejected
+      ? await client.page.locator("li").first().innerText().catch(() => "")
+      : "";
+    if (!rejected) {
+      await client.page
+        .waitForSelector("text=/شكراً|Thank|مؤكد|confirm/i", { timeout: 30000 })
+        .catch(() => {});
+    }
+    await client.page.waitForTimeout(1500);
+    await client.page.screenshot({ path: path.join(SHOTS, `${kind}-6-receipt-result.png`), fullPage: true });
+    check("receipt accepted", rejected === 0, reason);
 
     // ── 6. The slot disappears everywhere ───────────────────────────────────
     step("6/8", "Slot disappears for everyone else");

@@ -21,16 +21,19 @@ function receiptHtml({ amount, reference, method = "InstaPay", recipient = "0102
   const date = todayCairo();
   return `<!doctype html><html><head><meta charset="utf-8"><style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { width:720px; height:1100px; background:
-      repeating-linear-gradient(45deg,#fdfdfd 0 12px,#f4f4f6 12px 24px);
-      font-family: Arial, Helvetica, sans-serif; color:#0b0b0b; padding:48px; }
-    .card { background:#fff; border:3px solid #111; border-radius:18px; padding:40px; height:100%; }
-    h1 { font-size:42px; text-align:center; margin-bottom:8px; letter-spacing:1px; }
-    .ok { text-align:center; font-size:26px; margin-bottom:36px; }
-    .amount { font-size:74px; font-weight:bold; text-align:center; margin:30px 0 44px; }
-    .row { font-size:28px; margin:22px 0; display:flex; justify-content:space-between; }
-    .row span:last-child { font-weight:bold; }
-    .foot { margin-top:48px; font-size:22px; text-align:center; }
+    /* Plain white, generous spacing, no decorative background — Tesseract
+       misreads digits sitting on a patterned ground. */
+    body { width:760px; height:1160px; background:#fff;
+      font-family: Arial, Helvetica, sans-serif; color:#000; padding:56px; }
+    .card { background:#fff; border:2px solid #000; padding:44px; height:100%; }
+    h1 { font-size:40px; text-align:center; margin-bottom:10px; }
+    .ok { text-align:center; font-size:26px; margin-bottom:56px; }
+    /* Same size as the rest of the document: Tesseract's line model does much
+       better on uniform text than on one oversized hero number (it read a
+       64px "500" as "900"). */
+    .amount { font-size:34px; font-weight:bold; text-align:center; margin:0 0 56px; }
+    .row { font-size:30px; margin:34px 0; display:flex; justify-content:space-between; gap:24px; }
+    .foot { margin-top:64px; font-size:22px; text-align:center; }
   </style></head><body><div class="card">
     <h1>${method} Receipt</h1>
     <div class="ok">Transfer Successful</div>
@@ -38,14 +41,13 @@ function receiptHtml({ amount, reference, method = "InstaPay", recipient = "0102
     <div class="row"><span>Date</span><span>${date}</span></div>
     <div class="row"><span>To</span><span>${recipient}</span></div>
     <div class="row"><span>Reference</span><span>${reference}</span></div>
-    <div class="row"><span>Status</span><span>COMPLETED</span></div>
     <div class="foot">Thank you for using ${method}</div>
   </div></body></html>`;
 }
 
 /** Returns a PNG Buffer. */
 async function makeReceipt(browser, opts) {
-  const page = await browser.newPage({ viewport: { width: 720, height: 1100 } });
+  const page = await browser.newPage({ viewport: { width: 760, height: 1160 }, deviceScaleFactor: 2 });
   await page.setContent(receiptHtml(opts), { waitUntil: "load" });
   const buf = await page.screenshot({ type: "png" });
   await page.close();
