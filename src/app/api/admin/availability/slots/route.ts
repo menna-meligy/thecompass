@@ -22,8 +22,8 @@ export async function GET(_request: NextRequest) {
   const { data: slots, error } = await admin
     .from("availability_slots")
     .select(
-      `id, date, start_time, end_time, capacity, booked_count, status,
-       admin_marked_status, is_day_block,
+      `id, date, start_time, end_time, capacity, base_capacity, booked_count, status,
+       admin_marked_status, is_day_block, committed_offering_type, committed_workshop_id,
        slot_assignments(id, offering_type, workshop_id, workshop:workshops(id, title_ar, title_en))`,
     )
     .order("date", { ascending: true })
@@ -191,8 +191,9 @@ export async function POST(request: NextRequest) {
   }
   const resolved = offerings as { offeringType: OfferingType; workshopId: string | null }[];
 
-  // A slot's capacity is the largest capacity any of its offerings needs —
-  // group cohorts seat several people, 1-on-1s seat exactly one.
+  // The most the window could ever seat, given everything it's offered for.
+  // Which of those it actually becomes is decided by whoever books it first
+  // (see reserve_slot_for_booking) — a 1-on-1 booking collapses it to one seat.
   const capacity = Math.max(...resolved.map((o) => capacityFor(o.offeringType)));
 
   // Re-opening a day that was previously closed lifts the block.
@@ -213,9 +214,12 @@ export async function POST(request: NextRequest) {
       .from("availability_slots")
       .update({
         end_time: endTime,
-        capacity: Math.max(capacity, existing.booked_count),
+        base_capacity: capacity,
+        // Don't disturb a window someone is already holding.
+        ...(existing.booked_count === 0
+          ? { capacity, admin_marked_status: "available" }
+          : {}),
         status: "published",
-        admin_marked_status: existing.booked_count >= capacity ? "full" : "available",
         updated_at: new Date().toISOString(),
       })
       .eq("id", existing.id);
@@ -229,6 +233,7 @@ export async function POST(request: NextRequest) {
         start_time: startTime,
         end_time: endTime,
         capacity,
+        base_capacity: capacity,
         booked_count: 0,
         status: "published",
         admin_marked_status: "available",

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { parseOfferingKey, priceFor } from "@/lib/offerings";
+import { capacityFor, parseOfferingKey, priceFor } from "@/lib/offerings";
 import { isPastSlot, normaliseDate, shortTime, slotStartsAtISO } from "@/lib/schedule-dates";
 
 export const runtime = "nodejs";
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       .from("availability_slots")
       .select(
         `id, date, start_time, end_time, capacity, booked_count, status,
-         admin_marked_status, is_day_block,
+         admin_marked_status, is_day_block, committed_offering_type, committed_workshop_id,
          slot_assignments(offering_type, workshop_id)`,
       )
       .eq("id", slotId)
@@ -113,6 +113,22 @@ export async function POST(req: NextRequest) {
         {
           error: "slot_past",
           message: t("هذا الموعد عدّى بالفعل. اختر موعداً قادماً.", "This time has already passed. Please pick an upcoming one."),
+        },
+        { status: 409 },
+      );
+    }
+
+    // A window that someone has already taken IS that thing now — you can only
+    // join the same group, never book a 1-on-1 over it.
+    if (
+      s.committed_offering_type &&
+      (s.committed_offering_type !== offering.offeringType ||
+        (s.committed_workshop_id ?? null) !== offering.workshopId)
+    ) {
+      return NextResponse.json(
+        {
+          error: "slot_committed",
+          message: t("الموعد ده اتحجز لجلسة تانية. اختار موعد تاني.", "This time was taken for a different session. Please pick another."),
         },
         { status: 409 },
       );
@@ -177,6 +193,9 @@ export async function POST(req: NextRequest) {
         workshop_id: offering.workshopId,
         offering_type: offering.offeringType,
         seats: 1,
+        // How many this offering seats, so the database can decide what the
+        // window becomes without duplicating the catalogue in SQL.
+        offering_capacity: capacityFor(offering.offeringType),
         status: "pending",
         payment_deadline: paymentDeadline,
         scheduled_at: scheduledAt,

@@ -329,7 +329,20 @@ export default function DayEditor({
                       </div>
 
                       <p className="text-white/40 text-xs">
-                        {slot.assignments.length === 0
+                        {slot.committed_offering_type
+                          ? t("اتحجز كـ: ", "Taken as: ") +
+                            (slot.committed_offering_type === "career"
+                              ? t("جلسة تحديد المسار", "Career session")
+                              : `${
+                                  (isAr
+                                    ? slot.assignments.find((a) => a.workshop_id === slot.committed_workshop_id)?.workshop?.title_ar
+                                    : slot.assignments.find((a) => a.workshop_id === slot.committed_workshop_id)?.workshop?.title_en) ?? "—"
+                                } · ${
+                                  slot.committed_offering_type === "group"
+                                    ? t("مجموعة", "group")
+                                    : t("فردي", "1-on-1")
+                                }`)
+                          : slot.assignments.length === 0
                           ? t("مش متعيّن لأي جلسة", "Not assigned to any session type")
                           : slot.assignments
                               .map((a) =>

@@ -36,6 +36,8 @@ interface SlotRow {
   status: string;
   admin_marked_status: string | null;
   is_day_block: boolean | null;
+  committed_offering_type: OfferingType | null;
+  committed_workshop_id: string | null;
   slot_assignments: SlotAssignmentRow[] | null;
 }
 
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
       .from("availability_slots")
       .select(
         `id, date, start_time, end_time, capacity, booked_count, status,
-         admin_marked_status, is_day_block,
+         admin_marked_status, is_day_block, committed_offering_type, committed_workshop_id,
          slot_assignments(offering_type, workshop_id)`,
       )
       .eq("status", "published")
@@ -85,6 +87,17 @@ export async function GET(request: NextRequest) {
         if (isPastSlot(row.date, row.start_time)) return false;
 
         if (!offering) return true;
+
+        // Once someone has taken this window it IS that thing — a group cohort
+        // with seats left is still only open to that same group, never to a
+        // 1-on-1 that would double-book the coach.
+        if (row.committed_offering_type) {
+          return (
+            row.committed_offering_type === offering.offeringType &&
+            (row.committed_workshop_id ?? null) === offering.workshopId
+          );
+        }
+
         return (row.slot_assignments ?? []).some(
           (a) =>
             a.offering_type === offering.offeringType &&

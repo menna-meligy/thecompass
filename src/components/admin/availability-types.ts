@@ -34,10 +34,14 @@ export interface AdminSlot {
   start_time: string;
   end_time: string;
   capacity: number;
+  base_capacity: number;
   booked_count: number;
   status: string;
   admin_marked_status: string | null;
   is_day_block: boolean;
+  /** Set once someone takes the window — it IS this offering from then on. */
+  committed_offering_type: OfferingType | null;
+  committed_workshop_id: string | null;
   assignments: AdminSlotAssignment[];
   bookings: AdminSlotBooking[];
 }

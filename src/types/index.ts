@@ -353,10 +353,13 @@ export type Database = {
           start_time: string;
           end_time: string;
           capacity: number;
+          base_capacity: number;
           booked_count: number;
           status: string;
           admin_marked_status: string | null;
           is_day_block: boolean;
+          committed_offering_type: string | null;
+          committed_workshop_id: string | null;
           created_by: string;
           created_at: string;
           updated_at: string;
@@ -367,10 +370,13 @@ export type Database = {
           start_time: string;
           end_time: string;
           capacity?: number;
+          base_capacity?: number;
           booked_count?: number;
           status?: string;
           admin_marked_status?: string | null;
           is_day_block?: boolean;
+          committed_offering_type?: string | null;
+          committed_workshop_id?: string | null;
           created_by: string;
           created_at?: string;
           updated_at?: string;
@@ -381,10 +387,13 @@ export type Database = {
           start_time?: string;
           end_time?: string;
           capacity?: number;
+          base_capacity?: number;
           booked_count?: number;
           status?: string;
           admin_marked_status?: string | null;
           is_day_block?: boolean;
+          committed_offering_type?: string | null;
+          committed_workshop_id?: string | null;
           created_by?: string;
           created_at?: string;
           updated_at?: string;
@@ -436,6 +445,7 @@ export type Database = {
           workshop_id: string | null;
           offering_type: string | null;
           seats: number;
+          offering_capacity: number;
           slot_reserved_at: string | null;
           scheduled_at: string | null;
           google_meet_link: string | null;
@@ -456,6 +466,7 @@ export type Database = {
           workshop_id?: string | null;
           offering_type?: string | null;
           seats?: number;
+          offering_capacity?: number;
           slot_reserved_at?: string | null;
           scheduled_at?: string | null;
           google_meet_link?: string | null;
@@ -476,6 +487,7 @@ export type Database = {
           workshop_id?: string | null;
           offering_type?: string | null;
           seats?: number;
+          offering_capacity?: number;
           slot_reserved_at?: string | null;
           scheduled_at?: string | null;
           google_meet_link?: string | null;
