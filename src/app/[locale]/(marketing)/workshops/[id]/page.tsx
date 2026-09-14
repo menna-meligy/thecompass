@@ -7,7 +7,6 @@ import { topicLabel } from "@/lib/topics";
 import { CheckCircle2, Users, Target, Compass, ArrowRight, ArrowLeft, Calendar, Clock, MapPin } from "lucide-react";
 import type { Session, WorkshopOutlineItem } from "@/types/index";
 import WorkshopGraphic from "@/components/workshops/WorkshopGraphic";
-import SessionAvailabilityCalendar from "@/components/workshops/SessionAvailabilityCalendar";
 import WorkshopAvailabilityCalendar from "@/components/workshops/WorkshopAvailabilityCalendar";
 
 export default async function WorkshopDetailPage(props: { params: Promise<{ id: string; locale: string }> }) {
@@ -300,15 +299,6 @@ export default async function WorkshopDetailPage(props: { params: Promise<{ id: 
                               {isRtl ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
                             </Link>
                           )}
-                        </div>
-
-                        {/* Availability Calendar */}
-                        <div style={{ marginTop: "12px" }}>
-                          <SessionAvailabilityCalendar
-                            sessionId={session.id}
-                            workshopId={id}
-                            isAr={isRtl}
-                          />
                         </div>
                       </div>
                     );
