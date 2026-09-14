@@ -139,6 +139,7 @@ export function AdminSidebar() {
       items: [
         { href: `/${locale}/admin/availability`, labelAr: "التوفر", labelEn: "Availability", icon: Clock },
         { href: `/${locale}/admin/bookings`, labelAr: "الحجوزات", labelEn: "Bookings", icon: CalendarDays },
+        { href: `/${locale}/admin/meetings`, labelAr: "الجلسات المؤكدة", labelEn: "Confirmed Meetings", icon: CalendarDays },
       ],
     },
     {

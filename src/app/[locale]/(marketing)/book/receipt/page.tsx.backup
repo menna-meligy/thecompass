@@ -174,39 +174,27 @@ export default function ReceiptPage() {
       }
 
       const fileExt = selectedFile.name.split(".").pop() || "bin";
-      const fileName = `proofs/${user.id}/${Date.now()}.${fileExt}`;
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
-        .from("proofs")
+        .from("receipts")
         .upload(fileName, selectedFile);
 
       if (error) throw error;
 
-      // Get the public URL
-      const { data: urlData } = supabase.storage
-        .from("proofs")
-        .getPublicUrl(fileName);
+      // Store receipt metadata in database
+      const { error: dbError } = await (supabase as any).from("pending_receipts").insert({
+        user_id: user.id,
+        slot_date: slotDate,
+        slot_time: slotTime,
+        workshop_title: workshopTitle,
+        price: parseFloat(price || "0"),
+        receipt_url: data.path,
+        status: "pending",
+        uploaded_at: new Date().toISOString(),
+      });
 
-      // Get the latest booking for this user and update its payment with receipt URL
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("id, payment:payments(id)")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (bookings && bookings.length > 0 && bookings[0].payment && bookings[0].payment.length > 0) {
-        const paymentId = bookings[0].payment[0].id;
-        const { error: updateError } = await supabase
-          .from("payments")
-          .update({
-            proof_url: urlData.publicUrl,
-            status: "pending_verification"
-          })
-          .eq("id", paymentId);
-
-        if (updateError) throw updateError;
-      }
+      if (dbError) throw dbError;
 
       setUploadedReceipt(fileName);
     } catch (error) {
