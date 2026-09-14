@@ -1,226 +1,164 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Loader2, RefreshCw } from "lucide-react";
 import CalendarGrid from "./CalendarGrid";
-import SlotEditModal from "./SlotEditModal";
-import type { SessionTypeOption } from "./SlotEditModal";
+import DayEditor from "./DayEditor";
+import type { AdminSlot } from "./availability-types";
+import { allOfferings, type WorkshopLite } from "@/lib/offerings";
+import { normaliseDate } from "@/lib/schedule-dates";
 
-interface AvailabilitySlot {
-  id: string;
-  date: string;
-  start_time: string;
-  end_time: string;
-  admin_marked_status: "available" | "full" | "unavailable";
-  booked_count: number;
-  assignments?: Array<{
-    id: string;
-    session_id?: string;
-    workshop_id?: string;
-  }>;
-}
-
-interface Workshop {
-  id: string;
-  title_ar: string;
-  title_en: string;
-}
-
-interface Session {
-  id: string;
-  type: string;
-  workshop_id?: string;
-  workshop?: Workshop;
-}
-
-interface CentralizedAvailabilityManagerProps {
-  isAr: boolean;
-}
-
-export default function CentralizedAvailabilityManager({
-  isAr,
-}: CentralizedAvailabilityManagerProps) {
-  const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
-  const [workshops, setWorkshops] = useState<Workshop[]>([]);
-  const [sessions, setSessions] = useState<Session[]>([]);
+/**
+ * The coach's availability screen: one month calendar, click a day, then either
+ * open bookable times on it or close it entirely. What's set here is exactly
+ * what clients see on every booking calendar.
+ */
+export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean }) {
+  const [slots, setSlots] = useState<AdminSlot[]>([]);
+  const [workshops, setWorkshops] = useState<WorkshopLite[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [modalDate, setModalDate] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [openDate, setOpenDate] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const t = (ar: string, en: string) => (isAr ? ar : en);
 
-  const loadData = async () => {
+  const load = useCallback(async () => {
+    setRefreshing(true);
     try {
-      setLoading(true);
-      const [slotsRes, workshopsRes, sessionsRes] = await Promise.all([
-        fetch("/api/admin/availability/slots"),
-        fetch("/api/admin/availability/workshops"),
-        fetch("/api/admin/availability/sessions"),
+      const [slotsRes, workshopsRes] = await Promise.all([
+        fetch("/api/admin/availability/slots", { cache: "no-store" }),
+        fetch("/api/admin/availability/workshops", { cache: "no-store" }),
       ]);
 
-      if (slotsRes.ok) setSlots(await slotsRes.json());
+      if (!slotsRes.ok) {
+        setError(
+          slotsRes.status === 403
+            ? t("محتاجة صلاحية أدمن للصفحة دي.", "You need an admin account for this page.")
+            : t("تعذّر تحميل المواعيد.", "Couldn't load availability."),
+        );
+        return;
+      }
+
+      setError(null);
+      setSlots(await slotsRes.json());
       if (workshopsRes.ok) setWorkshops(await workshopsRes.json());
-      if (sessionsRes.ok) setSessions(await sessionsRes.json());
-    } catch (err) {
-      setError(isAr ? "خطأ في تحميل البيانات" : "Error loading data");
-      console.error("Failed to load data:", err);
+    } catch {
+      setError(t("تعذّر الاتصال بالسيرفر.", "Couldn't reach the server."));
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, [isAr]);
 
-  // Build session type options from workshops and career session
-  const sessionTypeOptions: SessionTypeOption[] = [
-    {
-      id: "career-deciding",
-      label: "Career Deciding Session",
-      labelAr: "جلسة تحديد المسار الوظيفي",
-      sessionId: undefined,
-      type: "individual",
-      price: 500,
-    },
-  ];
+  useEffect(() => {
+    load();
+  }, [load]);
 
-  // Add workshop options (individual + group for each)
-  workshops.forEach((workshop) => {
-    sessionTypeOptions.push(
-      {
-        id: `${workshop.id}-individual`,
-        label: `${workshop.title_en} - Individual`,
-        labelAr: `${workshop.title_ar} - فردي`,
-        workshopId: workshop.id,
-        type: "individual",
-        price: 500,
-      },
-      {
-        id: `${workshop.id}-group`,
-        label: `${workshop.title_en} - Group`,
-        labelAr: `${workshop.title_ar} - مجموعة`,
-        workshopId: workshop.id,
-        type: "group",
-        price: 1200,
-      }
-    );
-  });
+  const offerings = useMemo(() => allOfferings(workshops), [workshops]);
 
-  const handleCreateSlot = async (data: {
+  const slotsForOpenDay = useMemo(
+    () => (openDate ? slots.filter((s) => normaliseDate(s.date) === openDate) : []),
+    [slots, openDate],
+  );
+
+  async function post(body: Record<string, unknown>) {
+    const res = await fetch("/api/admin/availability/slots", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.message || data.error || t("العملية فشلت", "That didn't work"));
+    }
+    await load();
+  }
+
+  const handleAddTime = async (data: {
     date: string;
-    startTime: string;
-    endTime: string;
-    sessionTypeIds: string[];
-  }) => {
-    setSaving(true);
-    try {
-      // Create slot with all selected session type assignments
-      const assignments = data.sessionTypeIds
-        .map((typeId) => sessionTypeOptions.find((o) => o.id === typeId))
-        .filter(Boolean);
+    start_time: string;
+    end_time: string;
+    offerings: string[];
+  }) => post({ mode: "available", ...data });
 
-      if (assignments.length === 0) throw new Error("No session types selected");
+  const handleCloseDay = (date: string) => post({ mode: "day_block", date });
 
-      // Calculate capacity: individual sessions = 1, group sessions = 8
-      const hasGroupSession = assignments.some((opt) => opt?.type === "group");
-      const capacity = hasGroupSession ? 8 : 1;
+  const handleReopenDay = (date: string) => post({ mode: "unblock_day", date });
 
-      const res = await fetch("/api/admin/availability/slots", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date: data.date,
-          start_time: data.startTime,
-          end_time: data.endTime,
-          admin_marked_status: "available",
-          capacity,
-          assignments: assignments.map((opt) => ({
-            session_id: opt?.sessionId || null,
-            workshop_id: opt?.workshopId || null,
-          })),
-        }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to create slot");
-      }
-      await loadData();
-      setModalDate(null);
-    } catch (err) {
-      throw err;
-    } finally {
-      setSaving(false);
+  const handleDeleteSlot = async (slotId: string) => {
+    const res = await fetch(`/api/admin/availability/slots/${slotId}`, { method: "DELETE" });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.message || data.error || t("تعذّر الحذف", "Couldn't delete"));
     }
+    await load();
   };
 
-  const handleMarkUnavailable = async (date: string) => {
-    setSaving(true);
-    try {
-      const res = await fetch("/api/admin/availability/slots", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          date,
-          start_time: "00:00",
-          end_time: "23:59",
-          admin_marked_status: "unavailable",
-          assignments: [], // No assignments for unavailable days
-        }),
-      });
+  if (loading) {
+    return (
+      <div className="flex items-center gap-2 text-white/50">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        {t("جاري التحميل...", "Loading...")}
+      </div>
+    );
+  }
 
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to mark day unavailable");
-      }
-      await loadData();
-      setModalDate(null);
-    } catch (err) {
-      throw err;
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) return <div className="text-white/50">{isAr ? "جاري التحميل..." : "Loading..."}</div>;
+  const upcoming = slots.filter((s) => !s.is_day_block && s.booked_count > 0).length;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-2">
-          {isAr ? "📅 إدارة المواقيت المتاحة" : "📅 Manage Availability"}
-        </h2>
-        <p className="text-white/50 text-sm">
-          {isAr
-            ? "انقر على أي يوم لإنشاء حجز أو تعليم اليوم كممتلئ"
-            : "Click any day to create a slot or mark as unavailable"}
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-white mb-1">
+            {t("📅 مواعيدك", "📅 Your availability")}
+          </h2>
+          <p className="text-white/50 text-sm">
+            {t(
+              "اضغطي على أي يوم: تفتحيه بمواعيد للحجز، أو تقفليه بالكامل.",
+              "Click any day to open bookable times on it — or close the whole day.",
+            )}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={load}
+          disabled={refreshing}
+          className="flex items-center gap-2 text-sm text-white/60 hover:text-white px-3 py-2 rounded-lg bg-white/5 border border-white/10 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+          {t("تحديث", "Refresh")}
+        </button>
       </div>
 
-      {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+        <div className="p-4 bg-red-500/15 border border-red-500/40 rounded-lg text-red-300 text-sm">
           {error}
         </div>
       )}
 
-      {/* Calendar Grid */}
-      <CalendarGrid
-        slots={slots}
-        onDateClick={setModalDate}
-        isAr={isAr}
-      />
+      {upcoming > 0 && (
+        <p className="text-sm text-white/45">
+          {t(
+            `${upcoming} موعد متحجوز حالياً — ظاهرين في "الجلسات المؤكدة".`,
+            `${upcoming} time${upcoming === 1 ? "" : "s"} currently taken — they appear under "Confirmed Meetings".`,
+          )}
+        </p>
+      )}
 
-      {/* Modal */}
-      {modalDate && (
-        <SlotEditModal
-          date={modalDate}
-          onClose={() => setModalDate(null)}
-          onCreateSlot={handleCreateSlot}
-          onMarkUnavailable={handleMarkUnavailable}
-          sessionTypes={sessionTypeOptions}
+      <CalendarGrid slots={slots} onDateClick={setOpenDate} isAr={isAr} />
+
+      {openDate && (
+        <DayEditor
+          date={openDate}
+          slots={slotsForOpenDay}
+          offerings={offerings}
           isAr={isAr}
-          loading={saving}
+          onClose={() => setOpenDate(null)}
+          onAddTime={handleAddTime}
+          onCloseDay={handleCloseDay}
+          onReopenDay={handleReopenDay}
+          onDeleteSlot={handleDeleteSlot}
         />
       )}
     </div>

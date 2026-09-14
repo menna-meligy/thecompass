@@ -346,39 +346,146 @@ export type Database = {
           }
         ];
       };
+      availability_slots: {
+        Row: {
+          id: string;
+          date: string;
+          start_time: string;
+          end_time: string;
+          capacity: number;
+          booked_count: number;
+          status: string;
+          admin_marked_status: string | null;
+          is_day_block: boolean;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          date: string;
+          start_time: string;
+          end_time: string;
+          capacity?: number;
+          booked_count?: number;
+          status?: string;
+          admin_marked_status?: string | null;
+          is_day_block?: boolean;
+          created_by: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          date?: string;
+          start_time?: string;
+          end_time?: string;
+          capacity?: number;
+          booked_count?: number;
+          status?: string;
+          admin_marked_status?: string | null;
+          is_day_block?: boolean;
+          created_by?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      slot_assignments: {
+        Row: {
+          id: string;
+          slot_id: string;
+          session_id: string | null;
+          workshop_id: string | null;
+          offering_type: string;
+          assigned_at: string;
+        };
+        Insert: {
+          id?: string;
+          slot_id: string;
+          session_id?: string | null;
+          workshop_id?: string | null;
+          offering_type: string;
+          assigned_at?: string;
+        };
+        Update: {
+          id?: string;
+          slot_id?: string;
+          session_id?: string | null;
+          workshop_id?: string | null;
+          offering_type?: string;
+          assigned_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "slot_assignments_slot_id_fkey";
+            columns: ["slot_id"];
+            isOneToOne: false;
+            referencedRelation: "availability_slots";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       bookings: {
         Row: {
           id: string;
           user_id: string;
-          session_id: string;
+          session_id: string | null;
           time_slot_id: string | null;
+          slot_id: string | null;
+          workshop_id: string | null;
+          offering_type: string | null;
+          seats: number;
+          slot_reserved_at: string | null;
+          scheduled_at: string | null;
+          google_meet_link: string | null;
           status: string;
           created_at: string;
           payment_deadline: string | null;
           payment_reminder_sent_at: string | null;
           payment_cancelled_at: string | null;
+          reminder_1d_sent_at: string | null;
+          reminder_30m_sent_at: string | null;
         };
         Insert: {
           id?: string;
           user_id: string;
-          session_id: string;
+          session_id?: string | null;
           time_slot_id?: string | null;
+          slot_id?: string | null;
+          workshop_id?: string | null;
+          offering_type?: string | null;
+          seats?: number;
+          slot_reserved_at?: string | null;
+          scheduled_at?: string | null;
+          google_meet_link?: string | null;
           status?: string;
           created_at?: string;
           payment_deadline?: string | null;
           payment_reminder_sent_at?: string | null;
           payment_cancelled_at?: string | null;
+          reminder_1d_sent_at?: string | null;
+          reminder_30m_sent_at?: string | null;
         };
         Update: {
           id?: string;
           user_id?: string;
-          session_id?: string;
+          session_id?: string | null;
           time_slot_id?: string | null;
+          slot_id?: string | null;
+          workshop_id?: string | null;
+          offering_type?: string | null;
+          seats?: number;
+          slot_reserved_at?: string | null;
+          scheduled_at?: string | null;
+          google_meet_link?: string | null;
           status?: string;
           created_at?: string;
           payment_deadline?: string | null;
           payment_reminder_sent_at?: string | null;
           payment_cancelled_at?: string | null;
+          reminder_1d_sent_at?: string | null;
+          reminder_30m_sent_at?: string | null;
         };
         Relationships: [
           {
@@ -386,6 +493,20 @@ export type Database = {
             columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bookings_slot_id_fkey";
+            columns: ["slot_id"];
+            isOneToOne: false;
+            referencedRelation: "availability_slots";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "bookings_workshop_id_fkey";
+            columns: ["workshop_id"];
+            isOneToOne: false;
+            referencedRelation: "workshops";
             referencedColumns: ["id"];
           },
           {
@@ -409,6 +530,16 @@ export type Database = {
           proof_url: string | null;
           status: string;
           created_at: string;
+          admin_approved: boolean | null;
+          approved_at: string | null;
+          approved_by: string | null;
+          admin_approval_notes_ar: string | null;
+          admin_approval_notes_en: string | null;
+          admin_notes_ar: string | null;
+          admin_notes_en: string | null;
+          receipt_image_url: string | null;
+          receipt_validated_at: string | null;
+          receipt_validation_status: string | null;
         };
         Insert: {
           id?: string;
@@ -421,6 +552,16 @@ export type Database = {
           proof_url?: string | null;
           status?: string;
           created_at?: string;
+          admin_approved?: boolean | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          admin_approval_notes_ar?: string | null;
+          admin_approval_notes_en?: string | null;
+          admin_notes_ar?: string | null;
+          admin_notes_en?: string | null;
+          receipt_image_url?: string | null;
+          receipt_validated_at?: string | null;
+          receipt_validation_status?: string | null;
         };
         Update: {
           id?: string;
@@ -433,6 +574,16 @@ export type Database = {
           proof_url?: string | null;
           status?: string;
           created_at?: string;
+          admin_approved?: boolean | null;
+          approved_at?: string | null;
+          approved_by?: string | null;
+          admin_approval_notes_ar?: string | null;
+          admin_approval_notes_en?: string | null;
+          admin_notes_ar?: string | null;
+          admin_notes_en?: string | null;
+          receipt_image_url?: string | null;
+          receipt_validated_at?: string | null;
+          receipt_validation_status?: string | null;
         };
         Relationships: [
           {

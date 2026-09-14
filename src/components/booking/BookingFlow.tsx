@@ -25,7 +25,14 @@ const VODAFONE_LINK = process.env.NEXT_PUBLIC_VODAFONE_LINK || "https://web.voda
 type Step = "payment" | "proof" | "confirmed";
 
 interface Props {
+  /** The availability slot being taken. */
   sessionId: string;
+  /**
+   * Which offering this slot is being booked as — "career",
+   * "<workshopId>:individual" or "<workshopId>:group". The server resolves the
+   * price and the workshop from this, so the browser can't name its own price.
+   */
+  offering: string;
   workshopTitle: string;
   price: number;
   userId: string;
@@ -38,6 +45,7 @@ interface Props {
 
 export default function BookingFlow({
   sessionId,
+  offering,
   workshopTitle,
   price,
   userId,
@@ -143,14 +151,17 @@ export default function BookingFlow({
     setUploading(true);
     setBookingError(null);
     try {
-      console.log("Creating booking with:", { slotId: sessionId, userId, payment_method: selectedMethod, amount: price, locale: isAr ? 'ar' : 'en' });
       const res = await fetch("/api/bookings/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slotId: sessionId, userId, payment_method: selectedMethod, amount: price, locale: isAr ? 'ar' : 'en' }),
+        body: JSON.stringify({
+          slotId: sessionId,
+          offering,
+          payment_method: selectedMethod,
+          locale: isAr ? "ar" : "en",
+        }),
       });
       const data = await res.json();
-      console.log("Booking response:", { status: res.status, data });
       if (data.booking?.id) {
         setBookingId(data.booking.id);
         setPaymentDeadline(data.payment_deadline || null);
@@ -249,12 +260,8 @@ export default function BookingFlow({
 
       if (result.verified) {
         setVerifyStatus("ok");
-        // Mark the slot as booked when receipt is uploaded/verified
-        fetch("/api/bookings/mark-slot-booked", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ booking_id: bookingId, capacity }),
-        }).catch(() => {});
+        // The seat is taken server-side inside verify-screenshot, atomically,
+        // as part of accepting this receipt — nothing to do from the browser.
         // Notify the admin that a payment is awaiting review (non-blocking).
         fetch("/api/send-email", {
           method: "POST",
@@ -264,7 +271,7 @@ export default function BookingFlow({
         setTimeout(() => setStep("confirmed"), 1200);
       } else {
         // Collect every failing check so we can tell the client exactly what's wrong.
-        const KNOWN = ["amount_mismatch", "date_too_old", "date_future", "amount_unreadable", "date_unreadable", "reference_missing", "duplicate_reference", "duplicate_proof", "upload_failed"];
+        const KNOWN = ["amount_mismatch", "date_too_old", "date_future", "amount_unreadable", "date_unreadable", "reference_missing", "duplicate_reference", "duplicate_proof", "upload_failed", "slot_taken"];
         const errs: string[] = (Array.isArray(result.errors) ? result.errors : [result.error]).filter((e: string) => KNOWN.includes(e));
         if (errs.length > 0) {
           setVerifyErrors(errs);
@@ -519,6 +526,7 @@ export default function BookingFlow({
             duplicate_proof: { ar: "الإيصال ده مستخدم قبل كده.", en: "This receipt was already used." },
             reference_missing: { ar: "مقدرناش نلاقي رقم العملية في الإيصال.", en: "We couldn't find the transaction reference in the receipt." },
             upload_failed: { ar: "حصلت مشكلة في رفع صورة الإيصال، جرّب تاني.", en: "There was a problem uploading the receipt image, please try again." },
+            slot_taken: { ar: "للأسف حد تاني خد الموعد ده قبلك بثواني. اختار موعد تاني وكلّمنا عشان نرجّعلك المبلغ.", en: "Someone took this time seconds before you. Please pick another time and call us to arrange your refund." },
           };
           return (
             <div style={{ padding: "14px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
@@ -583,7 +591,7 @@ export default function BookingFlow({
   return (
     <div>
       <button
-        onClick={() => window.location.href = `/${locale}/book/availability`}
+        onClick={() => (onBack ? onBack() : (window.location.href = `/${locale}/book/availability`))}
         className="flex items-center gap-2 text-amber-300 hover:text-amber-200 mb-4 transition"
       >
         <ChevronLeft className="w-5 h-5" />

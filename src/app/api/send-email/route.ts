@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { Resend } from "resend";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { formatISODate, normaliseDate, shortTime } from "@/lib/schedule-dates";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -16,11 +18,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing booking_id" }, { status: 400 });
   }
 
-  const supabase = await createClient();
+  const supabase = await createAdminClient();
 
   const { data: booking } = await supabase
     .from("bookings")
-    .select("*, user:profiles(*), session:sessions(*, workshop:workshops(*)), payment:payments(amount, method, status)")
+    .select(
+      "*, user:profiles(*), workshop:workshops(id, title_ar, title_en), slot:availability_slots(date, start_time, end_time), payment:payments(amount, method, status)",
+    )
     .eq("id", booking_id)
     .single();
 
@@ -31,8 +35,16 @@ export async function POST(request: NextRequest) {
   const userEmail = (booking as { user?: { email?: string } }).user?.email;
   const userName = (booking as { user?: { full_name?: string } }).user?.full_name || userEmail || "عميل";
   const userPhone = (booking as { user?: { phone?: string } }).user?.phone || "-";
-  const workshopTitle =
-    (booking as { session?: { workshop?: { title_ar?: string } } }).session?.workshop?.title_ar || "الجلسة";
+  const b = booking as unknown as {
+    offering_type?: string | null;
+    workshop?: { id: string; title_ar: string; title_en: string } | null;
+    slot?: { date?: string; start_time?: string; end_time?: string } | null;
+  };
+  const offeringType = isOfferingType(b.offering_type) ? b.offering_type : "career";
+  const workshopTitle = offeringTitle(offeringType, b.workshop, true);
+  const slotWhen = b.slot?.date
+    ? `${formatISODate(normaliseDate(b.slot.date), true)} · ${shortTime(b.slot.start_time)}–${shortTime(b.slot.end_time)}`
+    : "-";
   const payment = (booking as { payment?: { amount?: number; method?: string } }).payment;
   const amountStr = payment?.amount != null ? `${payment.amount} ج.م` : "-";
   const methodStr = payment?.method === "vodafone_cash" ? "فودافون كاش" : payment?.method === "instapay" ? "إنستاباي" : payment?.method || "-";
@@ -62,6 +74,7 @@ export async function POST(request: NextRequest) {
         <h1 style="color: #8B0000;">البوصلة 🧭</h1>
         <h2>تم تأكيد الدفع ✅</h2>
         <p>تم التحقق من دفعتك وتأكيد حجزك في <strong>${workshopTitle}</strong>.</p>
+        <p>موعد الجلسة: <strong>${slotWhen}</strong></p>
         <p>نتطلع إلى لقائك!</p>
         <hr />
         <p style="color: #666; font-size: 12px;">البوصلة: دليلك نحو النجاح</p>
@@ -93,10 +106,11 @@ export async function POST(request: NextRequest) {
           <tr><td style="padding:6px 0; color:#666;">العميل</td><td><strong>${userName}</strong></td></tr>
           <tr><td style="padding:6px 0; color:#666;">التواصل</td><td>${userEmail || "-"} · ${userPhone}</td></tr>
           <tr><td style="padding:6px 0; color:#666;">الورشة</td><td><strong>${workshopTitle}</strong></td></tr>
+          <tr><td style="padding:6px 0; color:#666;">الموعد</td><td><strong>${slotWhen}</strong></td></tr>
           <tr><td style="padding:6px 0; color:#666;">المبلغ</td><td><strong>${amountStr}</strong> عبر ${methodStr}</td></tr>
         </table>
         <p style="margin-top:16px;">
-          <a href="${appUrl}/ar/admin/bookings" style="background:#F59E0B; color:#0f172a; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:bold;">راجِع الحجز وأكِّد الدفع ←</a>
+          <a href="${appUrl}/ar/admin/receipts" style="background:#F59E0B; color:#0f172a; padding:10px 18px; border-radius:8px; text-decoration:none; font-weight:bold;">راجِع الحجز وأكِّد الدفع ←</a>
         </p>
         <hr />
         <p style="color: #666; font-size: 12px;">البوصلة: إشعار إداري</p>

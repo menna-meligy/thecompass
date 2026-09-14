@@ -15,6 +15,8 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { reminder1DayEmail, reminder30MinEmail } from "@/lib/email/templates";
 import { logError } from "@/lib/observability/logger";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { slotStartsAtISO } from "@/lib/schedule-dates";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -27,12 +29,11 @@ interface BookingRow {
   status: string;
   reminder_1d_sent_at: string | null;
   reminder_30m_sent_at: string | null;
+  offering_type: string | null;
+  google_meet_link: string | null;
   user: { email: string | null; full_name: string | null } | null;
-  session: {
-    starts_at: string | null;
-    location_or_link: string | null;
-    workshop: { title_ar: string | null; title_en: string | null } | null;
-  } | null;
+  workshop: { title_ar: string; title_en: string } | null;
+  slot: { date: string | null; start_time: string | null } | null;
 }
 
 function authorized(req: NextRequest): boolean {
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const supabase = await createAdminClient();
-    // Fetch confirmed bookings with their session; filter the reminder windows in
+    // Fetch confirmed bookings with their slot; filter the reminder windows in
     // JS (the set of upcoming confirmed bookings is small, and filtering an
     // embedded to-one resource in PostgREST silently nulls the embed).
     const { data, error } = await (supabase as unknown as {
@@ -64,7 +65,7 @@ export async function GET(req: NextRequest) {
     })
       .from("bookings")
       .select(
-        "id, status, reminder_1d_sent_at, reminder_30m_sent_at, user:profiles(email, full_name), session:sessions(starts_at, location_or_link, workshop:workshops(title_ar, title_en))"
+        "id, status, offering_type, google_meet_link, reminder_1d_sent_at, reminder_30m_sent_at, user:profiles(email, full_name), workshop:workshops(title_ar, title_en), slot:availability_slots(date, start_time)"
       )
       .eq("status", "confirmed");
 
@@ -83,18 +84,23 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "query_failed" }, { status: 500 });
     }
 
-    const bookings = (data ?? []).filter((b) => b.session?.starts_at);
+    const bookings = (data ?? []).filter((b) => b.slot?.date && b.slot?.start_time);
     summary.considered = bookings.length;
 
     for (const b of bookings) {
-      const startsAt = new Date(b.session!.starts_at!).getTime();
+      const startsAtISO = slotStartsAtISO(b.slot!.date!, b.slot!.start_time!);
+      const startsAt = new Date(startsAtISO).getTime();
       const ms = startsAt - now;
       if (ms <= 0) continue; // already started
 
       const email = b.user?.email;
       const name = b.user?.full_name || "صديقنا";
-      const title = b.session?.workshop?.title_ar || b.session?.workshop?.title_en || "الجلسة";
-      const link = b.session?.location_or_link ?? null;
+      const title = offeringTitle(
+        isOfferingType(b.offering_type) ? b.offering_type : "career",
+        b.workshop,
+        true,
+      );
+      const link = b.google_meet_link ?? null;
 
       const due1d = !b.reminder_1d_sent_at && ms <= DAY && ms > 30 * MIN;
       const due30m = !b.reminder_30m_sent_at && ms <= 35 * MIN && ms > 0;
@@ -105,7 +111,7 @@ export async function GET(req: NextRequest) {
         continue;
       }
 
-      const data_ = { userName: name, workshopTitle: title, startsAt: b.session!.starts_at!, locationOrLink: link, appUrl };
+      const data_ = { userName: name, workshopTitle: title, startsAt: startsAtISO, locationOrLink: link, appUrl };
 
       if (due30m) {
         const { subject, html } = reminder30MinEmail(data_);

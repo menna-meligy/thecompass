@@ -2,6 +2,8 @@ import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Users, Calendar, TrendingUp, BookOpen, Clock, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { cairoNow, shortTime } from "@/lib/schedule-dates";
 import Link from "next/link";
 
 function KpiCard({ icon, label, value, sub, trend }: {
@@ -36,10 +38,10 @@ export default async function AdminDashboardPage() {
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
   const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).toISOString();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const todayISO = cairoNow().date;
 
   const [
     { count: totalBookings },
-    { count: pendingBookings },
     { count: todayBookings },
     { data: payments },
     { data: monthPayments },
@@ -49,7 +51,6 @@ export default async function AdminDashboardPage() {
     { data: todayAgenda },
   ] = await Promise.all([
     supabase.from("bookings").select("*", { count: "exact", head: true }).eq("status", "confirmed"),
-    supabase.from("bookings").select("*", { count: "exact", head: true }).eq("status", "pending"),
     supabase.from("bookings").select("*", { count: "exact", head: true })
       .eq("status", "confirmed").gte("created_at", todayStart).lt("created_at", todayEnd),
     supabase.from("payments").select("amount").eq("status", "paid"),
@@ -57,17 +58,27 @@ export default async function AdminDashboardPage() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase as any).from("workshops").select("*", { count: "exact", head: true }).eq("status", "published"),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "user"),
+    // Receipts uploaded and awaiting the coach's decision.
     supabase.from("bookings")
-      .select("id, created_at, status, user:profiles(full_name), session:sessions(starts_at, workshop:workshops(title_ar, title_en))")
-      .in("status", ["pending", "proof_submitted"])
+      .select("id, created_at, status, offering_type, user:profiles(full_name), workshop:workshops(title_ar, title_en), payment:payments(status, proof_url)")
+      .eq("status", "pending")
       .order("created_at", { ascending: false })
-      .limit(5),
-    supabase.from("sessions")
-      .select("id, starts_at, ends_at, workshop:workshops(title_ar, title_en)")
-      .gte("starts_at", todayStart)
-      .lt("starts_at", todayEnd)
-      .order("starts_at"),
+      .limit(20),
+    // Today's real appointments, from the slot the client actually booked.
+    supabase.from("bookings")
+      .select("id, status, offering_type, user:profiles(full_name), workshop:workshops(title_ar, title_en), slot:availability_slots!inner(date, start_time, end_time)")
+      .not("slot_reserved_at", "is", null)
+      .neq("status", "cancelled")
+      .eq("slot.date", todayISO)
+      .order("created_at"),
   ]);
+
+  // "Needs attention" means a receipt is sitting there unreviewed — a pending
+  // booking with no receipt yet is the client's move, not the coach's.
+  const needsReview = ((pendingList ?? []) as Array<{ payment?: unknown }>).filter((b) => {
+    const pays = Array.isArray(b.payment) ? b.payment : b.payment ? [b.payment] : [];
+    return pays.some((p: { proof_url?: string | null }) => !!p?.proof_url);
+  }).slice(0, 5);
 
   const totalRevenue = payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
   const monthRevenue = monthPayments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
@@ -87,9 +98,8 @@ export default async function AdminDashboardPage() {
       {/* KPI Grid — 6 cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <KpiCard icon={<CheckCircle2 className="h-4 w-4" />} label={isAr ? "حجوزات مؤكدة" : "Confirmed bookings"} value={totalBookings || 0} />
-        <KpiCard icon={<Clock className="h-4 w-4" />} label={isAr ? "تحتاج موافقة" : "Pending approval"} value={pendingBookings || 0}
-          sub={pendingBookings ? (isAr ? "تحتاج مراجعة" : "needs review") : undefined}
-          trend={pendingBookings ? { value: String(pendingBookings), up: false } : undefined}
+        <KpiCard icon={<Clock className="h-4 w-4" />} label={isAr ? "إيصالات تحتاج مراجعة" : "Receipts to review"} value={needsReview.length}
+          sub={needsReview.length ? (isAr ? "العميل رفع الإيصال" : "client uploaded a receipt") : undefined}
         />
         <KpiCard icon={<Calendar className="h-4 w-4" />} label={isAr ? "حجوزات اليوم" : "Today's bookings"} value={todayBookings || 0} />
         <KpiCard icon={<TrendingUp className="h-4 w-4" />} label={isAr ? "الإيرادات الكلية" : "Total revenue"} value={formatCurrency(totalRevenue, locale)} />
@@ -112,25 +122,26 @@ export default async function AdminDashboardPage() {
             <div className="space-y-3">
               {(todayAgenda as Array<{
                 id: string;
-                starts_at: string;
-                ends_at?: string;
-                workshop?: { title_ar?: string; title_en?: string };
-              }>).map((session) => {
-                const title = isAr ? session.workshop?.title_ar : session.workshop?.title_en;
-                const time = new Date(session.starts_at).toLocaleTimeString(
-                  isAr ? "ar-EG" : "en-US",
-                  { hour: "2-digit", minute: "2-digit" }
-                );
+                offering_type?: string | null;
+                user?: { full_name?: string };
+                workshop?: { title_ar: string; title_en: string } | null;
+                slot?: { start_time?: string } | null;
+              }>).map((booking) => {
+                const offeringType = isOfferingType(booking.offering_type) ? booking.offering_type : "career";
+                const title = offeringTitle(offeringType, booking.workshop, isAr);
                 return (
-                  <div key={session.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/3 border border-white/5">
+                  <div key={booking.id} className="flex items-center gap-3 p-3 rounded-xl bg-white/3 border border-white/5">
                     <div className="w-12 text-center">
-                      <p className="text-[#F59E0B] text-sm font-black">{time}</p>
+                      <p className="text-[#F59E0B] text-sm font-black">{shortTime(booking.slot?.start_time)}</p>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm font-semibold truncate">{title || (isAr ? "جلسة" : "Session")}</p>
+                      <p className="text-white text-sm font-semibold truncate">
+                        {booking.user?.full_name || (isAr ? "عميل" : "Client")}
+                      </p>
+                      <p className="text-white/40 text-xs truncate">{title}</p>
                     </div>
                     <Link
-                      href={`/${locale}/admin/bookings`}
+                      href={`/${locale}/admin/meetings`}
                       className="text-xs text-white/30 hover:text-[#F59E0B] transition-colors"
                     >
                       {isAr ? "عرض" : "View"}
@@ -148,31 +159,31 @@ export default async function AdminDashboardPage() {
             <h2 className="text-sm font-bold text-[#F59E0B] uppercase tracking-wider">
               {isAr ? "تحتاج انتباه" : "Needs Attention"}
             </h2>
-            {pendingBookings ? (
+            {needsReview.length ? (
               <span className="text-xs bg-amber-500/15 text-amber-400 border border-amber-500/20 rounded-full px-2 py-0.5 font-semibold">
-                {pendingBookings}
+                {needsReview.length}
               </span>
             ) : null}
           </div>
-          {!pendingList || pendingList.length === 0 ? (
+          {needsReview.length === 0 ? (
             <div className="text-center py-8">
               <CheckCircle2 className="h-8 w-8 text-emerald-500/30 mx-auto mb-2" />
               <p className="text-white/30 text-sm">{isAr ? "كل حاجة تمام تمام" : "All clear!"}</p>
             </div>
           ) : (
             <div className="space-y-2">
-              {(pendingList as Array<{
+              {(needsReview as Array<{
                 id: string;
                 status: string;
                 created_at: string;
+                offering_type?: string | null;
                 user?: { full_name?: string };
-                session?: { starts_at?: string; workshop?: { title_ar?: string; title_en?: string } };
+                workshop?: { title_ar: string; title_en: string } | null;
               }>).map((booking) => {
                 const name = booking.user?.full_name || (isAr ? "عميل" : "Client");
-                const workshopTitle = isAr
-                  ? booking.session?.workshop?.title_ar
-                  : booking.session?.workshop?.title_en;
-                const isPendingProof = booking.status === "proof_submitted";
+                const offeringType = isOfferingType(booking.offering_type) ? booking.offering_type : "career";
+                const workshopTitle = offeringTitle(offeringType, booking.workshop, isAr);
+                const isPendingProof = true;
                 return (
                   <div key={booking.id} className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10">
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${isPendingProof ? "bg-blue-500/15" : "bg-amber-500/15"}`}>
@@ -186,7 +197,7 @@ export default async function AdminDashboardPage() {
                       <p className="text-white/40 text-xs truncate">{workshopTitle || (isAr ? "جلسة" : "Session")}</p>
                     </div>
                     <Link
-                      href={`/${locale}/admin/bookings`}
+                      href={`/${locale}/admin/receipts`}
                       className="text-xs font-semibold text-[#F59E0B] hover:text-amber-300 transition-colors flex-shrink-0"
                     >
                       {isAr ? "مراجعة" : "Review"}
@@ -194,12 +205,12 @@ export default async function AdminDashboardPage() {
                   </div>
                 );
               })}
-              {(pendingBookings || 0) > 5 && (
+              {needsReview.length >= 5 && (
                 <Link
-                  href={`/${locale}/admin/bookings`}
+                  href={`/${locale}/admin/receipts`}
                   className="block text-center text-xs text-white/30 hover:text-[#F59E0B] py-2 transition-colors"
                 >
-                  {isAr ? `عرض الكل (${pendingBookings})` : `View all (${pendingBookings})`}
+                  {isAr ? "عرض كل الإيصالات" : "View all receipts"}
                 </Link>
               )}
             </div>

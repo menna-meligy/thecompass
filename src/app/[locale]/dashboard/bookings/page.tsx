@@ -2,7 +2,9 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate, formatCurrency, getLocalizedField } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { formatISODate, normaliseDate, shortTime } from "@/lib/schedule-dates";
 import type { Booking } from "@/types/index";
 import {
   Calendar, Clock, CheckCircle2, FileText, Compass, BookOpen, ArrowRight, MapPin, AlertTriangle, MessageSquare, Video
@@ -45,7 +47,9 @@ export default async function BookingsPage() {
 
   const { data: bookings } = await supabase
     .from("bookings")
-    .select("*, session:sessions(*, workshop:workshops(*)), payment:payments(*), payment_deadline, google_meet_link")
+    .select(
+      "*, workshop:workshops(id, title_ar, title_en), slot:availability_slots(date, start_time, end_time), payment:payments(*), payment_deadline, google_meet_link",
+    )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -189,10 +193,13 @@ export default async function BookingsPage() {
         ) : (
           <div className="space-y-4">
             {rows.map((booking) => {
-              const workshopTitle = getLocalizedField(
-                (booking.session?.workshop as unknown as Record<string, unknown>) || {},
-                "title", locale
-              );
+              const b = booking as unknown as {
+                offering_type?: string | null;
+                workshop?: { id: string; title_ar: string; title_en: string } | null;
+                slot?: { date?: string; start_time?: string; end_time?: string } | null;
+              };
+              const offeringType = isOfferingType(b.offering_type) ? b.offering_type : "career";
+              const workshopTitle = offeringTitle(offeringType, b.workshop, isAr);
               const statusStyle = STATUS_STYLES[booking.status] || STATUS_STYLES.pending;
               const paymentStyle = booking.payment ? PAYMENT_STYLES[booking.payment.status] || PAYMENT_STYLES.pending : null;
               const isPastBooking = booking.status === "completed";
@@ -217,31 +224,20 @@ export default async function BookingsPage() {
                         </p>
 
                         {/* Date + time */}
-                        {booking.session?.starts_at && (
+                        {b.slot?.date && (
                           <div className="flex items-center gap-3 flex-wrap" style={{ marginTop: "6px" }}>
                             <div className="flex items-center gap-1.5">
                               <Calendar className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
                               <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-                                {formatDate(booking.session.starts_at, locale)}
+                                {formatISODate(normaliseDate(b.slot.date), isAr)}
                               </span>
                             </div>
                             <div className="flex items-center gap-1.5">
                               <Clock className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
                               <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)" }}>
-                                {new Date(booking.session.starts_at).toLocaleTimeString(
-                                  locale === "ar" ? "ar-EG" : "en-US",
-                                  { hour: "2-digit", minute: "2-digit" }
-                                )}
+                                {shortTime(b.slot.start_time)}–{shortTime(b.slot.end_time)}
                               </span>
                             </div>
-                            {booking.session?.location_or_link && (
-                              <div className="flex items-center gap-1.5">
-                                <MapPin className="h-3.5 w-3.5" style={{ color: "rgba(255,255,255,0.35)" }} />
-                                <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.5)", maxWidth: "140px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                  {booking.session.location_or_link}
-                                </span>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>

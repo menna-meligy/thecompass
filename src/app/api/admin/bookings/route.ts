@@ -1,218 +1,130 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-guard";
+import { normaliseDate, shortTime } from "@/lib/schedule-dates";
+import { isOfferingType, offeringTitle } from "@/lib/offerings";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
- * Admin API endpoint for fetching all bookings with comprehensive payment and receipt data.
- * Returns:
- * - All bookings with booking_id, user_id, slot info, status
- * - Payment info (amount, method, status, proof_url)
- * - Receipt verification status and details
- * - Creation timestamp
- * - Support for filtering, pagination, and search
+ * Every booking, with the details the coach actually needs: when the session is,
+ * what was booked, who booked it, and where the payment stands.
+ *
+ * The appointment time comes from `availability_slots` via `bookings.slot_id`.
+ * This used to join `sessions`, a table that is empty in production — so every
+ * row rendered with a blank date and a blank workshop name.
  */
 
-interface BookingRow {
-  id: string;
-  user_id: string;
-  session_id: string;
-  status: string;
-  created_at: string;
-  payment_deadline?: string;
-  user?: { full_name?: string; email?: string; phone?: string };
-  session?: {
-    starts_at?: string;
-    ends_at?: string;
-    location_or_link?: string;
-    price?: number;
-    type?: string;
-    workshop?: { title_ar?: string; title_en?: string };
-  };
-  payment?: {
-    id?: string;
-    amount?: number;
-    currency?: string;
-    method?: string;
-    status?: string;
-    proof_url?: string;
-    gateway_txn_id?: string;
-    admin_approved?: boolean;
-    approved_at?: string;
-    admin_approval_notes_ar?: string;
-    admin_approval_notes_en?: string;
-    created_at?: string;
-  };
-}
+export type AdminBookingState =
+  | "awaiting_receipt"
+  | "receipt_to_review"
+  | "confirmed"
+  | "attended"
+  | "cancelled";
 
 export async function GET(req: NextRequest) {
-  try {
-    const supabase = await createClient();
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const { admin } = guard;
 
-    // Check admin authorization
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  const params = req.nextUrl.searchParams;
+  const state = params.get("state");
+  const search = (params.get("search") || "").trim().toLowerCase();
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const { data, error } = await admin
+    .from("bookings")
+    .select(
+      `id, user_id, status, created_at, payment_deadline, scheduled_at, offering_type,
+       workshop_id, seats, slot_reserved_at, google_meet_link,
+       user:profiles(full_name, email, phone),
+       workshop:workshops(id, title_ar, title_en),
+       slot:availability_slots(id, date, start_time, end_time, capacity, booked_count),
+       payment:payments(id, amount, currency, method, status, proof_url, gateway_txn_id,
+                        admin_approved, approved_at, created_at)`,
+      { count: "exact" },
+    )
+    .order("created_at", { ascending: false })
+    .limit(500);
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile || profile.role !== "admin") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    // Get query parameters
-    const searchParams = req.nextUrl.searchParams;
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const pageSize = Math.min(100, parseInt(searchParams.get("pageSize") || "50"));
-    const offset = (page - 1) * pageSize;
-    const status = searchParams.get("status") || null;
-    const search = searchParams.get("search") || null;
-    const paymentStatus = searchParams.get("paymentStatus") || null;
-    const receiptStatus = searchParams.get("receiptStatus") || null; // 'pending_verification', 'verified', 'rejected', 'none'
-    const sortBy = searchParams.get("sortBy") || "created_at"; // 'created_at', 'payment_deadline', 'session_date'
-    const sortOrder = searchParams.get("sortOrder") || "desc"; // 'asc', 'desc'
-
-    // Build query - fetch all bookings with related data
-    let query = supabase
-      .from("bookings")
-      .select(
-        "id, user_id, session_id, status, created_at, payment_deadline, user:profiles(full_name, email, phone), session:sessions(starts_at, ends_at, location_or_link, price, type, workshop:workshops(title_ar, title_en)), payment:payments(id, amount, currency, method, status, proof_url, gateway_txn_id, admin_approved, approved_at, admin_approval_notes_ar, admin_approval_notes_en, created_at)",
-        { count: "exact" }
-      );
-
-    // Apply filters
-    if (status) {
-      query = query.eq("status", status);
-    }
-
-    // Filter by payment status if specified
-    if (paymentStatus) {
-      // This requires a more complex join which we'll handle in post-processing
-    }
-
-    // Sort
-    if (sortBy === "created_at") {
-      query = query.order("created_at", { ascending: sortOrder === "asc" });
-    } else if (sortBy === "payment_deadline") {
-      query = query.order("payment_deadline", {
-        ascending: sortOrder === "asc",
-        nullsFirst: false,
-      });
-    }
-
-    // Pagination
-    query = query.range(offset, offset + pageSize - 1);
-
-    const { data, error, count } = await query;
-
-    if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
-    }
-
-    // Post-process: normalize payment data and apply additional filters
-    let bookings = (data as unknown as BookingRow[]).map((b) => {
-      const pay = (b as any).payment;
-      // Collapse array of payments to single most-recent payment
-      const single = Array.isArray(pay)
-        ? [...(pay as any[])].sort((a, z) => {
-            const aTime = new Date(a.created_at ?? 0).getTime();
-            const zTime = new Date(z.created_at ?? 0).getTime();
-            return zTime - aTime;
-          })[0]
-        : pay;
-      return { ...b, payment: single };
-    });
-
-    // Apply search filter (after fetching since it's cross-field)
-    if (search) {
-      const q = search.toLowerCase();
-      bookings = bookings.filter((b) => {
-        const name = b.user?.full_name?.toLowerCase() || "";
-        const email = b.user?.email?.toLowerCase() || "";
-        const phone = b.user?.phone?.toLowerCase() || "";
-        const title = (
-          b.session?.workshop?.title_ar || b.session?.workshop?.title_en
-        )?.toLowerCase() || "";
-        return (
-          name.includes(q) ||
-          email.includes(q) ||
-          phone.includes(q) ||
-          title.includes(q) ||
-          b.id.toLowerCase().includes(q)
-        );
-      });
-    }
-
-    // Apply payment status filter
-    if (paymentStatus) {
-      bookings = bookings.filter((b) => {
-        if (paymentStatus === "pending") {
-          return !b.payment || b.payment.status === "pending";
-        } else if (paymentStatus === "paid") {
-          return b.payment?.status === "paid";
-        } else if (paymentStatus === "pending_verification") {
-          return b.payment?.status === "pending_verification";
-        } else if (paymentStatus === "failed") {
-          return b.payment?.status === "failed";
-        }
-        return true;
-      });
-    }
-
-    // Apply receipt status filter
-    if (receiptStatus) {
-      bookings = bookings.filter((b) => {
-        if (receiptStatus === "none") {
-          return !b.payment?.proof_url;
-        } else if (receiptStatus === "pending_verification") {
-          return (
-            b.payment?.proof_url && b.payment?.status === "pending_verification"
-          );
-        } else if (receiptStatus === "verified") {
-          return (
-            b.payment?.proof_url &&
-            (b.payment?.status === "paid" || b.payment?.admin_approved)
-          );
-        } else if (receiptStatus === "rejected") {
-          return (
-            b.payment?.proof_url &&
-            b.payment?.status === "failed" &&
-            !b.payment?.admin_approved
-          );
-        }
-        return true;
-      });
-    }
-
-    // Calculate total count after filtering
-    const totalFiltered = bookings.length;
-
-    return NextResponse.json({
-      bookings,
-      pagination: {
-        page,
-        pageSize,
-        total: count || 0,
-        totalFiltered,
-        pages: Math.ceil(totalFiltered / pageSize),
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching admin bookings:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch bookings" },
-      { status: 500 }
-    );
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+
+  let bookings = (data ?? []).map((b: any) => {
+    const payments = Array.isArray(b.payment) ? b.payment : b.payment ? [b.payment] : [];
+    const payment = [...payments].sort(
+      (a, z) => new Date(z.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
+    )[0] ?? null;
+
+    const offeringType = isOfferingType(b.offering_type) ? b.offering_type : "career";
+
+    let derived: AdminBookingState;
+    if (b.status === "cancelled") derived = "cancelled";
+    else if (b.status === "attended") derived = "attended";
+    else if (b.status === "confirmed") derived = "confirmed";
+    else if (payment?.proof_url) derived = "receipt_to_review";
+    else derived = "awaiting_receipt";
+
+    return {
+      id: b.id,
+      user_id: b.user_id,
+      status: b.status,
+      state: derived,
+      created_at: b.created_at,
+      payment_deadline: b.payment_deadline,
+      scheduled_at: b.scheduled_at,
+      google_meet_link: b.google_meet_link,
+      seats: b.seats ?? 1,
+      holds_slot: !!b.slot_reserved_at,
+      offering_type: offeringType,
+      title_ar: offeringTitle(offeringType, b.workshop, true),
+      title_en: offeringTitle(offeringType, b.workshop, false),
+      slot: b.slot
+        ? {
+            id: b.slot.id,
+            date: normaliseDate(b.slot.date),
+            start_time: shortTime(b.slot.start_time),
+            end_time: shortTime(b.slot.end_time),
+            capacity: b.slot.capacity,
+            booked_count: b.slot.booked_count,
+          }
+        : null,
+      user: b.user ?? null,
+      payment: payment
+        ? {
+            ...payment,
+            reference: (payment.gateway_txn_id ?? "").replace(/^ref:/, "") || null,
+          }
+        : null,
+    };
+  });
+
+  if (state && state !== "all") {
+    bookings = bookings.filter((b) => b.state === state);
+  }
+
+  if (search) {
+    bookings = bookings.filter((b) => {
+      const haystack = [
+        b.user?.full_name,
+        b.user?.email,
+        b.user?.phone,
+        b.title_ar,
+        b.title_en,
+        b.id,
+        b.payment?.reference,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(search);
+    });
+  }
+
+  const counts = bookings.reduce<Record<string, number>>((acc, b) => {
+    acc[b.state] = (acc[b.state] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  return NextResponse.json({ bookings, counts, total: bookings.length });
 }

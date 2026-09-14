@@ -13,6 +13,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail } from "@/lib/email/resend";
 import { paymentReminderEmail, paymentCancelledEmail } from "@/lib/email/templates";
 import { logError } from "@/lib/observability/logger";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,7 +27,9 @@ interface BookingRow {
   payment_reminder_sent_at: string | null;
   payment_cancelled_at: string | null;
   user: { email: string | null; full_name: string | null } | null;
-  session: {
+  offering_type: string | null;
+  workshop: { title_ar: string; title_en: string } | null;
+  _unused_session: {
     workshop: { title_ar: string | null; title_en: string | null } | null;
   } | null;
   payment: { amount: number | null; status: string } | null;
@@ -66,7 +69,7 @@ export async function GET(req: NextRequest) {
     })
       .from("bookings")
       .select(
-        "id, status, payment_deadline, payment_reminder_sent_at, payment_cancelled_at, user_id, session_id, user:profiles(email, full_name), session:sessions(workshop:workshops(title_ar, title_en)), payment:payments(amount, status)"
+        "id, status, payment_deadline, payment_reminder_sent_at, payment_cancelled_at, user_id, session_id, offering_type, user:profiles(email, full_name), workshop:workshops(title_ar, title_en), payment:payments(amount, status)"
       )
       .eq("status", "pending")
       .is("payment_cancelled_at", false);
@@ -95,7 +98,11 @@ export async function GET(req: NextRequest) {
 
       const email = b.user?.email;
       const name = b.user?.full_name || "صديقنا";
-      const title = b.session?.workshop?.title_ar || b.session?.workshop?.title_en || "الجلسة";
+      const title = offeringTitle(
+        isOfferingType(b.offering_type) ? b.offering_type : "career",
+        b.workshop,
+        true,
+      );
       const amount = b.payment?.amount ? `${b.payment.amount} ج.م` : "-";
 
       // Cancel if deadline passed
@@ -111,11 +118,13 @@ export async function GET(req: NextRequest) {
           await sendEmail({ to: email, subject, html });
         }
 
-        // Update booking to cancelled
+        // Update booking to cancelled, and give the appointment back in case
+        // this booking was holding one.
         await (supabase as any)
           .from("bookings")
           .update({ status: "cancelled", payment_cancelled_at: now.toISOString() })
           .eq("id", b.id);
+        await (supabase as any).rpc("release_slot_for_booking", { p_booking: b.id });
 
         summary.cancelled++;
       }

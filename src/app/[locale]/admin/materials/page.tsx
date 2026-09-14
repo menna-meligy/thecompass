@@ -38,7 +38,7 @@ export default function AdminMaterialsPage() {
   const locale = useLocale();
   const isAr = locale === "ar";
   const [materials, setMaterials] = useState<MaterialRow[]>([]);
-  const [bookings, setBookings] = useState<{ id: string; label: string; session_id: string }[]>([]);
+  const [bookings, setBookings] = useState<{ id: string; label: string; session_id: string | null }[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -52,19 +52,31 @@ export default function AdminMaterialsPage() {
       .order("created_at", { ascending: false });
     setMaterials((data as MaterialRow[]) || []);
 
+    // Bookings are slot-based: the appointment time lives on availability_slots
+    // and the subject on workshops (or, with no workshop, the career session).
     const { data: bkgs } = await supabase
       .from("bookings")
-      .select("id, session_id, user:profiles(full_name), session:sessions(workshop:workshops(title_ar))")
+      .select("id, session_id, user:profiles(full_name), workshop:workshops(title_ar, title_en), slot:availability_slots(date, start_time)")
       .eq("status", "confirmed")
       .limit(50);
 
     if (bkgs) {
       setBookings(
-        bkgs.map((b) => ({
-          id: b.id,
-          session_id: b.session_id,
-          label: `${(b as { user?: { full_name?: string } }).user?.full_name || b.id.slice(0, 8)} - ${(b as { session?: { workshop?: { title_ar?: string } } }).session?.workshop?.title_ar || ""}`,
-        }))
+        bkgs.map((b) => {
+          const row = b as unknown as {
+            user?: { full_name?: string };
+            workshop?: { title_ar?: string; title_en?: string } | null;
+            slot?: { date?: string; start_time?: string } | null;
+          };
+          const who = row.user?.full_name || b.id.slice(0, 8);
+          const what =
+            (isAr ? row.workshop?.title_ar : row.workshop?.title_en) ||
+            (isAr ? "جلسة تحديد المسار" : "Career session");
+          const when = row.slot?.date
+            ? ` · ${String(row.slot.date).slice(0, 10)} ${String(row.slot.start_time ?? "").slice(0, 5)}`
+            : "";
+          return { id: b.id, session_id: b.session_id, label: `${who} — ${what}${when}` };
+        })
       );
     }
   }
@@ -73,7 +85,7 @@ export default function AdminMaterialsPage() {
 
   function handleBookingChange(bookingId: string) {
     const booking = bookings.find((b) => b.id === bookingId);
-    if (booking) form.setValue("session_id", booking.session_id);
+    if (booking?.session_id) form.setValue("session_id", booking.session_id);
   }
 
   async function handleAdd(data: MaterialData) {

@@ -1,34 +1,39 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin-guard";
+
+export const runtime = "nodejs";
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const { admin } = guard;
 
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Never silently delete a slot a client is holding — their booking would be
+  // orphaned and the coach would lose the appointment from the schedule.
+  const { data: held } = await admin
+    .from("bookings")
+    .select("id")
+    .eq("slot_id", id)
+    .not("slot_reserved_at", "is", null)
+    .neq("status", "cancelled")
+    .limit(1);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile || profile.role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (held && held.length > 0) {
+    return NextResponse.json(
+      {
+        error: "has_bookings",
+        message: "A client already holds this slot. Cancel their booking first.",
+      },
+      { status: 409 },
+    );
   }
 
-  const { error } = await (supabase as any)
-    .from("availability_slots")
-    .delete()
-    .eq("id", id);
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  const { error } = await admin.from("availability_slots").delete().eq("id", id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   return NextResponse.json({ ok: true });
 }

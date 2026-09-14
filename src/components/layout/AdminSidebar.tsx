@@ -14,6 +14,7 @@ import {
   Users,
   Settings,
   Clock,
+  Receipt,
   ExternalLink,
   ChevronDown,
   Menu,
@@ -139,6 +140,7 @@ export function AdminSidebar() {
       items: [
         { href: `/${locale}/admin/availability`, labelAr: "التوفر", labelEn: "Availability", icon: Clock },
         { href: `/${locale}/admin/bookings`, labelAr: "الحجوزات", labelEn: "Bookings", icon: CalendarDays },
+        { href: `/${locale}/admin/receipts`, labelAr: "الإيصالات", labelEn: "Receipts", icon: Receipt },
         { href: `/${locale}/admin/meetings`, labelAr: "الجلسات المؤكدة", labelEn: "Confirmed Meetings", icon: CalendarDays },
       ],
     },

@@ -1,246 +1,237 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale } from "next-intl";
-import { createClient } from "@/lib/supabase/client";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Mail, Phone, RefreshCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  formatISODate,
+  isoDate,
+  monthName,
+  normaliseDate,
+  weekdays,
+} from "@/lib/schedule-dates";
+
+/**
+ * The coach's schedule ahead of time.
+ *
+ * Shows confirmed sessions and the ones whose receipt is still being reviewed —
+ * both already hold their slot, so both are real commitments on the calendar.
+ * (This used to read `sessions.starts_at`; that table is empty in production, so
+ * the calendar was permanently blank no matter how many bookings existed.)
+ */
 
 interface Meeting {
   id: string;
-  user_id: string;
-  session_id: string;
-  status: string;
-  created_at: string;
-  user: { full_name: string | null; email: string };
-  session: {
-    starts_at: string;
-    ends_at: string;
-    location_or_link: string | null;
-    workshop?: { title_ar?: string; title_en?: string };
-  };
-  payment: Array<{
-    status?: string;
-  }>;
+  state: "confirmed" | "receipt_to_review" | "attended";
+  title_ar: string;
+  title_en: string;
+  slot: { date: string; start_time: string; end_time: string } | null;
+  user: { full_name: string | null; email: string | null; phone: string | null } | null;
+  payment: { amount: number | null; status: string | null } | null;
+  google_meet_link: string | null;
 }
-
-function getDaysInMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate();
-}
-
-function getFirstDayOfMonth(year: number, month: number): number {
-  return new Date(year, month, 1).getDay();
-}
-
-const monthNames = {
-  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-  ar: ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"],
-};
-
-const dayNames = {
-  en: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-  ar: ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
-};
 
 export default function MeetingsCalendarPage() {
   const locale = useLocale();
   const isAr = locale === "ar";
-  const supabase = createClient();
+  const t = (ar: string, en: string) => (isAr ? ar : en);
 
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [cursor, setCursor] = useState(() => new Date());
   const [meetings, setMeetings] = useState<Meeting[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selected, setSelected] = useState<Meeting | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadMeetings();
-  }, []);
-
-  async function loadMeetings() {
+  const load = useCallback(async () => {
+    setRefreshing(true);
     try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("bookings")
-        .select(
-          `
-          id,
-          user_id,
-          session_id,
-          status,
-          created_at,
-          user:profiles(full_name, email),
-          session:sessions(starts_at, ends_at, location_or_link, workshop:workshops(title_ar, title_en)),
-          payment:payments(status)
-        `
-        )
-        .eq("status", "confirmed")
-        .then((result) => {
-          if (result.error) return result;
-          // Filter for paid meetings
-          const filtered = result.data?.filter(
-            (m: any) => m.payment && Array.isArray(m.payment) && m.payment.length > 0 && m.payment[0]?.status === "paid"
-          ) || [];
-          return { data: filtered, error: null };
-        });
-
-      if (error) {
-        console.error("Error loading meetings:", error);
-      } else {
-        setMeetings(data || []);
+      const res = await fetch("/api/admin/bookings?state=all", { cache: "no-store" });
+      if (!res.ok) {
+        setError(
+          res.status === 403
+            ? t("محتاجة حساب أدمن.", "You need an admin account.")
+            : t("تعذّر تحميل الجدول.", "Couldn't load the schedule."),
+        );
+        return;
       }
-    } catch (err) {
-      console.error("Error:", err);
+      setError(null);
+      const data = await res.json();
+      setMeetings(
+        (data.bookings ?? []).filter((b: any) =>
+          ["confirmed", "attended", "receipt_to_review"].includes(b.state),
+        ),
+      );
+    } catch {
+      setError(t("تعذّر الاتصال بالسيرفر.", "Couldn't reach the server."));
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }
+  }, [isAr]);
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth();
-  const daysInMonth = getDaysInMonth(year, month);
-  const firstDay = getFirstDayOfMonth(year, month);
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  const previousEmptyCells = Array.from({ length: firstDay }, (_, i) => i);
+  useEffect(() => {
+    load();
+  }, [load]);
 
-  const getMeetingsForDay = (day: number) => {
-    return meetings.filter((meeting) => {
-      if (!meeting.session?.starts_at) return false;
-      const meetingDate = new Date(meeting.session.starts_at);
-      return (
-        meetingDate.getFullYear() === year &&
-        meetingDate.getMonth() === month &&
-        meetingDate.getDate() === day
-      );
-    });
-  };
+  const byDate = useMemo(() => {
+    const map = new Map<string, Meeting[]>();
+    for (const m of meetings) {
+      if (!m.slot?.date) continue;
+      const key = normaliseDate(m.slot.date);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(m);
+    }
+    for (const list of map.values()) {
+      list.sort((a, z) => (a.slot?.start_time ?? "").localeCompare(z.slot?.start_time ?? ""));
+    }
+    return map;
+  }, [meetings]);
 
-  const goToPreviousMonth = () => {
-    setCurrentDate(new Date(year, month - 1));
-  };
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const leadingBlanks = new Date(year, month, 1).getDay();
 
-  const goToNextMonth = () => {
-    setCurrentDate(new Date(year, month + 1));
-  };
-
-  const formatTime = (dateString?: string) => {
-    if (!dateString) return "";
-    return new Date(dateString).toLocaleTimeString(isAr ? "ar-EG" : "en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  const monthCount = Array.from({ length: daysInMonth }, (_, i) =>
+    byDate.get(isoDate(year, month, i + 1))?.length ?? 0,
+  ).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Page header */}
-      <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-[#F59E0B] mb-1">
-          {isAr ? "الجدولة" : "Scheduling"}
-        </p>
-        <h1 className="text-2xl font-black text-white">
-          {isAr ? "الجلسات المؤكدة والمدفوعة" : "Confirmed & Paid Meetings"}
-        </h1>
+    <div className="max-w-6xl mx-auto space-y-6" dir={isAr ? "rtl" : "ltr"}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest text-[#F59E0B] mb-1">
+            {t("الجدولة", "Scheduling")}
+          </p>
+          <h1 className="text-2xl font-black text-white">{t("جدول جلساتك", "Your schedule")}</h1>
+          <p className="text-sm text-white/50 mt-2">
+            {t(
+              "الجلسات المؤكدة واللي إيصالها تحت المراجعة — الاتنين حاجزين ميعادهم فعلاً.",
+              "Confirmed sessions plus the ones whose receipt is still under review — both already hold their slot.",
+            )}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={load}
+          disabled={refreshing}
+          className="flex items-center gap-2 text-sm text-white/60 hover:text-white px-3 py-2 rounded-lg bg-white/5 border border-white/10 transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+          {t("تحديث", "Refresh")}
+        </button>
       </div>
 
-      {/* Calendar */}
+      {error && (
+        <div className="p-4 bg-red-500/15 border border-red-500/40 rounded-lg text-red-300 text-sm">
+          {error}
+        </div>
+      )}
+
       <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-6">
-        {/* Header with navigation */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-black text-white">
-              {monthNames[isAr ? "ar" : "en"][month]} {year}
+              {monthName(month, isAr)} {year}
             </h2>
             <p className="text-xs text-white/40 mt-1">
-              {isAr ? `${meetings.length} جلسة مؤكدة ومدفوعة` : `${meetings.length} confirmed & paid meetings`}
+              {monthCount} {t("جلسة الشهر ده", monthCount === 1 ? "session this month" : "sessions this month")}
             </p>
           </div>
           <div className="flex gap-2">
             <button
-              onClick={goToPreviousMonth}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-[#F59E0B]/20 hover:bg-white/10 transition-all text-white"
-              aria-label={isAr ? "الشهر السابق" : "Previous month"}
+              type="button"
+              onClick={() => setCursor(new Date(year, month - 1, 1))}
+              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white"
+              aria-label={t("الشهر السابق", "Previous month")}
             >
               {isAr ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>
             <button
-              onClick={goToNextMonth}
-              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:border-[#F59E0B]/20 hover:bg-white/10 transition-all text-white"
-              aria-label={isAr ? "الشهر القادم" : "Next month"}
+              type="button"
+              onClick={() => setCursor(new Date(year, month + 1, 1))}
+              className="p-2 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white"
+              aria-label={t("الشهر القادم", "Next month")}
             >
               {isAr ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
             </button>
           </div>
         </div>
 
-        {/* Loading state */}
-        {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin">
-              <Calendar className="h-8 w-8 text-[#F59E0B]" />
-            </div>
-            <p className="text-white/40 text-sm mt-2">
-              {isAr ? "جاري التحميل..." : "Loading..."}
-            </p>
-          </div>
-        )}
+        <div className="mb-5 flex flex-wrap gap-5 text-sm">
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-emerald-500" />
+            <span className="text-white/70">{t("مؤكد", "Confirmed")}</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-blue-400" />
+            <span className="text-white/70">{t("إيصال تحت المراجعة", "Receipt under review")}</span>
+          </span>
+        </div>
 
-        {!loading && (
+        {loading ? (
+          <div className="flex items-center justify-center gap-2 text-white/50 py-14">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            {t("جاري التحميل...", "Loading...")}
+          </div>
+        ) : (
           <>
-            {/* Day headers */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {dayNames[isAr ? "ar" : "en"].map((day) => (
-                <div
-                  key={day}
-                  className="text-center text-xs font-bold text-white/40 py-2"
-                >
-                  {day}
+              {weekdays(isAr).map((d) => (
+                <div key={d} className="text-center text-xs font-bold text-white/40 py-2">
+                  {d}
                 </div>
               ))}
             </div>
 
-            {/* Calendar grid */}
             <div className="grid grid-cols-7 gap-1">
-              {/* Previous month's empty cells */}
-              {previousEmptyCells.map((i) => (
-                <div
-                  key={`empty-${i}`}
-                  className="aspect-square rounded-lg bg-white/2"
-                />
+              {Array.from({ length: leadingBlanks }).map((_, i) => (
+                <div key={`blank-${i}`} className="aspect-square rounded-lg bg-white/[0.02]" />
               ))}
 
-              {/* Days of the month */}
-              {days.map((day) => {
-                const dayMeetings = getMeetingsForDay(day);
+              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((day) => {
+                const dateStr = isoDate(year, month, day);
+                const dayMeetings = byDate.get(dateStr) ?? [];
                 return (
                   <div
                     key={day}
                     className={cn(
                       "aspect-square rounded-lg border transition-all overflow-hidden flex flex-col",
                       dayMeetings.length > 0
-                        ? "bg-[rgba(34,197,94,0.08)] border-emerald-500/30 hover:border-emerald-500/50"
-                        : "bg-white/3 border-white/10 hover:border-[#F59E0B]/20"
+                        ? "bg-[rgba(34,197,94,0.08)] border-emerald-500/30"
+                        : "bg-white/[0.03] border-white/10",
                     )}
                   >
-                    <div className={cn(
-                      "text-xs font-semibold p-1.5",
-                      dayMeetings.length > 0 ? "text-emerald-400" : "text-white/60"
-                    )}>
+                    <div
+                      className={cn(
+                        "text-xs font-semibold px-1.5 pt-1.5",
+                        dayMeetings.length > 0 ? "text-emerald-400" : "text-white/50",
+                      )}
+                    >
                       {day}
                     </div>
-                    <div className="flex-1 p-1 overflow-y-auto space-y-0.5 text-[0.65rem]">
-                      {dayMeetings.slice(0, 3).map((meeting) => (
+                    <div className="flex-1 p-1 overflow-y-auto space-y-0.5 text-[0.62rem]">
+                      {dayMeetings.slice(0, 3).map((m) => (
                         <button
-                          key={meeting.id}
-                          onClick={() => setSelectedMeeting(meeting)}
-                          className="w-full text-left bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 px-1.5 py-0.5 rounded truncate hover:bg-emerald-500/30 transition-colors"
-                          title={meeting.user?.full_name || "Meeting"}
+                          key={m.id}
+                          type="button"
+                          onClick={() => setSelected(m)}
+                          className={cn(
+                            "w-full text-start px-1.5 py-0.5 rounded truncate border transition-colors",
+                            m.state === "receipt_to_review"
+                              ? "bg-blue-500/20 border-blue-500/30 text-blue-200 hover:bg-blue-500/30"
+                              : "bg-emerald-500/20 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/30",
+                          )}
+                          title={`${m.slot?.start_time} · ${m.user?.full_name ?? ""}`}
                         >
-                          {meeting.user?.full_name || "Meeting"}
+                          {m.slot?.start_time} {m.user?.full_name || m.user?.email || ""}
                         </button>
                       ))}
                       {dayMeetings.length > 3 && (
-                        <div className="text-white/30 px-1.5 py-0.5">
-                          +{dayMeetings.length - 3} {isAr ? "أخرى" : "more"}
+                        <div className="text-white/35 px-1.5">
+                          +{dayMeetings.length - 3} {t("أخرى", "more")}
                         </div>
                       )}
                     </div>
@@ -252,80 +243,140 @@ export default function MeetingsCalendarPage() {
         )}
       </div>
 
-      {/* Selected meeting detail modal */}
-      {selectedMeeting && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      {/* Upcoming list — easier to read than squinting at the grid */}
+      {!loading && meetings.length > 0 && (
+        <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-6">
+          <h2 className="text-white font-black mb-4">{t("الجاي", "Coming up")}</h2>
+          <div className="space-y-2">
+            {meetings
+              .filter((m) => m.slot && normaliseDate(m.slot.date) >= isoDate(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()))
+              .sort((a, z) =>
+                `${a.slot?.date}${a.slot?.start_time}`.localeCompare(`${z.slot?.date}${z.slot?.start_time}`),
+              )
+              .slice(0, 12)
+              .map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => setSelected(m)}
+                  className="w-full text-start flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/10 hover:border-[#F59E0B]/30 transition-colors"
+                >
+                  <span className="text-white text-sm">
+                    <span className="font-bold">{formatISODate(m.slot!.date, isAr)}</span>
+                    <span className="text-white/50">
+                      {" "}
+                      · {m.slot!.start_time}–{m.slot!.end_time}
+                    </span>
+                  </span>
+                  <span className="text-white/70 text-sm truncate">
+                    {m.user?.full_name || m.user?.email}
+                  </span>
+                  <span className="text-white/45 text-xs truncate">
+                    {isAr ? m.title_ar : m.title_en}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-xs font-bold px-2 py-0.5 rounded-full",
+                      m.state === "receipt_to_review"
+                        ? "bg-blue-500/15 text-blue-300"
+                        : "bg-emerald-500/15 text-emerald-300",
+                    )}
+                  >
+                    {m.state === "receipt_to_review" ? t("تحت المراجعة", "Under review") : t("مؤكد", "Confirmed")}
+                  </span>
+                </button>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {selected && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
           <div className="bg-[#0d1526] border border-[rgba(245,158,11,0.2)] rounded-2xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-black text-white mb-4">
-              {selectedMeeting.user?.full_name || (isAr ? "تفاصيل الجلسة" : "Meeting Details")}
-            </h3>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <h3 className="text-lg font-black text-white">
+                {selected.user?.full_name || t("تفاصيل الجلسة", "Session details")}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="text-white/40 hover:text-white"
+                aria-label={t("إغلاق", "Close")}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <div className="space-y-3 mb-6">
-              <div>
-                <p className="text-xs text-white/40 uppercase font-semibold tracking-wider mb-1">
-                  {isAr ? "الورشة" : "Workshop"}
-                </p>
-                <p className="text-white font-semibold">
-                  {isAr
-                    ? selectedMeeting.session?.workshop?.title_ar
-                    : selectedMeeting.session?.workshop?.title_en}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-white/40 uppercase font-semibold tracking-wider mb-1">
-                  {isAr ? "الموعد" : "Time"}
-                </p>
-                <p className="text-white font-semibold">
-                  {selectedMeeting.session?.starts_at
-                    ? new Date(selectedMeeting.session.starts_at).toLocaleString(
-                      isAr ? "ar-EG" : "en-US",
-                      {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }
-                    )
-                    : (isAr ? "لا يوجد" : "N/A")}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-white/40 uppercase font-semibold tracking-wider mb-1">
-                  {isAr ? "البريد الإلكتروني" : "Email"}
-                </p>
-                <p className="text-white font-semibold">{selectedMeeting.user?.email || (isAr ? "لا يوجد" : "N/A")}</p>
-              </div>
-
-              {selectedMeeting.session?.location_or_link && (
-                <div>
-                  <p className="text-xs text-white/40 uppercase font-semibold tracking-wider mb-1">
-                    {isAr ? "الموقع أو الرابط" : "Location/Link"}
-                  </p>
-                  <p className="text-white font-semibold break-all">
-                    {selectedMeeting.session.location_or_link}
-                  </p>
-                </div>
+            <div className="space-y-3 mb-6 text-sm">
+              <Field label={t("الجلسة", "Session")}>
+                {isAr ? selected.title_ar : selected.title_en}
+              </Field>
+              <Field label={t("الموعد", "Time")}>
+                {selected.slot
+                  ? `${formatISODate(selected.slot.date, isAr)} · ${selected.slot.start_time}–${selected.slot.end_time}`
+                  : t("لا يوجد", "N/A")}
+              </Field>
+              {selected.user?.email && (
+                <Field label={t("الإيميل", "Email")}>
+                  <span className="flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5 text-white/40" />
+                    {selected.user.email}
+                  </span>
+                </Field>
               )}
-
+              {selected.user?.phone && (
+                <Field label={t("الموبايل", "Phone")}>
+                  <span className="flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-white/40" />
+                    {selected.user.phone}
+                  </span>
+                </Field>
+              )}
+              {selected.google_meet_link && (
+                <Field label={t("الرابط", "Link")}>
+                  <a
+                    href={selected.google_meet_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#F59E0B] hover:underline break-all"
+                  >
+                    {selected.google_meet_link}
+                  </a>
+                </Field>
+              )}
               <div className="pt-2 border-t border-white/10">
-                <p className="text-xs text-emerald-400 font-semibold">
-                  ✓ {isAr ? "مؤكد ومدفوع" : "Confirmed & Paid"}
+                <p
+                  className={cn(
+                    "text-xs font-semibold",
+                    selected.state === "receipt_to_review" ? "text-blue-300" : "text-emerald-400",
+                  )}
+                >
+                  {selected.state === "receipt_to_review"
+                    ? t("● الإيصال لسه تحت المراجعة — الموعد محجوز", "● Receipt still under review — slot is held")
+                    : t("✓ مؤكد ومدفوع", "✓ Confirmed & paid")}
                 </p>
               </div>
             </div>
 
             <button
-              onClick={() => setSelectedMeeting(null)}
+              type="button"
+              onClick={() => setSelected(null)}
               className="w-full bg-[#F59E0B]/10 border border-[#F59E0B]/20 text-[#F59E0B] font-semibold py-2 rounded-lg hover:bg-[#F59E0B]/15 transition-colors"
             >
-              {isAr ? "إغلاق" : "Close"}
+              {t("إغلاق", "Close")}
             </button>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs text-white/40 uppercase font-semibold tracking-wider mb-1">{label}</p>
+      <div className="text-white font-semibold">{children}</div>
     </div>
   );
 }

@@ -1,27 +1,89 @@
-import { createClient } from "@/lib/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { requireAdmin } from "@/lib/admin-guard";
+import { normaliseDate, shortTime } from "@/lib/schedule-dates";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
 
-export async function GET(req: NextRequest) {
-  const supabase = await createClient();
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  // Verify user is authenticated (admin check will be added later with user_roles table)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+/**
+ * Receipts clients have actually uploaded.
+ *
+ * Previously this read a `pending_receipts` table that nothing writes any more,
+ * so the admin's receipts screen was permanently empty while real receipts sat
+ * on `payments.proof_url` where nobody looked. It now reads the real thing.
+ *
+ * ?status=pending (default) | approved | rejected | all
+ */
+export async function GET(request: NextRequest) {
+  const guard = await requireAdmin();
+  if (!guard.ok) return guard.response;
+  const { admin } = guard;
 
-  // Fetch pending receipts
-  const { data: receipts, error } = await (supabase as any)
-    .from("pending_receipts")
-    .select("*")
-    .eq("status", "pending")
-    .order("uploaded_at", { ascending: false });
+  const status = request.nextUrl.searchParams.get("status") ?? "pending";
+
+  const { data, error } = await admin
+    .from("bookings")
+    .select(
+      `id, status, offering_type, workshop_id, seats, created_at, slot_reserved_at, scheduled_at,
+       user:profiles(full_name, email, phone),
+       workshop:workshops(id, title_ar, title_en),
+       slot:availability_slots(id, date, start_time, end_time),
+       payment:payments(id, amount, currency, method, status, proof_url, receipt_image_url,
+                        gateway_txn_id, admin_approved, approved_at, created_at)`,
+    )
+    .order("created_at", { ascending: false })
+    .limit(300);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(receipts);
+  const rows = (data ?? [])
+    .map((b: any) => {
+      const payments = Array.isArray(b.payment) ? b.payment : b.payment ? [b.payment] : [];
+      const payment = [...payments].sort(
+        (a, z) => new Date(z.created_at ?? 0).getTime() - new Date(a.created_at ?? 0).getTime(),
+      )[0];
+      return { booking: b, payment };
+    })
+    // A "receipt" is a payment with a stored proof. Anything else isn't here yet.
+    .filter(({ payment }) => !!payment?.proof_url)
+    .map(({ booking: b, payment }) => {
+      const offeringType = isOfferingType(b.offering_type) ? b.offering_type : "career";
+      const state =
+        payment.status === "paid" || payment.admin_approved
+          ? "approved"
+          : payment.status === "failed" || b.status === "cancelled"
+            ? "rejected"
+            : "pending";
+
+      return {
+        id: b.id,
+        booking_id: b.id,
+        payment_id: payment.id,
+        state,
+        booking_status: b.status,
+        payment_status: payment.status,
+        offering_type: offeringType,
+        title_ar: offeringTitle(offeringType, b.workshop, true),
+        title_en: offeringTitle(offeringType, b.workshop, false),
+        slot_date: b.slot ? normaliseDate(b.slot.date) : null,
+        slot_start: b.slot ? shortTime(b.slot.start_time) : null,
+        slot_end: b.slot ? shortTime(b.slot.end_time) : null,
+        amount: payment.amount,
+        currency: payment.currency ?? "EGP",
+        method: payment.method,
+        reference: (payment.gateway_txn_id ?? "").replace(/^ref:/, "") || null,
+        proof_url: payment.proof_url ?? payment.receipt_image_url ?? null,
+        uploaded_at: payment.created_at,
+        approved_at: payment.approved_at,
+        user_name: b.user?.full_name ?? null,
+        user_email: b.user?.email ?? null,
+        user_phone: b.user?.phone ?? null,
+      };
+    })
+    .filter((r) => status === "all" || r.state === status);
+
+  return NextResponse.json(rows);
 }

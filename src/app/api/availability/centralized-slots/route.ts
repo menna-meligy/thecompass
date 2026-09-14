@@ -1,82 +1,112 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { createAdminClient } from "@/lib/supabase/server";
+import { parseOfferingKey, type OfferingType } from "@/lib/offerings";
+import { isPastSlot, normaliseDate, shortTime, cairoNow } from "@/lib/schedule-dates";
 
-export async function GET(request: Request) {
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+/**
+ * Public availability feed. One endpoint for all four offerings, so the career
+ * session and the three workshops can never drift apart.
+ *
+ * GET /api/availability/centralized-slots?offering=career
+ * GET /api/availability/centralized-slots?offering=<workshopId>:individual
+ * GET /api/availability/centralized-slots?offering=<workshopId>:group
+ *
+ * Returns only slots a client can actually take right now: published, not on a
+ * blocked day, not marked unavailable, still has a free seat, and not in the
+ * past (Cairo wall-clock). A slot held by someone who has uploaded a receipt is
+ * already counted in booked_count, so it disappears here for everyone else the
+ * moment that receipt lands — which is exactly what "taken" means.
+ */
+
+interface SlotAssignmentRow {
+  offering_type: OfferingType | null;
+  workshop_id: string | null;
+}
+
+interface SlotRow {
+  id: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  capacity: number;
+  booked_count: number;
+  status: string;
+  admin_marked_status: string | null;
+  is_day_block: boolean | null;
+  slot_assignments: SlotAssignmentRow[] | null;
+}
+
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const offeringParam = request.nextUrl.searchParams.get("offering");
+    const offering = parseOfferingKey(offeringParam);
 
-    // Get all slots with their assignments (simplified query)
-    // Type-cast to bypass TypeScript errors (table not in schema types yet)
-    const { data: slots, error } = await (supabase as any)
+    if (offeringParam && !offering) {
+      return NextResponse.json({ error: "unknown_offering" }, { status: 400 });
+    }
+
+    const supabase = await createAdminClient();
+    const today = cairoNow().date;
+
+    const { data, error } = await (supabase as any)
       .from("availability_slots")
       .select(
-        `
-        id,
-        date,
-        start_time,
-        end_time,
-        capacity,
-        booked_count,
-        status,
-        admin_marked_status,
-        slot_assignments(
-          id,
-          workshop_id,
-          session_id,
-          workshop:workshops(id, title_ar, title_en)
-        )
-        `
+        `id, date, start_time, end_time, capacity, booked_count, status,
+         admin_marked_status, is_day_block,
+         slot_assignments(offering_type, workshop_id)`,
       )
       .eq("status", "published")
-      .gte("date", new Date().toISOString().split("T")[0])
+      .gte("date", today)
       .order("date", { ascending: true })
       .order("start_time", { ascending: true });
 
     if (error) {
-      console.error("Supabase error:", error);
-      // Return empty array on error - don't show dummy data
-      return NextResponse.json([]);
+      console.error("centralized-slots query failed:", error.message);
+      return NextResponse.json({ slots: [], blockedDates: [] });
     }
 
-    // Filter out past slots (Egypt timezone: UTC+2/+3)
-    // Get current time in Egypt and parse it properly
-    const now = new Date();
-    const egyptFormatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone: 'Africa/Cairo',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
+    const rows = (data ?? []) as SlotRow[];
 
-    const parts = egyptFormatter.formatToParts(now);
-    const egyptDate = parts.find(p => p.type === 'year')?.value + '-' +
-                      parts.find(p => p.type === 'month')?.value + '-' +
-                      parts.find(p => p.type === 'day')?.value;
-    const egyptTime = parts.find(p => p.type === 'hour')?.value + ':' +
-                      parts.find(p => p.type === 'minute')?.value + ':' +
-                      parts.find(p => p.type === 'second')?.value;
+    // Days the admin closed entirely — greyed out on every calendar.
+    const blockedDates = Array.from(
+      new Set(rows.filter((r) => r.is_day_block).map((r) => normaliseDate(r.date))),
+    );
+    const blocked = new Set(blockedDates);
 
-    const filteredSlots = (slots || []).filter((slot: any) => {
-      // Compare date first, then time
-      if (slot.date > egyptDate) return true;
-      if (slot.date < egyptDate) return false;
-      // Same date, compare time
-      return slot.start_time > egyptTime;
-    });
+    const slots = rows
+      .filter((row) => {
+        if (row.is_day_block) return false;
+        if (blocked.has(normaliseDate(row.date))) return false;
+        if ((row.admin_marked_status ?? "available") !== "available") return false;
+        if (row.booked_count >= row.capacity) return false;
+        if (isPastSlot(row.date, row.start_time)) return false;
 
-    // Return slots with assignments renamed for frontend consistency
-    const formattedSlots = filteredSlots.map((slot: any) => ({
-      ...slot,
-      assignments: slot.slot_assignments,
-    }));
-    return NextResponse.json(formattedSlots);
-  } catch (error) {
-    console.error("API error:", error);
-    // Return empty array on error - don't show dummy data
-    return NextResponse.json([]);
+        if (!offering) return true;
+        return (row.slot_assignments ?? []).some(
+          (a) =>
+            a.offering_type === offering.offeringType &&
+            (a.workshop_id ?? null) === offering.workshopId,
+        );
+      })
+      .map((row) => ({
+        id: row.id,
+        date: normaliseDate(row.date),
+        start_time: shortTime(row.start_time),
+        end_time: shortTime(row.end_time),
+        capacity: row.capacity,
+        booked_count: row.booked_count,
+        seats_left: Math.max(0, row.capacity - row.booked_count),
+        offerings: (row.slot_assignments ?? [])
+          .filter((a) => a.offering_type)
+          .map((a) => ({ offering_type: a.offering_type, workshop_id: a.workshop_id })),
+      }));
+
+    return NextResponse.json({ slots, blockedDates });
+  } catch (err) {
+    console.error("centralized-slots error:", err);
+    return NextResponse.json({ slots: [], blockedDates: [] });
   }
 }
