@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslations, useLocale } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -35,6 +35,13 @@ export function AuthForm() {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  // Send people back where they were headed (e.g. the booking calendar they
+  // clicked a time on) instead of dumping them on the dashboard.
+  const redirectTo = (() => {
+    const raw = searchParams.get("redirect");
+    return raw && raw.startsWith("/") && !raw.startsWith("//") ? raw : null;
+  })();
   const [mode, setMode] = useState<AuthMode>("login");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -66,7 +73,9 @@ export function AuthForm() {
         .select("role")
         .eq("id", authData.user.id)
         .single();
-      const dest = profile?.role === "admin" ? `/${locale}/admin` : `/${locale}/dashboard`;
+      const dest =
+        redirectTo ??
+        (profile?.role === "admin" ? `/${locale}/admin` : `/${locale}/dashboard`);
       router.push(dest);
       router.refresh();
     }
@@ -89,7 +98,7 @@ export function AuthForm() {
       setError(error.message);
     } else if (authData.session) {
       // Email confirmations disabled — session is already active, go straight in.
-      router.push(`/${locale}/dashboard`);
+      router.push(redirectTo ?? `/${locale}/dashboard`);
       router.refresh();
     } else {
       setMessage("تم إنشاء حسابك في البوصلة 🧭 — بعتنالك إيميل التفعيل، افتحه واضغط \"تفعيل الحساب\" عشان تبدأ رحلتك.");
