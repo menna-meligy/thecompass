@@ -469,8 +469,8 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
               className="inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#E88F00] text-[#0f172a] font-bold px-6 py-3 rounded-xl text-sm transition-colors"
             >
               {r.recommendation.type === "session"
-                ? (isAr ? "احجزي جلستك" : "Book a session")
-                : (isAr ? "استعرضي الورشة" : "View workshop")}
+                ? (isAr ? "احجز جلستك" : "Book a session")
+                : (isAr ? "استعرض الورشة" : "View workshop")}
               <ChevronIcon className="h-4 w-4" />
             </Link>
           </div>
