@@ -47,10 +47,6 @@ function loadLocal(): Task[] {
   }
 }
 
-function saveLocal(tasks: Task[]) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch {}
-}
-
 interface Props {
   userId: string;
   locale: string;
@@ -67,7 +63,6 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
 
   // Mentee tasks
   const [menteeTasks, setMenteeTasksState] = useState<Task[]>([REGISTRATION_TASK]);
-  const [menteeUseDB, setMenteeUseDB] = useState(false);
 
   // Mentor tasks
   const [mentorTasks, setMentorTasksState] = useState<Task[]>([]);
@@ -99,9 +94,27 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
           ? menteeData
           : [REGISTRATION_TASK, ...menteeData];
         setMenteeTasksState(withReg);
-        setMenteeUseDB(true);
-      } else {
+      } else if (!menteeError) {
+        // Nothing stored yet. Anything sitting in this browser was written back
+        // when the board saved locally — it never left the device, so the mentor
+        // could not see it and it would die with the browser cache. Adopt it
+        // into the account once, then it lives in the database like everything
+        // else. Only for the client's own board; an admin viewing someone else
+        // must never push their local copy onto that person's account.
         const local = loadLocal();
+        const strays = local.filter((t) => t.id !== "reg-node");
+        if (!isAdmin && !targetUserId && strays.length > 0) {
+          for (const task of strays) {
+            await (supabase as any).from("user_tasks").upsert(
+              {
+                id: task.id, user_id: uid, title: task.title, icon: task.icon,
+                status: task.status, position: task.position,
+                track: "mentee", steps: task.steps ?? [],
+              },
+              { onConflict: "id" },
+            );
+          }
+        }
         setMenteeTasksState(local);
       }
 
@@ -155,29 +168,33 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
   const setMenteeTasks = useCallback((updated: (prev: Task[]) => Task[]) => {
     setMenteeTasksState((prev) => {
       const next = updated(prev);
-      if (menteeUseDB) {
-        (async () => {
-          for (const task of next) {
-            if (task.id === "reg-node") continue;
-            const { error } = await (supabase as any).from("user_tasks").upsert({
-              id: task.id, user_id: uid, title: task.title, icon: task.icon,
-              status: task.status, position: task.position,
-              track: "mentee", steps: task.steps ?? [],
-            }, { onConflict: "id" });
-            if (error) console.error("mentee task save failed:", error.message);
+      // Always the database. This used to fall back to localStorage whenever the
+      // board started empty — which was every client, so no goal a client wrote
+      // ever reached the mentor, and it vanished if they changed browser.
+      (async () => {
+        for (const task of next) {
+          if (task.id === "reg-node") continue;
+          const { error } = await (supabase as any).from("user_tasks").upsert({
+            id: task.id, user_id: uid, title: task.title, icon: task.icon,
+            status: task.status, position: task.position,
+            track: "mentee", steps: task.steps ?? [],
+          }, { onConflict: "id" });
+          if (error) {
+            console.error("mentee task save failed:", error.message);
+            setSaveError(error.message);
+            return;
           }
-          const nextIds = next.map((t) => t.id);
-          for (const task of prev.filter((t) => t.id !== "reg-node" && !nextIds.includes(t.id))) {
-            await (supabase as any).from("user_tasks").delete().eq("id", task.id);
-          }
-        })();
-      } else {
-        saveLocal(next);
-      }
+        }
+        const nextIds = next.map((t) => t.id);
+        for (const task of prev.filter((t) => t.id !== "reg-node" && !nextIds.includes(t.id))) {
+          await (supabase as any).from("user_tasks").delete().eq("id", task.id);
+        }
+        setSaveError(null);
+      })();
       return next;
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menteeUseDB, uid]);
+  }, [uid]);
 
   // Mentor tasks setter — saves with track='mentor', user_id=uid
   const setMentorTasks = useCallback((updated: (prev: Task[]) => Task[]) => {
@@ -334,7 +351,7 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
             setTasks={setMenteeTasks}
             userId={userId}
             locale={locale}
-            useDB={menteeUseDB}
+            useDB={true}
             readOnly={isAdmin}
             trackLabel={isAdmin ? (isAr ? "أهداف العميل" : "Client's Goals") : (isAr ? "أهدافي" : "My Goals")}
             trackColor="#F59E0B"
