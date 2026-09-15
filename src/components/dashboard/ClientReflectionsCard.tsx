@@ -34,12 +34,15 @@ interface SessionReflection {
 
 interface Props {
   bookingId: string;
+  /** Required by /api/reflections, which checks you're reading your own. */
+  clientId: string;
   locale?: "ar" | "en";
   onRefresh?: () => void;
 }
 
 export default function ClientReflectionsCard({
   bookingId,
+  clientId,
   locale: propLocale,
   onRefresh,
 }: Props) {
@@ -58,8 +61,10 @@ export default function ClientReflectionsCard({
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
 
+      // /api/reflections takes query params; there is no /api/reflections/[id]
+      // route, so the old path 404'd on every dashboard load.
       const response = await fetch(
-        `/api/reflections/${bookingId}?locale=${locale}`,
+        `/api/reflections?booking_id=${encodeURIComponent(bookingId)}&client_id=${encodeURIComponent(clientId)}`,
         {
           method: "GET",
           headers: { "Accept": "application/json" }
@@ -87,7 +92,7 @@ export default function ClientReflectionsCard({
 
   useEffect(() => {
     fetchReflection();
-  }, [bookingId, locale]);
+  }, [bookingId, clientId, locale]);
 
   const handleRefresh = async () => {
     await fetchReflection(true);

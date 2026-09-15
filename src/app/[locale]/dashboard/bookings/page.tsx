@@ -207,6 +207,15 @@ export default async function BookingsPage() {
               // the older spelling. Either means the session happened, so the
               // reflection + notes section belongs here.
               const isPastBooking = booking.status === "attended" || booking.status === "completed";
+              // Notes are stored one per booking; show the client which session
+              // each one is about rather than a bare "Mentor Notes" card.
+              const sessionLabel = [
+                workshopTitle,
+                b.slot?.date ? formatISODate(b.slot.date, isAr) : null,
+                b.slot?.start_time ? shortTime(b.slot.start_time) : null,
+              ]
+                .filter(Boolean)
+                .join(" · ");
 
               return (
                 <div key={booking.id} className="space-y-3">
@@ -374,6 +383,7 @@ export default async function BookingsPage() {
                       {/* Reflection card */}
                       <ClientReflectionsCard
                         bookingId={booking.id}
+                        clientId={user.id}
                         locale={locale as "ar" | "en"}
                       />
 
@@ -389,6 +399,7 @@ export default async function BookingsPage() {
                         bookingId={booking.id}
                         clientId={user.id}
                         locale={locale as "ar" | "en"}
+                        sessionLabel={sessionLabel}
                       />
                     </div>
                   )}

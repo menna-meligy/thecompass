@@ -28,6 +28,12 @@ interface Props {
   bookingId: string;
   clientId: string;
   locale?: "ar" | "en";
+  /**
+   * Which session these notes belong to, e.g. "اكسر الحلقة — فردي · 21 سبتمبر".
+   * Notes are stored one-per-booking, so say so on the card: without it every
+   * note looks like a general message and the timestamp reads like a session date.
+   */
+  sessionLabel?: string;
   onRefresh?: () => void;
 }
 
@@ -35,6 +41,7 @@ export default function MentorNotesDisplay({
   bookingId,
   clientId,
   locale: propLocale,
+  sessionLabel,
   onRefresh,
 }: Props) {
   const defaultLocale = useLocale();
@@ -149,6 +156,9 @@ export default function MentorNotesDisplay({
             <p className="text-sm text-white/60">
               {isAr ? "لم تتلقَ ملاحظات من المرشد بعد" : "No mentor notes yet"}
             </p>
+            {sessionLabel && (
+              <p className="text-xs text-white/35">{sessionLabel}</p>
+            )}
             <p className="text-xs text-white/40">
               {isAr
                 ? "سيشارك المرشد ملاحظاته معك بعد الجلسة"
@@ -197,13 +207,19 @@ export default function MentorNotesDisplay({
               <CardTitle className="flex items-center gap-2">
                 <span>{isAr ? "💬 ملاحظات المرشد" : "💬 Mentor Notes"}</span>
               </CardTitle>
+              {sessionLabel && (
+                <p className="text-xs text-white/55 mt-1">
+                  {isAr ? "عن جلسة: " : "For: "}
+                  <span className="text-white/75 font-semibold">{sessionLabel}</span>
+                </p>
+              )}
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span className="text-xs px-2 py-1 rounded-full font-medium bg-green-500/20 text-green-300">
                   {isAr ? "منشورة" : "Published"}
                 </span>
                 <span className="text-xs text-white/50 flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
-                  {formattedDate}
+                  {isAr ? "اتكتبت " : "written "}{formattedDate}
                 </span>
               </div>
             </div>
