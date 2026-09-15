@@ -132,6 +132,36 @@ export function allOfferings(workshops: WorkshopLite[]): Offering[] {
   return [careerOffering(), ...workshops.flatMap(workshopOfferings)];
 }
 
+/**
+ * How many sessions, in Arabic that reads correctly.
+ * Arabic counts in three shapes: a dual for two, a plural for 3-10, and a
+ * singular again from 11 up. "2 جلسات" and "11 جلسات" are both wrong.
+ */
+export function sessionsCount(n: number, isAr: boolean): string {
+  if (!isAr) return n === 1 ? "one session" : `${n} sessions`;
+  if (n === 1) return "جلسة واحدة";
+  if (n === 2) return "جلستين";
+  if (n <= 10) return `${n} جلسات`;
+  return `${n} جلسة`;
+}
+
+/**
+ * What the client is buying, said as a quantity rather than a format.
+ * "1-on-1" and "Group" described who else is in the room; what a client is
+ * actually choosing between is a single session or the whole workshop, so the
+ * label says that — and names the number when we know it.
+ */
+export function offeringSizeLabel(
+  offeringType: OfferingType,
+  isAr: boolean,
+  sessionCount?: number,
+): string {
+  if (offeringType === "career") return isAr ? CAREER_TITLE_AR : CAREER_TITLE_EN;
+  if (offeringType === "individual") return isAr ? "جلسة واحدة" : "One session";
+  if (!sessionCount || sessionCount < 2) return isAr ? "الورشة كاملة" : "Full workshop";
+  return isAr ? `باقة ${sessionsCount(sessionCount, true)}` : `Bundle of ${sessionCount} sessions`;
+}
+
 export function offeringLabel(o: Offering, isAr: boolean): string {
   return isAr ? o.labelAr : o.labelEn;
 }
@@ -155,13 +185,6 @@ export function offeringTitle(
   if (offeringType === "career") return isAr ? CAREER_TITLE_AR : CAREER_TITLE_EN;
   if (!workshop) return isAr ? "ورشة" : "Workshop";
   const base = isAr ? workshop.title_ar : workshop.title_en;
-  const suffix =
-    offeringType === "group"
-      ? isAr
-        ? "مجموعة"
-        : "Group"
-      : isAr
-        ? "فردي"
-        : "1-on-1";
+  const suffix = offeringSizeLabel(offeringType, isAr);
   return `${base}${isAr ? "، " : ", "}${suffix}`;
 }

@@ -199,6 +199,7 @@ export default async function WorkshopDetailPage(props: { params: Promise<{ id: 
               <WorkshopBookingPanel
                 workshopId={id}
                 workshopTitle={title}
+                sessionCount={outline.length}
                 isAr={isRtl}
                 accentColor={accentColor}
               />
