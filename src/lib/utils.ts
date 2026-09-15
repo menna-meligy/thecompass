@@ -36,17 +36,25 @@ export function getLocalizedField<T extends Record<string, unknown>>(
 }
 
 /**
- * Keeps sentence-final punctuation attached to a Latin word inside Arabic prose.
+ * Keeps sentence-final punctuation attached to a Latin run inside Arabic prose.
  *
  * In an RTL paragraph a full stop is a neutral character, so when the sentence
- * ends on a Latin run ("...بيتلوّن بالـ halo effect.") the bidi algorithm gives
- * the stop the paragraph direction and paints it at the far LEFT — before the
- * English words, reading as ".halo effect". Appending a Left-to-Right Mark puts
- * the stop between two strong LTR characters, so it resolves LTR and stays
- * where it was typed.
+ * ends on Latin text ("...بيتلوّن بالـ halo effect.") the bidi algorithm gives
+ * the stop the paragraph direction and paints it at the far LEFT, before the
+ * English words — ".halo effect".
  *
- * Invisible and inert for every other string, so it is safe to wrap any text.
+ * A Left-to-Right Mark is the usual trick, but it fails as soon as the run ends
+ * in a bracket ("(Growth vs Fixed Mindset).") because the paired-bracket rule
+ * resolves the brackets first and the stop is still left outside the run. An
+ * explicit isolate holds for both, so that is what we use.
+ *
+ * Only a trailing run with no Arabic in it is wrapped: a sentence that ends on
+ * an Arabic word keeps its stop on the left, which is correct Arabic typography.
+ * Every other string is returned untouched.
  */
 export function bidiSafe(text: string): string {
-  return /[A-Za-z0-9)\]]\s*[.!?]\s*$/.test(text) ? `${text}\u200E` : text;
+  return text.replace(
+    /([A-Za-z0-9([][^\u0600-\u06FF]*[.!?]+)\s*$/u,
+    "\u2066$1\u2069",
+  );
 }
