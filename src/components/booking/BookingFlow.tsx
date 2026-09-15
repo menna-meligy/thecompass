@@ -578,7 +578,7 @@ export default function BookingFlow({
                 </p>
                 {slotHeld && (
                   <p style={{ margin: "6px 0 0", color: "#86EFAC", fontSize: "0.82rem" }}>
-                    {isAr ? "موعدك محجوزلك لحد ما يراجعوه." : "Your appointment is held until they do."}
+                    {isAr ? "موعدك محجوزلك لحد ما نراجعه." : "Your appointment is held until we review it."}
                   </p>
                 )}
               </div>
@@ -596,7 +596,7 @@ export default function BookingFlow({
                   href={`/${locale}/dashboard/bookings`}
                   style={{ width: "100%", padding: "11px", borderRadius: "8px", background: "#F59E0B", color: "#0f172a", fontWeight: 900, fontSize: "0.88rem", textAlign: "center", textDecoration: "none" }}
                 >
-                  {isAr ? "تمام، مستني موافقة الدعم" : "OK, waiting for support to approve"}
+                  {isAr ? "تمام، هتابع" : "OK, I'll follow up"}
                 </Link>
               </div>
             </div>
