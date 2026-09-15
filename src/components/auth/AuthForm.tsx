@@ -217,6 +217,10 @@ export function AuthForm() {
       });
       if (res.status === 429) {
         setError(t("errors.rateLimited"));
+      } else if (res.status === 502) {
+        // The code was minted but no mail could be delivered — telling them to
+        // "try again" would loop them forever, so hand them a person instead.
+        setError(t("errors.resetSendFailed"));
       } else if (!res.ok) {
         setError(t("errors.generic"));
       } else {

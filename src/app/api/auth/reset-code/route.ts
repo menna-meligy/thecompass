@@ -25,15 +25,23 @@ export const runtime = "nodejs";
 const lastSent = new Map<string, number>();
 const COOLDOWN_MS = 60_000;
 
-function throttled(email: string): boolean {
-  const now = Date.now();
+function coolingDown(email: string): boolean {
   const prev = lastSent.get(email);
-  if (prev && now - prev < COOLDOWN_MS) return true;
+  return !!prev && Date.now() - prev < COOLDOWN_MS;
+}
+
+/**
+ * Only a message that actually went out starts the cooldown. Recording the
+ * attempt up front meant a failed send locked the client out for a minute: no
+ * email arrived, and the retry answered "too many requests" — which reads as
+ * the system working when nothing had been sent at all.
+ */
+function markSent(email: string): void {
+  const now = Date.now();
   lastSent.set(email, now);
   if (lastSent.size > 500) {
     for (const [k, v] of lastSent) if (now - v > COOLDOWN_MS) lastSent.delete(k);
   }
-  return false;
 }
 
 export async function POST(request: NextRequest) {
@@ -44,7 +52,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "invalid_email" }, { status: 400 });
   }
 
-  if (throttled(address)) {
+  if (coolingDown(address)) {
     return NextResponse.json({ error: "rate_limited" }, { status: 429 });
   }
 
@@ -57,6 +65,7 @@ export async function POST(request: NextRequest) {
 
     // No such account: answer exactly as if we had sent one.
     if (error || !data?.properties?.email_otp) {
+      markSent(address);
       return NextResponse.json({ ok: true });
     }
 
@@ -71,7 +80,10 @@ export async function POST(request: NextRequest) {
     });
 
     const res = await sendEmail({ to: address, subject, html });
-    if (res.ok) return NextResponse.json({ ok: true, via: "resend" });
+    if (res.ok) {
+      markSent(address);
+      return NextResponse.json({ ok: true, via: "resend" });
+    }
 
     logError(new Error("reset code email failed, falling back"), {
       where: "api/auth/reset-code",
@@ -83,7 +95,10 @@ export async function POST(request: NextRequest) {
     // that reaches them. It is Supabase's shared mailer — rate-limited to a
     // handful an hour — hence it is the fallback and not the primary.
     const fellBack = await sendViaSupabase(address);
-    if (fellBack) return NextResponse.json({ ok: true, via: "supabase" });
+    if (fellBack) {
+      markSent(address);
+      return NextResponse.json({ ok: true, via: "supabase" });
+    }
 
     return NextResponse.json({ error: "send_failed" }, { status: 502 });
   } catch (e) {
