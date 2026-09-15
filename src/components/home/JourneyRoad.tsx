@@ -133,8 +133,8 @@ export default function JourneyRoad({ isRtl }: { isRtl: boolean }) {
         </h2>
         <p className="text-white/50 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
           {isRtl
-            ? "كل خطوة تقرّبك من نفسك.. واتبع الطريق اللي تختاره"
-            : "Every step brings you closer to yourself. Follow the path you choose"}
+            ? "كل خطوة بتاخدها هنا بتقرّبك من نفسك"
+            : "Every step you take here brings you closer to yourself"}
         </p>
       </div>
 
