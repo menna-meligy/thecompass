@@ -156,7 +156,7 @@
     "orEmail": "Or sign in with email",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
-    "forgotPassword": "Forgot password?",
+    "forgotPassword": "Forgot password",
     "forgotPasswordPrompt": "Enter your email and we'll send you a reset code.",
     "sendResetCode": "Send reset code",
     "resetCodeSent": "We sent a 6-digit code to your email.",
