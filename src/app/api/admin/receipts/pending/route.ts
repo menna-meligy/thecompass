@@ -13,14 +13,18 @@ export const dynamic = "force-dynamic";
  * so the admin's receipts screen was permanently empty while real receipts sat
  * on `payments.proof_url` where nobody looked. It now reads the real thing.
  *
- * ?status=pending (default) | approved | rejected | all
+ * ?status=needs_review | pending | approved | rejected | all
+ *
+ * "needs_review" is a receipt the automatic OCR check refused. It is kept and
+ * shown here on purpose: that check runs on a phone photo and misreads real
+ * digits, so a human has to be able to look at the image and decide.
  */
 export async function GET(request: NextRequest) {
   const guard = await requireAdmin();
   if (!guard.ok) return guard.response;
   const { admin } = guard;
 
-  const status = request.nextUrl.searchParams.get("status") ?? "pending";
+  const status = request.nextUrl.searchParams.get("status") ?? "open";
 
   const { data, error } = await admin
     .from("bookings")
@@ -30,7 +34,9 @@ export async function GET(request: NextRequest) {
        workshop:workshops(id, title_ar, title_en),
        slot:availability_slots(id, date, start_time, end_time),
        payment:payments(id, amount, currency, method, status, proof_url, receipt_image_url,
-                        gateway_txn_id, admin_approved, approved_at, created_at)`,
+                        gateway_txn_id, admin_approved, approved_at, created_at,
+                        receipt_validation_status, receipt_validation_errors,
+                        receipt_attempts, receipt_last_attempt_at)`,
     )
     .order("created_at", { ascending: false })
     .limit(300);
@@ -51,12 +57,16 @@ export async function GET(request: NextRequest) {
     .filter(({ payment }) => !!payment?.proof_url)
     .map(({ booking: b, payment }) => {
       const offeringType = isOfferingType(b.offering_type) ? b.offering_type : "career";
-      const state =
+      const decided =
         payment.status === "paid" || payment.admin_approved
           ? "approved"
           : payment.status === "failed" || b.status === "cancelled"
             ? "rejected"
-            : "pending";
+            : null;
+      // Undecided receipts split by whether the automatic check was happy.
+      const state =
+        decided ??
+        (payment.receipt_validation_status === "needs_review" ? "needs_review" : "pending");
 
       return {
         id: b.id,
@@ -76,14 +86,25 @@ export async function GET(request: NextRequest) {
         method: payment.method,
         reference: (payment.gateway_txn_id ?? "").replace(/^ref:/, "") || null,
         proof_url: payment.proof_url ?? payment.receipt_image_url ?? null,
-        uploaded_at: payment.created_at,
+        validation_errors: Array.isArray(payment.receipt_validation_errors)
+          ? payment.receipt_validation_errors
+          : [],
+        attempts: payment.receipt_attempts ?? 1,
+        holds_slot: !!b.slot_reserved_at,
+        uploaded_at: payment.receipt_last_attempt_at ?? payment.created_at,
         approved_at: payment.approved_at,
         user_name: b.user?.full_name ?? null,
         user_email: b.user?.email ?? null,
         user_phone: b.user?.phone ?? null,
       };
     })
-    .filter((r) => status === "all" || r.state === status);
+    .filter((r) =>
+      status === "all"
+        ? true
+        : status === "open"
+          ? r.state === "pending" || r.state === "needs_review"
+          : r.state === status,
+    );
 
   return NextResponse.json(rows);
 }

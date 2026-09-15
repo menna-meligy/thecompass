@@ -18,6 +18,7 @@ export const dynamic = "force-dynamic";
 export type AdminBookingState =
   | "awaiting_receipt"
   | "receipt_to_review"
+  | "receipt_needs_review"
   | "confirmed"
   | "attended"
   | "cancelled";
@@ -40,7 +41,8 @@ export async function GET(req: NextRequest) {
        workshop:workshops(id, title_ar, title_en),
        slot:availability_slots(id, date, start_time, end_time, capacity, booked_count),
        payment:payments(id, amount, currency, method, status, proof_url, gateway_txn_id,
-                        admin_approved, approved_at, created_at)`,
+                        admin_approved, approved_at, created_at,
+                        receipt_validation_status, receipt_validation_errors, receipt_attempts)`,
       { count: "exact" },
     )
     .order("created_at", { ascending: false })
@@ -62,7 +64,11 @@ export async function GET(req: NextRequest) {
     if (b.status === "cancelled") derived = "cancelled";
     else if (b.status === "attended") derived = "attended";
     else if (b.status === "confirmed") derived = "confirmed";
-    else if (payment?.proof_url) derived = "receipt_to_review";
+    else if (payment?.proof_url)
+      derived =
+        payment.receipt_validation_status === "needs_review"
+          ? "receipt_needs_review"
+          : "receipt_to_review";
     else derived = "awaiting_receipt";
 
     return {
@@ -94,10 +100,19 @@ export async function GET(req: NextRequest) {
         ? {
             ...payment,
             reference: (payment.gateway_txn_id ?? "").replace(/^ref:/, "") || null,
+            validation_errors: Array.isArray(payment.receipt_validation_errors)
+              ? payment.receipt_validation_errors
+              : [],
           }
         : null,
     };
   });
+
+  // Tab counts describe the whole set, so they must be taken before filtering.
+  const counts = bookings.reduce<Record<string, number>>((acc, b) => {
+    acc[b.state] = (acc[b.state] ?? 0) + 1;
+    return acc;
+  }, {});
 
   if (state && state !== "all") {
     bookings = bookings.filter((b) => b.state === state);
@@ -120,11 +135,6 @@ export async function GET(req: NextRequest) {
       return haystack.includes(search);
     });
   }
-
-  const counts = bookings.reduce<Record<string, number>>((acc, b) => {
-    acc[b.state] = (acc[b.state] ?? 0) + 1;
-    return acc;
-  }, {});
 
   return NextResponse.json({ bookings, counts, total: bookings.length });
 }

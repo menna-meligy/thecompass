@@ -552,6 +552,9 @@ export type Database = {
           receipt_image_url: string | null;
           receipt_validated_at: string | null;
           receipt_validation_status: string | null;
+          receipt_validation_errors: string[] | null;
+          receipt_attempts: number;
+          receipt_last_attempt_at: string | null;
         };
         Insert: {
           id?: string;
@@ -574,6 +577,9 @@ export type Database = {
           receipt_image_url?: string | null;
           receipt_validated_at?: string | null;
           receipt_validation_status?: string | null;
+          receipt_validation_errors?: string[] | null;
+          receipt_attempts?: number;
+          receipt_last_attempt_at?: string | null;
         };
         Update: {
           id?: string;
@@ -596,6 +602,9 @@ export type Database = {
           receipt_image_url?: string | null;
           receipt_validated_at?: string | null;
           receipt_validation_status?: string | null;
+          receipt_validation_errors?: string[] | null;
+          receipt_attempts?: number;
+          receipt_last_attempt_at?: string | null;
         };
         Relationships: [
           {

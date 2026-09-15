@@ -90,7 +90,8 @@ export default function BookingFlow({
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [verifying, setVerifying] = useState(false);
-  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "invalid" | "fail">("idle");
+  const [verifyStatus, setVerifyStatus] = useState<"idle" | "ok" | "review" | "invalid" | "fail">("idle");
+  const [slotHeld, setSlotHeld] = useState(false);
   const [verifyErrors, setVerifyErrors] = useState<string[]>([]);
   const [ocrAmount, setOcrAmount] = useState<number | null>(null);
   const SUPPORT_PHONE = "01093026726";
@@ -273,8 +274,19 @@ export default function BookingFlow({
         // Collect every failing check so we can tell the client exactly what's wrong.
         const KNOWN = ["amount_mismatch", "date_too_old", "date_future", "amount_unreadable", "date_unreadable", "reference_missing", "duplicate_reference", "duplicate_proof", "upload_failed", "slot_taken"];
         const errs: string[] = (Array.isArray(result.errors) ? result.errors : [result.error]).filter((e: string) => KNOWN.includes(e));
-        if (errs.length > 0) {
-          setVerifyErrors(errs);
+        setVerifyErrors(errs);
+
+        if (result.needsReview) {
+          // The receipt IS saved and the coach will look at it herself — this
+          // is a hand-off to a human, not a dead end.
+          setSlotHeld(!!result.slotHeld);
+          setVerifyStatus("review");
+          fetch("/api/send-email", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "admin_new_payment", booking_id: bookingId }),
+          }).catch(() => {});
+        } else if (errs.length > 0) {
           setVerifyStatus("invalid");
         } else {
           setVerifyStatus("fail");
@@ -449,7 +461,7 @@ export default function BookingFlow({
 
   // ── PROOF STEP ───────────────────────────────────────────
   if (step === "proof") {
-    const canSubmit = !!proofFile && !verifying && verifyStatus !== "ok";
+    const canSubmit = !!proofFile && !verifying && verifyStatus !== "ok" && verifyStatus !== "review";
     return (
       <div>
         <button
@@ -514,6 +526,62 @@ export default function BookingFlow({
             </div>
           </div>
         )}
+        {verifyStatus === "review" && (() => {
+          const amt = ocrAmount != null ? ocrAmount.toLocaleString() : "؟";
+          const M: Record<string, { ar: string; en: string }> = {
+            amount_mismatch: { ar: `قرينا المبلغ في الصورة (${amt} جنيه) ومش مطابق لسعر الجلسة (${price.toLocaleString()} جنيه).`, en: `We read ${amt} EGP on the image, which doesn't match the session price (${price.toLocaleString()} EGP).` },
+            amount_unreadable: { ar: "مقدرناش نقرا المبلغ من الصورة.", en: "We couldn't read the amount from the image." },
+            date_too_old: { ar: "مقدرناش نتأكد إن تاريخ التحويل هو النهاردة.", en: "We couldn't confirm the transfer date is today." },
+            date_future: { ar: "تاريخ التحويل اللي قريناه مش مظبوط.", en: "The transfer date we read doesn't look right." },
+            date_unreadable: { ar: "مقدرناش نقرا تاريخ التحويل من الصورة.", en: "We couldn't read the transfer date from the image." },
+            reference_missing: { ar: "مقدرناش نلاقي رقم العملية في الصورة.", en: "We couldn't find the transaction reference on the image." },
+            duplicate_reference: { ar: "رقم العملية ده مستخدم في حجز تاني.", en: "This transaction reference is already used on another booking." },
+            duplicate_proof: { ar: "الصورة دي مستخدمة قبل كده.", en: "This image has been used before." },
+            slot_taken: { ar: "للأسف حد تاني خد الموعد ده قبلك بثواني.", en: "Someone took this time seconds before you." },
+          };
+          return (
+            <div style={{ marginBottom: "16px" }}>
+              <div style={{ padding: "14px 16px", borderRadius: "8px", background: "rgba(245,158,11,0.10)", border: "1px solid rgba(245,158,11,0.30)", color: "rgba(255,255,255,0.8)", fontSize: "0.85rem", lineHeight: 1.7 }}>
+                <p style={{ fontWeight: 800, color: "#F59E0B", marginBottom: "6px" }}>
+                  {isAr ? "استلمنا إيصالك ✅" : "We've got your receipt ✅"}
+                </p>
+                <p style={{ margin: 0 }}>
+                  {isAr
+                    ? "بس مقدرناش نتأكد منه أوتوماتيك، فبعتناه للفريق يراجعه بنفسه. هيتأكد حجزك خلال ٢٤ ساعة وهيوصلك إيميل."
+                    : "We couldn't verify it automatically, so we've sent it to the team to check by hand. Your booking will be confirmed within 24 hours and you'll get an email."}
+                </p>
+                {verifyErrors.length > 0 && (
+                  <ul style={{ margin: "10px 0 0", paddingInlineStart: "18px", listStyle: "disc", display: "flex", flexDirection: "column", gap: "4px", color: "rgba(255,255,255,0.6)", fontSize: "0.8rem" }}>
+                    {verifyErrors.map((e) => (
+                      <li key={e}>{M[e] ? (isAr ? M[e].ar : M[e].en) : e}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              {slotHeld && (
+                <div style={{ marginTop: "10px", padding: "10px 14px", borderRadius: "8px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.22)", color: "#86EFAC", fontSize: "0.8rem" }}>
+                  {isAr
+                    ? "موعدك محجوزلك لحد ما الفريق يراجع الإيصال."
+                    : "Your appointment is being held for you while the team reviews the receipt."}
+                </div>
+              )}
+
+              <div style={{ marginTop: "10px", padding: "10px 14px", borderRadius: "8px", background: "rgba(59,130,246,0.08)", border: "1px solid rgba(59,130,246,0.22)", color: "rgba(255,255,255,0.7)", fontSize: "0.8rem", lineHeight: 1.6 }}>
+                {isAr
+                  ? `لو عايز تستعجل، ابعت صورة أوضح أو كلّمنا على ${SUPPORT_PHONE}.`
+                  : `To speed things up, upload a clearer photo or call us on ${SUPPORT_PHONE}.`}
+              </div>
+
+              <button
+                onClick={() => { setProofFile(null); setProofPreview(null); setVerifyStatus("idle"); setVerifyErrors([]); }}
+                style={{ marginTop: "10px", width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid rgba(245,158,11,0.3)", background: "transparent", color: "#F59E0B", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer" }}
+              >
+                {isAr ? "ارفع صورة أوضح" : "Upload a clearer photo"}
+              </button>
+            </div>
+          );
+        })()}
         {verifyStatus === "invalid" && (() => {
           const amt = ocrAmount != null ? ocrAmount.toLocaleString() : "؟";
           const M: Record<string, { ar: string; en: string }> = {

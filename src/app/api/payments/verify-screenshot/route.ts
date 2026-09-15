@@ -7,18 +7,27 @@ export const runtime = "nodejs";
 /**
  * Manual InstaPay / Vodafone Cash verification (no gateway, no AI).
  *
- * The receipt is OCR'd in the browser; here we validate the extracted values
- * against the booking's trusted price + today, and enforce that the transaction
- * reference hasn't been reused.
+ * The receipt is OCR'd in the client's browser and the extracted values are
+ * checked here against the booking's trusted price and today's date.
  *
- * Crucially, this is also the moment the slot becomes TAKEN. Reservation runs
- * through an atomic Postgres function before the receipt is accepted, so two
- * clients uploading receipts for the same one-seat slot in the same second can
- * never both win — and the loser is told immediately rather than discovering it
- * at the session.
+ * Those checks decide how confident we are — they do NOT decide whether the
+ * upload is kept. OCR runs on a photo of a phone screen and misreads real
+ * digits, so a rejected receipt is stored exactly like an accepted one and put
+ * in front of the coach with the reasons it failed. Throwing it away left an
+ * honest client at a dead end and the coach unaware they had even tried.
+ *
+ * This is also where a slot becomes TAKEN, through an atomic Postgres function,
+ * so two clients uploading for the same one-seat slot can never both win.
  */
 
 const PROOF_BUCKETS = ["payment-proofs", "proofs"];
+
+/**
+ * Reusing another booking's transaction reference isn't a bad photo, it's a
+ * duplicate payment claim — so it must never hold a slot. Everything else is
+ * treated as "we couldn't read it", which a human can settle.
+ */
+const FRAUD_SIGNALS = new Set(["duplicate_reference", "duplicate_proof"]);
 
 export async function POST(req: NextRequest) {
   try {
@@ -71,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
     const expectedAmount = Number(payment.amount);
 
-    // ── Validate the OCR'd values ──────────────────────────────────────────
+    // ── What the automatic checks make of it ───────────────────────────────
     const parsed: ParsedReceipt = {
       amount: ocrAmount != null && !Number.isNaN(ocrAmount) ? ocrAmount : null,
       date: ocrDate ? new Date(ocrDate) : null,
@@ -91,26 +100,10 @@ export async function POST(req: NextRequest) {
       if (dup) errors.push("duplicate_reference");
     }
 
-    if (errors.length > 0) {
-      return NextResponse.json({ verified: false, error: errors[0], errors, expected: expectedAmount });
-    }
+    const passed = errors.length === 0;
+    const hasFraudSignal = errors.some((e) => FRAUD_SIGNALS.has(e));
 
-    // ── Take the slot, atomically, before accepting the receipt ────────────
-    const { data: reservation, error: reserveError } = await (admin as any).rpc(
-      "reserve_slot_for_booking",
-      { p_booking: bookingId },
-    );
-
-    if (reserveError) {
-      console.error("reserve_slot_for_booking failed:", reserveError.message);
-      return NextResponse.json({ verified: false, error: "fail" });
-    }
-
-    if (reservation === "full" || reservation === "unavailable") {
-      return NextResponse.json({ verified: false, error: "slot_taken", errors: ["slot_taken"] });
-    }
-
-    // ── Store the proof so the admin can review it ─────────────────────────
+    // ── Keep the image, whatever the checks concluded ──────────────────────
     let finalProofUrl = proofUrl;
     if (!finalProofUrl) {
       const safe = (file.name || "receipt.png").replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -132,27 +125,70 @@ export async function POST(req: NextRequest) {
     }
 
     if (!finalProofUrl) {
-      // No stored proof → the admin could never review it. Give the slot back.
-      await (admin as any).rpc("release_slot_for_booking", { p_booking: bookingId });
-      return NextResponse.json({ verified: false, error: "upload_failed" });
+      // Nothing stored means the coach would have nothing to look at.
+      return NextResponse.json({ verified: false, error: "upload_failed", errors: ["upload_failed"] });
+    }
+
+    // ── Hold the slot for any genuine attempt ──────────────────────────────
+    // A client whose real receipt the OCR misread shouldn't lose their
+    // appointment while waiting for a human. Rejecting the receipt hands it
+    // straight back (see /api/admin/bookings/action).
+    let reservation: string | null = null;
+    if (!hasFraudSignal) {
+      const { data, error: reserveError } = await (admin as any).rpc("reserve_slot_for_booking", {
+        p_booking: bookingId,
+      });
+      if (reserveError) {
+        console.error("reserve_slot_for_booking failed:", reserveError.message);
+      } else {
+        reservation = data as string;
+      }
+    }
+
+    if (reservation === "full" || reservation === "unavailable" || reservation === "committed_elsewhere") {
+      // Someone else got there first — don't keep their money in limbo.
+      await admin
+        .from("payments")
+        .update({
+          proof_url: finalProofUrl,
+          receipt_image_url: finalProofUrl,
+          receipt_validation_status: "needs_review",
+          receipt_validation_errors: ["slot_taken"],
+          receipt_attempts: (payment.receipt_attempts ?? 0) + 1,
+          receipt_last_attempt_at: new Date().toISOString(),
+        })
+        .eq("id", payment.id);
+      return NextResponse.json({ verified: false, error: "slot_taken", errors: ["slot_taken"] });
     }
 
     await admin
       .from("payments")
       .update({
-        gateway_txn_id: `ref:${parsed.reference}`,
+        ...(parsed.reference ? { gateway_txn_id: `ref:${parsed.reference}` } : {}),
         status: "pending_verification",
         proof_url: finalProofUrl,
         receipt_image_url: finalProofUrl,
         receipt_validated_at: new Date().toISOString(),
-        receipt_validation_status: "pending_manual_review",
+        receipt_validation_status: passed ? "auto_verified" : "needs_review",
+        receipt_validation_errors: passed ? null : errors,
+        receipt_attempts: (payment.receipt_attempts ?? 0) + 1,
+        receipt_last_attempt_at: new Date().toISOString(),
       })
       .eq("id", payment.id);
 
+    if (passed) {
+      return NextResponse.json({ verified: true, reference: parsed.reference, reserved: reservation });
+    }
+
+    // Stored, visible to the coach, and (unless it looked like a duplicate
+    // payment claim) the appointment is being held meanwhile.
     return NextResponse.json({
-      verified: true,
-      reference: parsed.reference,
-      reserved: reservation,
+      verified: false,
+      needsReview: true,
+      slotHeld: !hasFraudSignal,
+      error: errors[0],
+      errors,
+      expected: expectedAmount,
     });
   } catch (err) {
     console.error("verify-screenshot error:", err);

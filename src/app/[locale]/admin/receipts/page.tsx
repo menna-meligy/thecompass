@@ -18,7 +18,7 @@ import { formatISODate } from "@/lib/schedule-dates";
 interface Receipt {
   id: string;
   booking_id: string;
-  state: "pending" | "approved" | "rejected";
+  state: "pending" | "needs_review" | "approved" | "rejected";
   booking_status: string;
   payment_status: string;
   offering_type: string;
@@ -32,6 +32,9 @@ interface Receipt {
   method: string | null;
   reference: string | null;
   proof_url: string | null;
+  validation_errors: string[];
+  attempts: number;
+  holds_slot: boolean;
   uploaded_at: string;
   approved_at: string | null;
   user_name: string | null;
@@ -40,18 +43,33 @@ interface Receipt {
 }
 
 const TABS = [
-  { key: "pending", ar: "بانتظار المراجعة", en: "To review" },
+  { key: "open", ar: "محتاجة قرار", en: "Needs a decision" },
+  { key: "needs_review", ar: "الفحص التلقائي رفضها", en: "Auto-check refused" },
+  { key: "pending", ar: "الفحص التلقائي قبلها", en: "Auto-check passed" },
   { key: "approved", ar: "متأكدة", en: "Approved" },
   { key: "rejected", ar: "مرفوضة", en: "Rejected" },
   { key: "all", ar: "الكل", en: "All" },
 ] as const;
+
+/** Why the automatic check refused a receipt, in plain language. */
+const REASONS: Record<string, { ar: string; en: string }> = {
+  amount_mismatch: { ar: "المبلغ المقروء مش مطابق لسعر الجلسة", en: "Amount read doesn't match the session price" },
+  amount_unreadable: { ar: "مقدرناش نقرا المبلغ", en: "Couldn't read the amount" },
+  date_too_old: { ar: "تاريخ التحويل مش النهاردة", en: "Transfer date isn't today" },
+  date_future: { ar: "تاريخ التحويل في المستقبل", en: "Transfer date is in the future" },
+  date_unreadable: { ar: "مقدرناش نقرا التاريخ", en: "Couldn't read the date" },
+  reference_missing: { ar: "مفيش رقم عملية واضح", en: "No clear transaction reference" },
+  duplicate_reference: { ar: "⚠️ رقم العملية مستخدم في حجز تاني", en: "⚠️ Reference already used on another booking" },
+  duplicate_proof: { ar: "⚠️ الصورة دي مستخدمة قبل كده", en: "⚠️ This image was used before" },
+  slot_taken: { ar: "الموعد اتاخد قبلها", en: "The slot was taken first" },
+};
 
 export default function AdminReceiptsPage() {
   const locale = useLocale();
   const isAr = locale === "ar";
   const t = (ar: string, en: string) => (isAr ? ar : en);
 
-  const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("pending");
+  const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("open");
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -115,11 +133,13 @@ export default function AdminReceiptsPage() {
 
   const stateStyle: Record<string, string> = {
     pending: "bg-amber-500/15 text-amber-300",
+    needs_review: "bg-orange-500/20 text-orange-300",
     approved: "bg-emerald-500/15 text-emerald-300",
     rejected: "bg-red-500/15 text-red-300",
   };
   const stateLabel: Record<string, string> = {
     pending: t("بانتظار المراجعة", "To review"),
+    needs_review: t("محتاجة عينك", "Needs your eyes"),
     approved: t("متأكد", "Approved"),
     rejected: t("مرفوض", "Rejected"),
   };
@@ -134,8 +154,8 @@ export default function AdminReceiptsPage() {
           <h1 className="text-2xl font-black text-white">{t("إيصالات العملاء", "Client receipts")}</h1>
           <p className="text-sm text-white/50 mt-2">
             {t(
-              "كل إيصال العميل رفعه. الموعد بيتحجز فوراً لما يرفع الإيصال — الموافقة هنا بتأكد الحجز.",
-              "Every receipt a client uploaded. The slot is already held from the moment it lands — approving here confirms the booking.",
+              "كل إيصال رفعه عميل — حتى اللي الفحص التلقائي رفضه، لأن الفحص بيقرا صورة موبايل وبيغلط. الموعد محجوز من ساعة الرفع، والموافقة هنا بتأكد الحجز.",
+              "Every receipt a client uploaded — including the ones the automatic check refused, because that check reads a phone photo and gets it wrong. The slot is held from the moment it lands; approving here confirms the booking.",
             )}
           </p>
         </div>
@@ -301,7 +321,35 @@ export default function AdminReceiptsPage() {
                 </div>
               </div>
 
-              {r.state === "pending" ? (
+              {r.state === "needs_review" && (
+                <div className="mt-4 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30">
+                  <p className="text-orange-300 text-sm font-bold mb-1.5">
+                    {t("الفحص التلقائي رفض الإيصال ده:", "The automatic check refused this receipt:")}
+                  </p>
+                  <ul className="list-disc ps-5 space-y-0.5 text-sm text-white/70">
+                    {(r.validation_errors.length ? r.validation_errors : ["unknown"]).map((e) => (
+                      <li key={e}>{REASONS[e] ? (isAr ? REASONS[e].ar : REASONS[e].en) : e}</li>
+                    ))}
+                  </ul>
+                  <p className="text-white/45 text-xs mt-2">
+                    {t(
+                      "بصّي على الصورة بنفسك — الفحص بيغلط في قراية الأرقام. لو التحويل سليم اضغطي أكّد الحجز.",
+                      "Look at the image yourself — the check misreads digits. If the transfer is genuine, just confirm.",
+                    )}
+                  </p>
+                </div>
+              )}
+
+              {(r.attempts > 1 || !r.holds_slot) && (
+                <p className="mt-3 text-xs text-white/40">
+                  {r.attempts > 1 &&
+                    t(`حاول ${r.attempts} مرات. `, `${r.attempts} upload attempts. `)}
+                  {!r.holds_slot &&
+                    t("الموعد مش محجوزله.", "The slot is NOT being held for them.")}
+                </p>
+              )}
+
+              {r.state === "pending" || r.state === "needs_review" ? (
                 <div className="flex flex-wrap gap-3 mt-5 pt-4 border-t border-white/10">
                   <button
                     type="button"

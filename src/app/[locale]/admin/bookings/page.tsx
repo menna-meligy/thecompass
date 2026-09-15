@@ -22,7 +22,7 @@ interface Booking {
   id: string;
   user_id: string;
   status: string;
-  state: "awaiting_receipt" | "receipt_to_review" | "confirmed" | "attended" | "cancelled";
+  state: "awaiting_receipt" | "receipt_to_review" | "receipt_needs_review" | "confirmed" | "attended" | "cancelled";
   created_at: string;
   payment_deadline: string | null;
   scheduled_at: string | null;
@@ -40,12 +40,14 @@ interface Booking {
     status: string | null;
     proof_url: string | null;
     reference: string | null;
+    validation_errors?: string[];
   } | null;
 }
 
 const TABS = [
   { key: "all", ar: "الكل", en: "All" },
   { key: "receipt_to_review", ar: "إيصال للمراجعة", en: "Receipt to review" },
+  { key: "receipt_needs_review", ar: "إيصال محتاج عينك", en: "Receipt needs your eyes" },
   { key: "awaiting_receipt", ar: "بانتظار الدفع", en: "Awaiting payment" },
   { key: "confirmed", ar: "مؤكد", en: "Confirmed" },
   { key: "attended", ar: "حضر", en: "Attended" },
@@ -55,6 +57,7 @@ const TABS = [
 const STATE_STYLE: Record<Booking["state"], string> = {
   awaiting_receipt: "bg-white/5 text-white/50",
   receipt_to_review: "bg-blue-500/15 text-blue-300",
+  receipt_needs_review: "bg-orange-500/20 text-orange-300",
   confirmed: "bg-emerald-500/15 text-emerald-300",
   attended: "bg-purple-500/15 text-purple-300",
   cancelled: "bg-red-500/15 text-red-300",
@@ -106,6 +109,7 @@ export default function AdminBookingsPage() {
   const STATE_LABEL: Record<Booking["state"], string> = {
     awaiting_receipt: t("بانتظار الإيصال", "Awaiting receipt"),
     receipt_to_review: t("إيصال للمراجعة", "Receipt to review"),
+    receipt_needs_review: t("إيصال محتاج عينك", "Receipt needs your eyes"),
     confirmed: t("مؤكد", "Confirmed"),
     attended: t("حضر", "Attended"),
     cancelled: t("ملغي", "Cancelled"),
@@ -314,7 +318,7 @@ export default function AdminBookingsPage() {
               </div>
 
               <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-white/10">
-                {b.state === "receipt_to_review" && (
+                {(b.state === "receipt_to_review" || b.state === "receipt_needs_review") && (
                   <button
                     type="button"
                     onClick={() => act(b.id, "confirm")}
