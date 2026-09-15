@@ -137,7 +137,7 @@ export default async function CompassPage() {
       )}
 
       {/*
-        CompassFlow — the full interactive quiz + result screen.
+        CompassFlow, the full interactive quiz + result screen.
         Props passed for context:
           clientId            → user.id
           locale              → page locale

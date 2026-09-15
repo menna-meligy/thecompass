@@ -108,8 +108,8 @@ export default function MeetingsCalendarPage() {
           <h1 className="text-2xl font-black text-white">{t("جدول جلساتك", "Your schedule")}</h1>
           <p className="text-sm text-white/50 mt-2">
             {t(
-              "الجلسات المؤكدة واللي إيصالها تحت المراجعة — الاتنين حاجزين ميعادهم فعلاً.",
-              "Confirmed sessions plus the ones whose receipt is still under review — both already hold their slot.",
+              "الجلسات المؤكدة واللي إيصالها تحت المراجعة، الاتنين حاجزين ميعادهم فعلاً.",
+              "Confirmed sessions plus the ones whose receipt is still under review, both already hold their slot.",
             )}
           </p>
         </div>
@@ -352,7 +352,7 @@ export default function MeetingsCalendarPage() {
                   )}
                 >
                   {selected.state === "receipt_to_review"
-                    ? t("● الإيصال لسه تحت المراجعة — الموعد محجوز", "● Receipt still under review — slot is held")
+                    ? t("● الإيصال لسه تحت المراجعة، الموعد محجوز", "● Receipt still under review, slot is held")
                     : t("✓ مؤكد ومدفوع", "✓ Confirmed & paid")}
                 </p>
               </div>

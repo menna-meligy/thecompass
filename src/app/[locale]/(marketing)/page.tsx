@@ -41,7 +41,7 @@ export default async function HomePage() {
       role: "مهندس مبيعات",
       roleEn: "Sales Engineer",
       text: "كنت شغال وأنا مش عارف رايح فين. الجلسات خلّتني أعرف نقط قوتي فين بالظبط، ودلوقتي ماشي في مسار المبيعات الهندسية وأنا مقتنع بيه.",
-      textEn: "I was working without knowing where I was headed. The sessions showed me exactly where my strengths are — now I'm in sales engineering and sure of it.",
+      textEn: "I was working without knowing where I was headed. The sessions showed me exactly where my strengths are, now I'm in sales engineering and sure of it.",
       stars: 5,
       avatar: "كم",
       avatarEn: "KM",
@@ -51,8 +51,8 @@ export default async function HomePage() {
       nameEn: "Sara Abdelrahman",
       role: "باحثة أحياء · حصلت على منحة",
       roleEn: "Biologist · Scholarship recipient",
-      text: "كنت تايهة بين تلات مسارات ومش عارفة أقدّم على إيه. رتّبنا أوراقي وحدّدنا هدف واحد، وقدّمت على المنحة وأنا فاهمة أنا عايزة إيه — واتقبلت.",
-      textEn: "I was torn between three paths and unsure what to apply for. We narrowed it to one goal, I applied knowing exactly what I wanted — and I got in.",
+      text: "كنت تايهة بين تلات مسارات ومش عارفة أقدّم على إيه. رتّبنا أوراقي وحدّدنا هدف واحد، وقدّمت على المنحة وأنا فاهمة أنا عايزة إيه، واتقبلت.",
+      textEn: "I was torn between three paths and unsure what to apply for. We narrowed it to one goal, I applied knowing exactly what I wanted, and I got in.",
       stars: 5,
       avatar: "سع",
       avatarEn: "SA",
@@ -63,7 +63,7 @@ export default async function HomePage() {
       role: "مدرّسة · مبرمجة دلوقتي",
       roleEn: "Teacher · now a developer",
       text: "قضيت ٦ سنين في التدريس وأنا حاسة إن ده مش مكاني. الورش خلّتني أجرّب البرمجة من غير ما أسيب شغلي فجأة، ودلوقتي شغالة مبرمجة بدوام كامل.",
-      textEn: "Six years of teaching and it never felt like mine. The workshops let me try programming without quitting overnight — I'm now a full-time developer.",
+      textEn: "Six years of teaching and it never felt like mine. The workshops let me try programming without quitting overnight, I'm now a full-time developer.",
       stars: 5,
       avatar: "هف",
       avatarEn: "HF",
@@ -142,7 +142,7 @@ export default async function HomePage() {
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 16px", background: "rgba(245,158,11,0.12)", border: "1px solid rgba(245,158,11,0.25)", color: "#F59E0B", fontSize: "0.8rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", borderRadius: "6px" }}>
               <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#F59E0B", animation: "pulse 2s infinite", flexShrink: 0 }} />
-              {isRtl ? "ليك طريق شبهك.. طريق مخصوص ليك" : "A Path That's Yours"}
+              {isRtl ? "ليك طريق شبهك، طريق مخصوص ليك" : "A Path That's Yours"}
             </div>
           </div>
 

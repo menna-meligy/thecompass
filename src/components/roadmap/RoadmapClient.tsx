@@ -284,8 +284,8 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
             color: "#FCA5A5", fontSize: "0.83rem", lineHeight: 1.6,
           }}>
             {isAr
-              ? "الملاحظة دي مااتسجلتش. اعمل ريفريش وجرّب تاني — لو فضلت تفشل، صلاحيات حسابك محتاجة مراجعة."
-              : "That note was not saved. Refresh and try again — if it keeps failing, your account's permissions need checking."}
+              ? "الملاحظة دي مااتسجلتش. اعمل ريفريش وجرّب تاني، لو فضلت تفشل، صلاحيات حسابك محتاجة مراجعة."
+              : "That note was not saved. Refresh and try again, if it keeps failing, your account's permissions need checking."}
           </div>
         )}
 

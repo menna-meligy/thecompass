@@ -75,7 +75,7 @@ export default function AdminMaterialsPage() {
           const when = row.slot?.date
             ? ` · ${String(row.slot.date).slice(0, 10)} ${String(row.slot.start_time ?? "").slice(0, 5)}`
             : "";
-          return { id: b.id, session_id: b.session_id, label: `${who} — ${what}${when}` };
+          return { id: b.id, session_id: b.session_id, label: `${who}, ${what}${when}` };
         })
       );
     }

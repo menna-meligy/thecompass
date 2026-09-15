@@ -72,7 +72,7 @@ export default function WorkshopBookingPanel({
       <OfferingCalendar
         key={type}
         offering={offeringKey(type, workshopId)}
-        title={`${workshopTitle} — ${suffix}`}
+        title={`${workshopTitle}, ${suffix}`}
         price={price}
         isAr={isAr}
         heading={isAr ? "اختر موعداً" : "Choose a time"}

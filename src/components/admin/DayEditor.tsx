@@ -188,7 +188,7 @@ export default function DayEditor({
                     {t("يوم كامل مقفول", "Full day closed")}
                   </span>
                   <span className="block text-white/50 text-xs leading-relaxed">
-                    {t("اقفلي اليوم كله، مش هيظهر لحد", "Close the whole day — nobody can book it")}
+                    {t("اقفلي اليوم كله، مش هيظهر لحد", "Close the whole day, nobody can book it")}
                   </span>
                 </button>
               </div>
@@ -338,7 +338,7 @@ export default function DayEditor({
                               : `${
                                   (isAr
                                     ? slot.assignments.find((a) => a.workshop_id === slot.committed_workshop_id)?.workshop?.title_ar
-                                    : slot.assignments.find((a) => a.workshop_id === slot.committed_workshop_id)?.workshop?.title_en) ?? "—"
+                                    : slot.assignments.find((a) => a.workshop_id === slot.committed_workshop_id)?.workshop?.title_en) ?? "-"
                                 } · ${
                                   slot.committed_offering_type === "group"
                                     ? t("مجموعة", "group")
@@ -350,7 +350,7 @@ export default function DayEditor({
                               .map((a) =>
                                 a.offering_type === "career"
                                   ? t("جلسة Self Awareness وتحديد المسار", "Self Awareness & Career Direction")
-                                  : `${(isAr ? a.workshop?.title_ar : a.workshop?.title_en) ?? "—"} · ${
+                                  : `${(isAr ? a.workshop?.title_ar : a.workshop?.title_en) ?? "-"} · ${
                                       a.offering_type === "group"
                                         ? t("مجموعة", "group")
                                         : t("فردي", "1-on-1")

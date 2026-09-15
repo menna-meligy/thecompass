@@ -123,8 +123,8 @@ export default function AdminReceiptsPage() {
       if (action === "confirm" && data?.email && data.email.ok === false) {
         setError(
           t(
-            "الحجز اتأكد، بس الإيميل مبعتش للعميل — كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",
-            "Confirmed, but the client was NOT emailed — tell them yourself. (Email needs a verified domain in Resend.)",
+            "الحجز اتأكد، بس الإيميل مبعتش للعميل، كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",
+            "Confirmed, but the client was NOT emailed, tell them yourself. (Email needs a verified domain in Resend.)",
           ),
         );
       }
@@ -157,8 +157,8 @@ export default function AdminReceiptsPage() {
           <h1 className="text-2xl font-black text-white">{t("إيصالات العملاء", "Client receipts")}</h1>
           <p className="text-sm text-white/50 mt-2">
             {t(
-              "كل إيصال رفعه عميل — حتى اللي الفحص التلقائي رفضه، لأن الفحص بيقرا صورة موبايل وبيغلط. الموعد محجوز من ساعة الرفع، والموافقة هنا بتأكد الحجز.",
-              "Every receipt a client uploaded — including the ones the automatic check refused, because that check reads a phone photo and gets it wrong. The slot is held from the moment it lands; approving here confirms the booking.",
+              "كل إيصال رفعه عميل، حتى اللي الفحص التلقائي رفضه، لأن الفحص بيقرا صورة موبايل وبيغلط. الموعد محجوز من ساعة الرفع، والموافقة هنا بتأكد الحجز.",
+              "Every receipt a client uploaded, including the ones the automatic check refused, because that check reads a phone photo and gets it wrong. The slot is held from the moment it lands; approving here confirms the booking.",
             )}
           </p>
         </div>
@@ -344,8 +344,8 @@ export default function AdminReceiptsPage() {
                   )}
                   <p className="text-white/45 text-xs mt-2">
                     {t(
-                      "بصّي على الصورة بنفسك — الفحص بيغلط في قراية الأرقام. لو التحويل سليم اضغطي أكّد الحجز.",
-                      "Look at the image yourself — the check misreads digits. If the transfer is genuine, just confirm.",
+                      "بصّي على الصورة بنفسك، الفحص بيغلط في قراية الأرقام. لو التحويل سليم اضغطي أكّد الحجز.",
+                      "Look at the image yourself, the check misreads digits. If the transfer is genuine, just confirm.",
                     )}
                   </p>
                 </div>
@@ -398,7 +398,7 @@ export default function AdminReceiptsPage() {
                   <Clock className="w-4 h-4" />
                   {r.state === "approved"
                     ? t("تم التأكيد", "Confirmed")
-                    : t("مرفوض — الموعد رجع متاح", "Rejected — the slot is free again")}
+                    : t("مرفوض، الموعد رجع متاح", "Rejected, the slot is free again")}
                   {r.approved_at &&
                     ` · ${new Date(r.approved_at).toLocaleString(isAr ? "ar-EG" : "en-GB")}`}
                 </div>

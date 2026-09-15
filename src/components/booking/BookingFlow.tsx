@@ -578,7 +578,7 @@ export default function BookingFlow({
                 <p style={{ margin: verifyErrors.length ? "10px 0 0" : 0, color: "rgba(255,255,255,0.75)", fontSize: "0.85rem" }}>
                   {isAr
                     ? "استلمنا الإيصال والفريق هيراجعه بنفسه ويتواصل معاك."
-                    : "We've got your receipt — the team will review it and get back to you."}
+                    : "We've got your receipt, the team will review it and get back to you."}
                 </p>
                 {slotHeld && (
                   <p style={{ margin: "6px 0 0", color: "#86EFAC", fontSize: "0.82rem" }}>
@@ -588,7 +588,7 @@ export default function BookingFlow({
               </div>
 
               {/* Either send another photo, or accept that a human will settle
-                  it — nothing else is worth offering at this point. */}
+                  it, nothing else is worth offering at this point. */}
               <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "8px" }}>
                 <button
                   onClick={() => { setProofFile(null); setProofPreview(null); setVerifyStatus("idle"); setVerifyErrors([]); }}
@@ -602,7 +602,7 @@ export default function BookingFlow({
                 >
                   {/* Asked for as "ok till support approves it": the "تمام" is the
                       client accepting the wait, which is the whole point of the
-                      button — without it this reads as a status, not a choice. */}
+                      button, without it this reads as a status, not a choice. */}
                   {isAr ? "تمام، مستني موافقة الدعم" : "OK, waiting for support to approve"}
                 </Link>
               </div>
@@ -643,7 +643,7 @@ export default function BookingFlow({
           <div style={{ padding: "12px 16px", borderRadius: "8px", background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#FCA5A5", fontSize: "0.83rem", marginBottom: "16px", lineHeight: 1.6 }}>
             {isAr
               ? "حصلت مشكلة وإحنا بنراجع الإيصال. جرّب تاني، ولو المشكلة فضلت تلاقي أرقام التواصل في آخر الصفحة."
-              : "Something went wrong while checking the receipt. Please try again — if it keeps happening, our contact details are at the bottom of the page."}
+              : "Something went wrong while checking the receipt. Please try again, if it keeps happening, our contact details are at the bottom of the page."}
           </div>
         )}
 

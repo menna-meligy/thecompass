@@ -71,7 +71,7 @@ export async function POST(request: Request) {
           await resend.emails.send({
             from: "البوصلة <noreply@albosla.vercel.app>",
             to: user.email,
-            subject: `⏰ تذكير: استكمل دفعتك لتأكيد جلستك — ${workshopTitle}`,
+            subject: `⏰ تذكير: استكمل دفعتك لتأكيد جلستك، ${workshopTitle}`,
             html: `
               <div style="direction: rtl; font-family: Arial, sans-serif; background: #0f172a; color: white; padding: 20px;">
                 <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.6); border-radius: 12px; padding: 30px;">
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
             await resend.emails.send({
               from: "البوصلة <noreply@albosla.vercel.app>",
               to: user.email,
-              subject: `تم إلغاء حجزك — لم تكمل الدفع في الوقت المحدد`,
+              subject: `تم إلغاء حجزك، لم تكمل الدفع في الوقت المحدد`,
               html: `
                 <div style="direction: rtl; font-family: Arial, sans-serif; background: #0f172a; color: white; padding: 20px;">
                   <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.6); border-radius: 12px; padding: 30px;">

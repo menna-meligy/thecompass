@@ -110,8 +110,8 @@ export function workshopOfferings(w: WorkshopLite): Offering[] {
       key: offeringKey("individual", w.id),
       offeringType: "individual",
       workshopId: w.id,
-      labelAr: `${w.title_ar} — فردي`,
-      labelEn: `${w.title_en} — 1-on-1`,
+      labelAr: `${w.title_ar}، فردي`,
+      labelEn: `${w.title_en}, 1-on-1`,
       price: OFFERING_PRICE.individual,
       capacity: OFFERING_CAPACITY.individual,
     },
@@ -119,8 +119,8 @@ export function workshopOfferings(w: WorkshopLite): Offering[] {
       key: offeringKey("group", w.id),
       offeringType: "group",
       workshopId: w.id,
-      labelAr: `${w.title_ar} — مجموعة`,
-      labelEn: `${w.title_en} — Group`,
+      labelAr: `${w.title_ar}، مجموعة`,
+      labelEn: `${w.title_en}, Group`,
       price: OFFERING_PRICE.group,
       capacity: OFFERING_CAPACITY.group,
     },
@@ -163,5 +163,5 @@ export function offeringTitle(
       : isAr
         ? "فردي"
         : "1-on-1";
-  return `${base} — ${suffix}`;
+  return `${base}${isAr ? "، " : ", "}${suffix}`;
 }

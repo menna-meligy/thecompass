@@ -40,5 +40,5 @@ export function joinState(startsAt: string | Date, now: Date = new Date()): Join
 export function linkAppearsNote(isAr: boolean): string {
   return isAr
     ? `لينك الجلسة هيظهر هنا قبل الميعاد بـ${JOIN_OPENS_MINUTES} دقيقة، وهيوصلك كمان على الإيميل.`
-    : `The join link appears here ${JOIN_OPENS_MINUTES} minutes before the session — we'll email it to you too.`;
+    : `The join link appears here ${JOIN_OPENS_MINUTES} minutes before the session, we'll email it to you too.`;
 }

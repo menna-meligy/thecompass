@@ -326,8 +326,8 @@ export default function OfferingCalendar({ offering, title, price, isAr, heading
       {slots.length === 0 && (
         <p className="text-white/35 text-sm text-center mt-6">
           {isAr
-            ? "مفيش مواعيد متاحة حالياً — تابعنا قريباً."
-            : "No times are open right now — check back soon."}
+            ? "مفيش مواعيد متاحة حالياً، تابعنا قريباً."
+            : "No times are open right now, check back soon."}
         </p>
       )}
     </div>

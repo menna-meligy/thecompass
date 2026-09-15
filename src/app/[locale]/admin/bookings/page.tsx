@@ -133,8 +133,8 @@ export default function AdminBookingsPage() {
       if (action === "confirm" && data?.email && data.email.ok === false) {
         setNotice(
           t(
-            "الحجز اتأكد، بس الإيميل مبعتش للعميل — كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",
-            "Confirmed, but the client was NOT emailed — tell them yourself. (Email needs a verified domain in Resend.)",
+            "الحجز اتأكد، بس الإيميل مبعتش للعميل، كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",
+            "Confirmed, but the client was NOT emailed, tell them yourself. (Email needs a verified domain in Resend.)",
           ),
         );
       }
@@ -285,14 +285,14 @@ export default function AdminBookingsPage() {
                     {t("الدفع", "Payment")}
                   </p>
                   <p className="text-[#F59E0B] font-bold">
-                    {b.payment?.amount?.toLocaleString() ?? "—"} {t("ج.م", "EGP")}
+                    {b.payment?.amount?.toLocaleString() ?? "-"} {t("ج.م", "EGP")}
                   </p>
                   <p className="text-white/50">
                     {b.payment?.method === "vodafone_cash"
                       ? t("فودافون كاش", "Vodafone Cash")
                       : b.payment?.method === "instapay"
                         ? t("إنستاباي", "InstaPay")
-                        : "—"}
+                        : "-"}
                   </p>
                 </div>
 

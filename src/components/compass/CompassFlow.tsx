@@ -490,8 +490,8 @@ export function CompassFlow({ locale, userId, existingResult }: Props) {
         <div className="text-center pt-2 pb-8">
           <p className="text-white/30 text-xs max-w-sm mx-auto leading-relaxed">
             {isAr
-              ? "تقييم واحد كل شهر — تقييمك الجاي هيفتح الشهر الجاي عشان التقدم يبان بصدق."
-              : "One assessment a month — your next reading unlocks next month so progress shows honestly."}
+              ? "تقييم واحد كل شهر، تقييمك الجاي هيفتح الشهر الجاي عشان التقدم يبان بصدق."
+              : "One assessment a month, your next reading unlocks next month so progress shows honestly."}
           </p>
         </div>
       </div>

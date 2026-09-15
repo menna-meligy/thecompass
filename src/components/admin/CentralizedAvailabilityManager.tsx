@@ -173,7 +173,7 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
           <p className="text-white/50 text-sm">
             {t(
               "اضغطي على أي يوم: تفتحيه بمواعيد للحجز، أو تقفليه بالكامل.",
-              "Click any day to open bookable times on it — or close the whole day.",
+              "Click any day to open bookable times on it, or close the whole day.",
             )}
           </p>
         </div>
@@ -197,8 +197,8 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
       {upcoming > 0 && (
         <p className="text-sm text-white/45">
           {t(
-            `${upcoming} موعد متحجوز حالياً — ظاهرين في "الجلسات المؤكدة".`,
-            `${upcoming} time${upcoming === 1 ? "" : "s"} currently taken — they appear under "Confirmed Meetings".`,
+            `${upcoming} موعد متحجوز حالياً، ظاهرين في "الجلسات المؤكدة".`,
+            `${upcoming} time${upcoming === 1 ? "" : "s"} currently taken, they appear under "Confirmed Meetings".`,
           )}
         </p>
       )}

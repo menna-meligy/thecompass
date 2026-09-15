@@ -145,7 +145,7 @@ export default function MySessionsBoard({ sessions, locale }: Props) {
           <div className="relative">
             <span className="inline-flex items-center gap-2 text-emerald-300 text-xs font-black uppercase tracking-widest mb-2">
               <Clock className="h-3.5 w-3.5" />
-              {t("جلستك الجاية — مؤكدة", "Your next session — confirmed")}
+              {t("جلستك الجاية، مؤكدة", "Your next session, confirmed")}
             </span>
             <p className="text-white font-black text-lg leading-tight mb-1">{next.title}</p>
             <p className="text-white/70 text-sm mb-4">

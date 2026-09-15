@@ -42,7 +42,7 @@ function layout(inner: string): string {
         ${inner}
       </div>
       <div style="padding:16px 28px; border-top:1px solid rgba(245,158,11,0.12);">
-        <p style="color:rgba(255,255,255,0.4); font-size:12px; margin:0;">البوصلة — ليك طريق شبهك.. طريق مخصوص ليك</p>
+        <p style="color:rgba(255,255,255,0.4); font-size:12px; margin:0;">البوصلة، ليك طريق شبهك، طريق مخصوص ليك</p>
       </div>
     </div>
   </div>`;
@@ -74,7 +74,7 @@ export function reminder1DayEmail(d: ReminderData): { subject: string; html: str
     ? ctaButton(`${d.appUrl}/ar/dashboard`, "افتح لوحة التحكم")
     : "";
   return {
-    subject: `تذكير: عندك جلسة بكرة — ${d.workshopTitle}`,
+    subject: `تذكير: عندك جلسة بكرة، ${d.workshopTitle}`,
     html: layout(`
       <h2 style="color:#fff; margin:0 0 10px;">جلستك بكرة ⏰</h2>
       <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
@@ -94,7 +94,7 @@ export function reminder30MinEmail(d: ReminderData): { subject: string; html: st
     ? ctaButton(`${d.appUrl}/ar/dashboard`, "افتح لوحة التحكم")
     : "";
   return {
-    subject: `جلستك هتبدأ بعد شوية — ${d.workshopTitle}`,
+    subject: `جلستك هتبدأ بعد شوية، ${d.workshopTitle}`,
     html: layout(`
       <h2 style="color:#fff; margin:0 0 10px;">الجلسة قرّبت</h2>
       <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
@@ -121,8 +121,8 @@ export function bookingApprovedEmail(d: BookingApprovedData): { subject: string;
   const cta = d.appUrl ? ctaButton(`${d.appUrl}/ar/dashboard/bookings`, "شوف حجزك") : "";
   const heading = d.isFirst ? "أهلاً بيك في البوصلة" : "حجزك اتأكد";
   const subject = d.isFirst
-    ? `أهلاً بيك في البوصلة — جلستك الأولى اتأكدت (${d.workshopTitle})`
-    : `حجزك اتأكد — ${d.workshopTitle}`;
+    ? `أهلاً بيك في البوصلة، جلستك الأولى اتأكدت (${d.workshopTitle})`
+    : `حجزك اتأكد، ${d.workshopTitle}`;
 
   const opening = d.isFirst
     ? `تحويلك وصل واتأكد، ومكانك في <strong style="color:#F59E0B;">${d.workshopTitle}</strong> بقى محجوز. دي أول خطوة في طريقك معانا، وإحنا مستنيينك.`
@@ -137,11 +137,11 @@ export function bookingApprovedEmail(d: BookingApprovedData): { subject: string;
       ${detailsBox(when, null)}
       <div style="background:rgba(59,130,246,0.10); border:1px solid rgba(59,130,246,0.30); border-radius:10px; padding:12px 14px; margin:14px 0;">
         <p style="margin:0; line-height:1.7; font-size:14px; color:#bfdbfe;">
-          <strong>لينك الجلسة</strong> هيظهر لك في لوحة التحكم قبل الميعاد بـ15 دقيقة، وهنبعتهولك على الإيميل كمان — مش محتاج تدوّر عليه.
+          <strong>لينك الجلسة</strong> هيظهر لك في لوحة التحكم قبل الميعاد بـ15 دقيقة، وهنبعتهولك على الإيميل كمان، مش محتاج تدوّر عليه.
         </p>
       </div>
       <p style="line-height:1.7; margin:0 0 4px; font-size:14px; color:#9ca3af;">
-        قبل الجلسة، اكتب أهم حاجة عايز تخرج بيها منها — ده بيخلي الجلسة أنفع ليك بكتير.
+        قبل الجلسة، اكتب أهم حاجة عايز تخرج بيها منها، ده بيخلي الجلسة أنفع ليك بكتير.
       </p>
       ${cta}
     `),
@@ -158,7 +158,7 @@ export interface PasswordResetData {
  *  shared mailer (which is rate-limited to a handful of messages an hour). */
 export function passwordResetEmail(d: PasswordResetData): { subject: string; html: string } {
   return {
-    subject: "رمز إعادة تعيين كلمة المرور — البوصلة",
+    subject: "رمز إعادة تعيين كلمة المرور، البوصلة",
     html: layout(`
       <h2 style="color:#fff; margin:0 0 10px;">إعادة تعيين كلمة المرور 🔑</h2>
       <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
@@ -205,7 +205,7 @@ export interface PaymentReminderData {
 /** Payment reminder email - first reminder at 12 hours. */
 export function paymentReminderEmail(d: PaymentReminderData): { subject: string; html: string } {
   return {
-    subject: `⏰ تذكير: استكمل دفعتك لتأكيد جلستك — ${d.workshopTitle}`,
+    subject: `⏰ تذكير: استكمل دفعتك لتأكيد جلستك، ${d.workshopTitle}`,
     html: layout(`
       <h2 style="color:#fff; margin:0 0 10px;">تذكير بالدفع ⏰</h2>
       <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
@@ -222,7 +222,7 @@ export function paymentReminderEmail(d: PaymentReminderData): { subject: string;
 /** Payment cancellation email - booking has been cancelled due to non-payment. */
 export function paymentCancelledEmail(d: Omit<PaymentReminderData, 'hoursRemaining'>): { subject: string; html: string } {
   return {
-    subject: `تم إلغاء حجزك — لم تكمل الدفع في الوقت المحدد`,
+    subject: `تم إلغاء حجزك، لم تكمل الدفع في الوقت المحدد`,
     html: layout(`
       <h2 style="color:#fca5a5; margin:0 0 10px;">تم إلغاء الحجز</h2>
       <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>

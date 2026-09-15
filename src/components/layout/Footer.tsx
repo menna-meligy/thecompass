@@ -88,7 +88,7 @@ export function Footer() {
                   {isRtl ? "البوصلة" : "The Compass"}
                 </div>
                 <div className="text-[#F59E0B]/60 text-xs mt-0.5">
-                  {isRtl ? "ليك طريق شبهك.. طريق مخصوص ليك" : "A Path That's Yours"}
+                  {isRtl ? "ليك طريق شبهك، طريق مخصوص ليك" : "A Path That's Yours"}
                 </div>
               </div>
             </div>
