@@ -451,10 +451,10 @@ INSERT INTO public.announcements (id, title_ar, title_en, body_ar, body_en, is_a
 VALUES
   (
     'e1b2c3d4-0001-0001-0001-000000000001',
-    'مرحباً بكم في البوصلة!',
+    'مرحباً بك في البوصلة!',
     'Welcome to The Compass!',
-    'نحن سعداء بانضمامكم إلى مجتمع البوصلة. استخدم كود WELCOME20 للحصول على خصم 20% على أول جلسة.',
-    'We are happy to have you join The Compass community. Use code WELCOME20 for 20% off your first session.',
+    'نحن سعداء بانضمامك إلى مجتمع البوصلة. استخدم كود WELCOME20 للحصول على خصم 20% على أول جلسة.',
+    'Welcome to The Compass community. Use code WELCOME20 for 20% off your first session.',
     true
   )
 ON CONFLICT (id) DO NOTHING;
