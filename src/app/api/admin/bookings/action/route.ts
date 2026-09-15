@@ -87,9 +87,12 @@ export async function POST(request: NextRequest) {
     // Welcome the client the moment their seat is real. Sent from here rather
     // than the browser so it can't be lost to a closed tab, and never fatal —
     // a bounced email must not make the coach think the approval failed.
-    await sendApprovalEmail(admin, booking as any);
+    const mail = await sendApprovalEmail(admin, booking as any);
 
-    return NextResponse.json({ ok: true, status: "confirmed" });
+    // Tell the coach if the client was NOT emailed. Swallowing this let her
+    // believe every confirmation had gone out when Resend was refusing all of
+    // them, and the client heard nothing.
+    return NextResponse.json({ ok: true, status: "confirmed", email: mail });
   }
 
   if (action === "attended") {
@@ -126,10 +129,15 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ ok: true, status: "cancelled", released: true });
 }
 
-async function sendApprovalEmail(admin: any, b: any) {
+async function sendApprovalEmail(
+  admin: any,
+  b: any,
+): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
   try {
     const email = b?.user?.email;
-    if (!email || !b?.slot?.date || !b?.slot?.start_time) return;
+    if (!email || !b?.slot?.date || !b?.slot?.start_time) {
+      return { ok: false, error: "no_recipient" };
+    }
 
     // "your first session" only if this is their first confirmed booking.
     const { count } = await admin
@@ -149,8 +157,9 @@ async function sendApprovalEmail(admin: any, b: any) {
       appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
       isFirst: (count ?? 1) <= 1,
     });
-    await sendEmail({ to: email, subject, html });
+    return await sendEmail({ to: email, subject, html });
   } catch (e) {
     logError(e, { where: "api/admin/bookings/action", op: "sendApprovalEmail" });
+    return { ok: false, error: e instanceof Error ? e.message : "send_failed" };
   }
 }

@@ -129,6 +129,15 @@ export default function AdminBookingsPage() {
         setNotice(data.message || data.error || t("العملية فشلت", "That didn't work"));
         return;
       }
+      const data = await res.json().catch(() => ({}));
+      if (action === "confirm" && data?.email && data.email.ok === false) {
+        setNotice(
+          t(
+            "الحجز اتأكد، بس الإيميل مبعتش للعميل — كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",
+            "Confirmed, but the client was NOT emailed — tell them yourself. (Email needs a verified domain in Resend.)",
+          ),
+        );
+      }
       await load();
     } finally {
       setBusy(null);
