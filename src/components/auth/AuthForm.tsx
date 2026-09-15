@@ -32,7 +32,12 @@ const forgotSchema = z.object({
 });
 
 const resetSchema = z.object({
-  code: z.string().min(6, "invalidOrExpiredCode").max(6, "invalidOrExpiredCode"),
+  // Supabase mints an 8-digit recovery code, and the length is a project
+  // setting — pinning this to exactly 6 made the code impossible to enter.
+  code: z
+    .string()
+    .transform((v) => v.replace(/\s/g, ""))
+    .pipe(z.string().regex(/^\d{6,10}$/, "invalidOrExpiredCode")),
   password: z.string().min(6, "passwordMin"),
 });
 
@@ -409,7 +414,8 @@ export function AuthForm() {
           <Input
             label={t("resetCode")}
             inputMode="numeric"
-            maxLength={6}
+            autoComplete="one-time-code"
+            maxLength={10}
             error={fieldError(resetForm.formState.errors.code?.message)}
             {...resetForm.register("code")}
           />
