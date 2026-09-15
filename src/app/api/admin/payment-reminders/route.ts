@@ -84,7 +84,7 @@ export async function POST(request: Request) {
                     ⏳ عندك <strong style="color: #fca5a5;">${hoursRemaining} ساعات</strong> عشان تكمل الدفع وإلا هنلغي حجزك!
                   </p>
                   <div style="background: rgba(245,158,11,0.1); border-right: 3px solid #F59E0B; padding: 12px 16px; margin: 14px 0; border-radius: 4px;">
-                    <p style="color: #F59E0B; margin: 0; font-weight: bold;">💡 استكمل الدفع دلوقتي عشان ما تخسر مكانك</p>
+                    <p style="color: #F59E0B; margin: 0; font-weight: bold;">استكمل الدفع دلوقتي عشان ما تخسر مكانك</p>
                   </div>
                   <a href="${process.env.NEXT_PUBLIC_APP_URL}/ar/dashboard/bookings" style="display: inline-block; background: #F59E0B; color: #0f172a; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px;">استكمل الدفع</a>
                   <p style="margin-top: 30px; color: rgba(255,255,255,0.4); font-size: 12px;">
@@ -150,17 +150,17 @@ export async function POST(request: Request) {
             await resend.emails.send({
               from: "البوصلة <noreply@albosla.vercel.app>",
               to: user.email,
-              subject: `❌ تم إلغاء حجزك — لم تكمل الدفع في الوقت المحدد`,
+              subject: `تم إلغاء حجزك — لم تكمل الدفع في الوقت المحدد`,
               html: `
                 <div style="direction: rtl; font-family: Arial, sans-serif; background: #0f172a; color: white; padding: 20px;">
                   <div style="max-width: 600px; margin: 0 auto; background: rgba(30,41,59,0.6); border-radius: 12px; padding: 30px;">
-                    <h2 style="color: #fca5a5; margin: 0 0 20px;">تم إلغاء الحجز ❌</h2>
+                    <h2 style="color: #fca5a5; margin: 0 0 20px;">تم إلغاء الحجز</h2>
                     <p style="line-height: 1.7; margin: 0 0 12px;">أهلاً ${user.full_name}،</p>
                     <p style="line-height: 1.7; margin: 0 0 12px;">
                       نأسف، لكن حجزك في <strong>${workshopTitle}</strong> تم إلغاؤه لأنك ما أكملتش الدفع في الوقت المحدد.
                     </p>
                     <p style="line-height: 1.7; margin: 0 0 12px;">
-                      لو بتفكر تحجز مرة ثانية، اضغط الزرار تحت وختار جلسة جديدة. 💪
+                      لو بتفكر تحجز مرة ثانية، اضغط الزرار تحت وختار جلسة جديدة.
                     </p>
                     <a href="${process.env.NEXT_PUBLIC_APP_URL}/ar/book/general" style="display: inline-block; background: #F59E0B; color: #0f172a; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-top: 20px;">اختر جلسة جديدة</a>
                     <p style="margin-top: 30px; color: rgba(255,255,255,0.4); font-size: 12px;">

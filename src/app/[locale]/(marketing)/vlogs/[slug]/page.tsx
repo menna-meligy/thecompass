@@ -96,7 +96,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ locale
 
         {/* takeaways */}
         <div style={{ marginTop: "40px", background: `linear-gradient(135deg, ${article.accent}14, rgba(15,23,42,0.4))`, border: `1px solid ${article.accent}33`, borderRadius: "16px", padding: "24px 24px 26px" }}>
-          <h3 style={{ color: "#fff", fontWeight: 900, fontSize: "1.2rem", marginBottom: "16px" }}>{t("الخلاصة 🎯", "Key takeaways 🎯")}</h3>
+          <h3 style={{ color: "#fff", fontWeight: 900, fontSize: "1.2rem", marginBottom: "16px" }}>{t("الخلاصة", "Key takeaways")}</h3>
           <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
             {takeaways.map((tk, i) => (
               <li key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>

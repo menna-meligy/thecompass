@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     subject = `تأكيد الحجز - ${workshopTitle}`;
     html = `
       <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #8B0000;">البوصلة 🧭</h1>
+        <h1 style="color: #8B0000;">البوصلة</h1>
         <h2>تأكيد الحجز</h2>
         <p>تم تأكيد حجزك في <strong>${workshopTitle}</strong>.</p>
         <p>سنتواصل معك قريباً بتفاصيل الجلسة.</p>
@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
     subject = `تم تأكيد دفعتك - ${workshopTitle}`;
     html = `
       <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #8B0000;">البوصلة 🧭</h1>
-        <h2>تم تأكيد الدفع ✅</h2>
+        <h1 style="color: #8B0000;">البوصلة</h1>
+        <h2>تم تأكيد الدفع</h2>
         <p>تم التحقق من دفعتك وتأكيد حجزك في <strong>${workshopTitle}</strong>.</p>
         <p>موعد الجلسة: <strong>${slotWhen}</strong></p>
         <p>نتطلع إلى لقائك!</p>
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     subject = `تذكير - جلستك غداً: ${workshopTitle}`;
     html = `
       <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #8B0000;">البوصلة 🧭</h1>
+        <h1 style="color: #8B0000;">البوصلة</h1>
         <h2>تذكير بجلستك ⏰</h2>
         <p>جلستك في <strong>${workshopTitle}</strong> غداً.</p>
         <p>تأكد من الحضور في الوقت المحدد!</p>
@@ -96,10 +96,10 @@ export async function POST(request: NextRequest) {
     // Notify the admin that a client submitted a payment awaiting review.
     recipient = process.env.ADMIN_EMAIL || "";
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "";
-    subject = `💰 دفعة جديدة تنتظر المراجعة: ${workshopTitle}`;
+    subject = `دفعة جديدة تنتظر المراجعة: ${workshopTitle}`;
     html = `
       <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #F59E0B;">البوصلة 🧭</h1>
+        <h1 style="color: #F59E0B;">البوصلة</h1>
         <h2>دفعة جديدة تحتاج مراجعة</h2>
         <p>قام عميل برفع إيصال دفع لحجز جديد:</p>
         <table style="border-collapse: collapse; width: 100%; font-size: 14px;">

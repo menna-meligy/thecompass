@@ -60,8 +60,8 @@ const REASONS: Record<string, { ar: string; en: string }> = {
   date_future: { ar: "تاريخ التحويل في المستقبل", en: "Transfer date is in the future" },
   date_unreadable: { ar: "مقدرناش نقرا التاريخ", en: "Couldn't read the date" },
   reference_missing: { ar: "مفيش رقم عملية واضح", en: "No clear transaction reference" },
-  duplicate_reference: { ar: "⚠️ رقم العملية مستخدم في حجز تاني", en: "⚠️ Reference already used on another booking" },
-  duplicate_proof: { ar: "⚠️ الصورة دي مستخدمة قبل كده", en: "⚠️ This image was used before" },
+  duplicate_reference: { ar: "رقم العملية مستخدم في حجز تاني", en: "Reference already used on another booking" },
+  duplicate_proof: { ar: "الصورة دي مستخدمة قبل كده", en: "This image was used before" },
   slot_taken: { ar: "الموعد اتاخد قبلها", en: "The slot was taken first" },
 };
 

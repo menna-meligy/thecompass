@@ -85,7 +85,7 @@ export default async function ResumeBookingPage(props: {
   if (payment?.status === "paid" || booking.status === "confirmed") {
     return (
       <Problem
-        title={t("الحجز ده متأكد ✅", "This booking is confirmed ✅")}
+        title={t("الحجز ده متأكد", "This booking is confirmed")}
         body={t("مفيش حاجة مطلوبة منك.", "There's nothing left for you to do.")}
       />
     );

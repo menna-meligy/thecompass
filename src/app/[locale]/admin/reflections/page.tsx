@@ -122,7 +122,7 @@ export default function AdminReflectionsPage() {
           {isAr ? "النمو والتقييم" : "Growth & Feedback"}
         </p>
         <h1 className="text-2xl font-black text-white">
-          {isAr ? "💭 رسائل التشجيع" : "💭 Reflections"}
+          {isAr ? "رسائل التشجيع" : "Reflections"}
         </h1>
       </div>
 

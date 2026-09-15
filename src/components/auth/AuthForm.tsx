@@ -135,6 +135,24 @@ export function AuthForm() {
   async function handleRegister(data: RegisterData) {
     setLoading(true);
     setError(null);
+
+    // Check first, before ever calling signUp(). If this email belongs to an
+    // unconfirmed account, signUp() itself would silently delete that account
+    // and create a fresh one in its place (a real Supabase Auth behavior) —
+    // wiping the person's profile and progress. Blocking here is what
+    // prevents that.
+    const checkRes = await fetch("/api/auth/check-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: data.email }),
+    });
+    const checkResult = await checkRes.json().catch(() => ({ exists: false }));
+    if (checkResult.exists) {
+      setError(t("errors.emailAlreadyRegistered"));
+      setLoading(false);
+      return;
+    }
+
     const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,

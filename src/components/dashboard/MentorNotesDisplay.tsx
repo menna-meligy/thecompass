@@ -84,7 +84,7 @@ export default function MentorNotesDisplay({
         setError(null);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "error_loading";
+      const message = err instanceof Error ? err.message : (isAr ? "حصل خطأ أثناء تحميل البيانات" : "Something went wrong loading the data");
       setError(message);
     } finally {
       setLoading(false);
@@ -205,7 +205,7 @@ export default function MentorNotesDisplay({
             </div>
             <div className="min-w-0 flex-1">
               <CardTitle className="flex items-center gap-2">
-                <span>{isAr ? "💬 ملاحظات المرشد" : "💬 Mentor Notes"}</span>
+                <span>{isAr ? "ملاحظات المرشد" : "Mentor Notes"}</span>
               </CardTitle>
               {sessionLabel && (
                 <p className="text-xs text-white/55 mt-1">

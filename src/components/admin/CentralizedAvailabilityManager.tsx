@@ -168,7 +168,7 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-white mb-1">
-            {t("📅 مواعيدك", "📅 Your availability")}
+            {t("مواعيدك", "Your availability")}
           </h2>
           <p className="text-white/50 text-sm">
             {t(

@@ -136,7 +136,7 @@ export default function SessionQuestionnaire({
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-black text-white mb-2">
-            {isAr ? "🎯 تعرّف علينا بنفسك" : "🎯 Get to Know You"}
+            {isAr ? "تعرّف علينا بنفسك" : "Get to Know You"}
           </h1>
           <p className="text-white/50 text-sm">
             {isAr

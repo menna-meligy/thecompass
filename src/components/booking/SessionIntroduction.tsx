@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Lightbulb, Heart, Target, Zap } from "lucide-react";
+import { ChevronRight, Lightbulb, Heart, Target, Zap, Compass } from "lucide-react";
 
 interface SessionIntroductionProps {
   onContinue: () => void;
@@ -63,7 +63,7 @@ export default function SessionIntroduction({
         {/* Hero Section */}
         <div className="mb-12">
           <div className="mb-6 inline-block">
-            <div className="text-5xl">🧭</div>
+            <Compass className="w-12 h-12 text-amber-400" />
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
             {isAr ? "تعرّف على نفسك حقاً" : "Know Yourself Truly"}
@@ -100,8 +100,9 @@ export default function SessionIntroduction({
 
         {/* What to Expect */}
         <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg p-6 mb-12">
-          <h2 className="font-bold text-white mb-3">
-            {isAr ? "🎯 ماذا تتوقع؟" : "🎯 What to Expect?"}
+          <h2 className="font-bold text-white mb-3 flex items-center gap-2">
+            <Target className="w-4 h-4 text-amber-400" />
+            {isAr ? "ماذا تتوقع؟" : "What to Expect?"}
           </h2>
           <ul className="space-y-2 text-white/80 text-sm">
             <li className="flex gap-3">

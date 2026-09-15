@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin, ChevronLeft } from "lucide-react";
+import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin, ChevronLeft, CreditCard, Smartphone } from "lucide-react";
 import QRCode from "qrcode";
 import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
 import { offeringNoun, parseOfferingKey } from "@/lib/offerings";
@@ -365,7 +365,7 @@ export default function BookingFlow({
             const isSelected = selectedMethod === method;
             const isInstapay = method === "instapay";
             const label = isInstapay ? (isAr ? "إنستاباي" : "InstaPay") : (isAr ? "فودافون كاش" : "Vodafone Cash");
-            const icon = isInstapay ? "💳" : "📱";
+            const IconComp = isInstapay ? CreditCard : Smartphone;
 
             function handleOpenPaymentApp() {
               setSelectedMethod(method);
@@ -387,7 +387,9 @@ export default function BookingFlow({
                   transition: "all 0.15s",
                 }}
               >
-                <div style={{ fontSize: "1.5rem", width: "40px", height: "40px", borderRadius: "8px", background: "rgba(245,158,11,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{icon}</div>
+                <div style={{ width: "40px", height: "40px", borderRadius: "8px", background: "rgba(245,158,11,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <IconComp size={20} style={{ color: "#F59E0B" }} />
+                </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, color: isSelected ? "#F59E0B" : "rgba(255,255,255,0.85)", fontSize: "0.9rem" }}>{label}</div>
                   <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.35)", fontFamily: "monospace", marginTop: "2px" }}>{isInstapay ? INSTAPAY_NUMBER : VODAFONE_NUMBER}</div>
@@ -596,7 +598,9 @@ export default function BookingFlow({
                   href={`/${locale}/dashboard/bookings`}
                   style={{ width: "100%", padding: "11px", borderRadius: "8px", background: "#F59E0B", color: "#0f172a", fontWeight: 900, fontSize: "0.88rem", textAlign: "center", textDecoration: "none" }}
                 >
-                  {isAr ? "تمام، هتابع" : "OK, I'll follow up"}
+                  {/* The point of this button is that the client is content to
+                      wait for a person — say that, not a vague "I'll follow up". */}
+                  {isAr ? "تمام، مستني موافقة الدعم" : "OK, waiting for support to approve"}
                 </Link>
               </div>
             </div>

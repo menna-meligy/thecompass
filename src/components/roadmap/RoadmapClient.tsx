@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { StickyNote } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import HorizontalRoadmap from "./HorizontalRoadmap";
 import type { SessionMilestone } from "./HorizontalRoadmap";
@@ -26,7 +27,7 @@ const STORAGE_KEY = "albosla_kanban_v2";
 const REGISTRATION_TASK: Task = {
   id: "reg-node",
   title: "Joined The Compass",
-  icon: "🧭",
+  icon: "◎",
   status: "done",
   position: 0,
   pinned: true,
@@ -139,7 +140,6 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
             id: booking.id,
             title,
             date: booking.session?.starts_at || new Date().toISOString(),
-            icon: "📅",
           };
         });
         setSessionMilestones(milestones);
@@ -351,7 +351,9 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
                 padding: "48px 24px",
                 textAlign: "center",
               }}>
-                <div style={{ fontSize: "2rem", marginBottom: "12px" }}>📝</div>
+                <div style={{ marginBottom: "12px", display: "flex", justifyContent: "center" }}>
+                  <StickyNote size={32} style={{ color: "rgba(167,139,250,0.5)" }} />
+                </div>
                 <p style={{ color: "rgba(167,139,250,0.7)", fontSize: "0.9rem", fontWeight: 600 }}>
                   {isAr ? "لسه مفيش ملاحظات من المنتور" : "No notes from mentor yet"}
                 </p>

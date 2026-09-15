@@ -124,7 +124,7 @@ export default function MentorNotesForm({
           throw new Error(`HTTP ${response.status}`);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "error_loading");
+        setError(err instanceof Error ? err.message : (isAr ? "حصل خطأ أثناء تحميل البيانات" : "Something went wrong loading the data"));
       } finally {
         setLoading(false);
       }
@@ -165,7 +165,7 @@ export default function MentorNotesForm({
       onSave?.(savedNote);
       setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "error_saving");
+      setError(err instanceof Error ? err.message : (isAr ? "حصل خطأ أثناء الحفظ" : "Something went wrong saving"));
     } finally {
       setSaving(false);
     }
@@ -203,7 +203,7 @@ export default function MentorNotesForm({
       onSave?.(publishedNote);
       setTimeout(() => setSuccess(false), 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "error_saving");
+      setError(err instanceof Error ? err.message : (isAr ? "حصل خطأ أثناء الحفظ" : "Something went wrong saving"));
     } finally {
       setPublishing(false);
     }

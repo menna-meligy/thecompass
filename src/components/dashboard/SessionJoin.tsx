@@ -46,7 +46,7 @@ export default function SessionJoin({ startsAt, bookingLink, locale }: Props) {
             {isAr ? "ادخل الجلسة دلوقتي" : "Join your session now"}
           </p>
           <p style={{ fontSize: "0.72rem", color: "rgba(15,23,42,0.75)", marginTop: "1px" }}>
-            {isAr ? "المنتور مستنيك 👋" : "Your mentor is waiting 👋"}
+            {isAr ? "المنتور مستنيك" : "Your mentor is waiting"}
           </p>
         </div>
         <ArrowRight

@@ -191,7 +191,9 @@ export default async function BookingsPage() {
             background: "rgba(30,41,59,0.4)", border: "1px solid rgba(245,158,11,0.10)",
             borderRadius: "12px", textAlign: "center", padding: "56px 24px",
           }}>
-            <div style={{ fontSize: "2.5rem", marginBottom: "14px" }}>📋</div>
+            <div style={{ marginBottom: "14px", display: "flex", justifyContent: "center" }}>
+              <FileText size={40} style={{ color: "rgba(255,255,255,0.25)" }} />
+            </div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.95rem", marginBottom: "8px", fontWeight: 600 }}>
               {isAr ? "مفيش حجوزات لحد دلوقتي" : "No bookings yet"}
             </p>

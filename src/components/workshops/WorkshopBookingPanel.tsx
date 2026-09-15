@@ -75,7 +75,7 @@ export default function WorkshopBookingPanel({
         title={`${workshopTitle} — ${suffix}`}
         price={price}
         isAr={isAr}
-        heading={isAr ? "📅 اختر موعداً" : "📅 Choose a time"}
+        heading={isAr ? "اختر موعداً" : "Choose a time"}
       />
     </div>
   );

@@ -95,7 +95,7 @@ export default function NextSessionCountdown({ startsAt, title, locationOrLink, 
 
       {isOnline && join === "too_early" && (
         <p className="relative mt-4 text-xs leading-relaxed" style={{ color: "rgba(191,219,254,0.85)" }}>
-          🎥 {linkAppearsNote(isAr)}
+          {linkAppearsNote(isAr)}
         </p>
       )}
     </div>

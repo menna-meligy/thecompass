@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, X, GripVertical, ChevronDown, ChevronUp, Trophy, Lock, Check, Flag } from "lucide-react";
+import { Plus, X, GripVertical, ChevronDown, ChevronUp, Trophy, Lock, Check, Flag, Pin } from "lucide-react";
 import type { Task, Status, TaskStep } from "./RoadmapClient";
 
 const EMOJIS = ["🎯","🚀","📚","💡","🔥","⚡","🌟","🎓","💪","🧭","📝","✅","🏆","🌱","🔑","💎","🗺️","🎨","🤝","📊"];
@@ -29,7 +29,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
   const isAr = locale === "ar";
   const [addingTo, setAddingTo] = useState<Status | null>(null);
   const [newTitle, setNewTitle] = useState("");
-  const [newIcon, setNewIcon] = useState("🎯");
+  const [newIcon, setNewIcon] = useState(EMOJIS[0]);
   const [showEmojis, setShowEmojis] = useState(false);
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<Status | null>(null);
@@ -45,7 +45,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
       position: tasks.filter((t) => t.status === status).length, steps: [],
     };
     setTasks((prev) => [...prev, newTask]);
-    setNewTitle(""); setNewIcon("🎯"); setAddingTo(null); setShowEmojis(false);
+    setNewTitle(""); setNewIcon(EMOJIS[0]); setAddingTo(null); setShowEmojis(false);
     setExpanded(newTask.id);
   }
 
@@ -163,7 +163,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
                         style={{ padding: "11px 12px", display: "flex", alignItems: "center", gap: "9px", cursor: task.pinned ? "default" : "pointer" }}
                       >
                         {canEdit && !isOpen && <GripVertical className="h-3.5 w-3.5 flex-shrink-0" style={{ color:"rgba(255,255,255,0.15)" }} />}
-                        {task.pinned && <span style={{ fontSize:"0.7rem", flexShrink:0 }}>📌</span>}
+                        {task.pinned && <Pin className="h-3 w-3 flex-shrink-0" style={{ color: "#F59E0B" }} fill="#F59E0B" />}
                         <span style={{ fontSize:"1.1rem", flexShrink:0 }}>{task.icon}</span>
                         <span style={{ flex: 1, fontSize: "0.875rem", fontWeight: task.pinned ? 700 : 600, color: allDone ? "#86EFAC" : task.pinned ? "#F59E0B" : "rgba(255,255,255,0.9)", minWidth: 0, wordBreak: "break-word", lineHeight: 1.35 }}>
                           {task.title}
@@ -223,7 +223,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
                                   <Flag className="h-3 w-3" style={{ color: allDone ? "#0f172a" : "rgba(255,255,255,0.3)" }} />
                                 </div>
                                 <span style={{ fontSize: "0.78rem", fontWeight: 700, color: allDone ? "#86EFAC" : "rgba(255,255,255,0.3)" }}>
-                                  {allDone ? (isAr ? "خلّصت المهمة دي! 🎉" : "Task complete! 🎉") : (isAr ? "خط النهاية" : "Finish")}
+                                  {allDone ? (isAr ? "خلّصت المهمة دي!" : "Task complete!") : (isAr ? "خط النهاية" : "Finish")}
                                 </span>
                               </div>
                             )}

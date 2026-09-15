@@ -59,7 +59,7 @@ export default function SessionCountdownTimer({
     return (
       <div className="p-4 bg-amber-500/20 border border-amber-500/50 rounded-lg text-center">
         <p className="text-amber-300 font-semibold">
-          {isAr ? "🎉 الجلسة جارية الآن!" : "🎉 Session is happening now!"}
+          {isAr ? "الجلسة جارية الآن!" : "Session is happening now!"}
         </p>
       </div>
     );
@@ -96,7 +96,7 @@ export default function SessionCountdownTimer({
       {timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes <= 30 && (
         <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg">
           <p className="text-red-300 text-sm font-semibold text-center">
-            {isAr ? "⚠️ ستبدأ الجلسة قريباً!" : "⚠️ Session starting soon!"}
+            {isAr ? "ستبدأ الجلسة قريباً!" : "Session starting soon!"}
           </p>
         </div>
       )}

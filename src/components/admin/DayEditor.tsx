@@ -13,8 +13,8 @@ import type { AdminSlot } from "./availability-types";
  * own buttons — they used to sit side by side under one shared time form, where
  * "mark unavailable" silently reused whatever times happened to be typed in:
  *
- *   🟢 Available day → add one or more bookable time windows
- *   🔴 Full day      → close the whole day; nothing on it is bookable
+ *   Available day → add one or more bookable time windows
+ *   Full day      → close the whole day; nothing on it is bookable
  */
 
 type Mode = null | "available" | "close";
@@ -167,7 +167,7 @@ export default function DayEditor({
                 >
                   <span className="flex items-center gap-2 text-green-300 font-black mb-1">
                     <CalendarPlus className="w-4 h-4" />
-                    {t("🟢 يوم متاح", "🟢 Available day")}
+                    {t("يوم متاح", "Available day")}
                   </span>
                   <span className="block text-white/50 text-xs leading-relaxed">
                     {t("ضيفي مواعيد يقدر العملاء يحجزوها", "Add time windows clients can book")}
@@ -185,7 +185,7 @@ export default function DayEditor({
                 >
                   <span className="flex items-center gap-2 text-red-300 font-black mb-1">
                     <Lock className="w-4 h-4" />
-                    {t("🔴 يوم كامل مقفول", "🔴 Full day closed")}
+                    {t("يوم كامل مقفول", "Full day closed")}
                   </span>
                   <span className="block text-white/50 text-xs leading-relaxed">
                     {t("اقفلي اليوم كله، مش هيظهر لحد", "Close the whole day — nobody can book it")}

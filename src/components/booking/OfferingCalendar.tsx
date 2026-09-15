@@ -177,7 +177,7 @@ export default function OfferingCalendar({ offering, title, price, isAr, heading
       style={{ textAlign: isAr ? "right" : "left", direction: isAr ? "rtl" : "ltr" }}
     >
       <h3 className="text-white font-bold text-lg mb-6">
-        {heading ?? (isAr ? "📅 اختر موعداً" : "📅 Choose a time")}
+        {heading ?? (isAr ? "اختر موعداً" : "Choose a time")}
       </h3>
 
       {/* Month navigation */}

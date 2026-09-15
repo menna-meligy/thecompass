@@ -79,8 +79,8 @@ export default function PaymentCountdownTimer({ paymentDeadline, onExpired }: Pa
           </div>
           <p className="text-xs text-white/50 mt-2">
             {isLowTime
-              ? "⚠️ قريب جداً! استكمل الدفع دلوقتي قبل ما تخسر مكانك"
-              : "🕐 عندك 24 ساعة من اختيار الجلسة"}
+              ? "قريب جداً! استكمل الدفع دلوقتي قبل ما تخسر مكانك"
+              : "عندك 24 ساعة من اختيار الجلسة"}
           </p>
         </div>
       </div>

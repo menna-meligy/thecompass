@@ -58,7 +58,7 @@ export default async function ClientReflectionsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-black text-white mb-1">
-            {isAr ? "💭 رسائل التشجيع" : "💭 Feedback Hub"}
+            {isAr ? "رسائل التشجيع" : "Feedback Hub"}
           </h1>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.875rem" }}>
             {isAr
@@ -78,7 +78,9 @@ export default async function ClientReflectionsPage() {
               padding: "56px 24px",
             }}
           >
-            <div style={{ fontSize: "2.5rem", marginBottom: "14px" }}>💭</div>
+            <div style={{ marginBottom: "14px", display: "flex", justifyContent: "center" }}>
+              <MessageSquare size={40} style={{ color: "rgba(255,255,255,0.25)" }} />
+            </div>
             <p
               style={{
                 color: "rgba(255,255,255,0.4)",

@@ -237,7 +237,11 @@ export default async function DashboardPage() {
             <div className="space-y-2.5">
               {(mentorNotes as unknown as { id: string; title: string; icon: string | null }[]).map((note) => (
                 <div key={note.id} className="flex items-start gap-3">
-                  <span className="text-lg leading-none mt-0.5 flex-shrink-0">{note.icon || "📝"}</span>
+                  {note.icon ? (
+                    <span className="text-lg leading-none mt-0.5 flex-shrink-0">{note.icon}</span>
+                  ) : (
+                    <StickyNote className="h-4 w-4 mt-0.5 flex-shrink-0 text-[#A78BFA]" />
+                  )}
                   <p className="text-sm text-white/80 leading-relaxed">{note.title}</p>
                 </div>
               ))}

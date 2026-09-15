@@ -1,12 +1,12 @@
 "use client";
 
+import { Calendar } from "lucide-react";
 import type { Task } from "./RoadmapClient";
 
 export interface SessionMilestone {
   id: string;
   title: string;
   date: string; // ISO string
-  icon?: string;
 }
 
 interface Props {
@@ -87,7 +87,7 @@ export default function HorizontalRoadmap({ doneTasks, sessions = [], locale }: 
                       flexShrink: 0,
                     }}
                   >
-                    {s.icon || "📅"}
+                    <Calendar size={16} style={{ color: "rgba(139,92,246,0.9)" }} />
                   </div>
                   {/* Title */}
                   <div

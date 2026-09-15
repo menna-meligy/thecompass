@@ -82,7 +82,7 @@ export default function ClientReflectionsCard({
         setError(null);
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "error_loading";
+      const message = err instanceof Error ? err.message : (isAr ? "حصل خطأ أثناء تحميل البيانات" : "Something went wrong loading the data");
       setError(message);
     } finally {
       setLoading(false);
@@ -210,7 +210,7 @@ export default function ClientReflectionsCard({
             </div>
             <div className="min-w-0 flex-1">
               <CardTitle className="flex items-center gap-2">
-                <span>{isAr ? "📝 رسالة تشجيعية" : "📝 Mentor Feedback"}</span>
+                <span>{isAr ? "رسالة تشجيعية" : "Mentor Feedback"}</span>
               </CardTitle>
               <div className="flex items-center gap-2 mt-2 flex-wrap">
                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor}`}>

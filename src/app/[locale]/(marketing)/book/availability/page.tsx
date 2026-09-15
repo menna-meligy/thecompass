@@ -30,7 +30,7 @@ export default function CareerSessionBookingPage() {
       <div className="max-w-3xl mx-auto" dir={isAr ? "rtl" : "ltr"}>
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
-            {isAr ? "🧭 تعرّف على نفسك" : "🧭 Find your direction"}
+            {isAr ? "تعرّف على نفسك" : "Find your direction"}
           </h1>
           <p className="text-white/50 text-sm">{title}</p>
         </div>
