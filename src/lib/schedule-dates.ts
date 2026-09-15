@@ -72,9 +72,51 @@ export function isPastDate(date: string): boolean {
   return normaliseDate(date) < cairoNow().date;
 }
 
-/** An ISO timestamp for a Cairo wall-clock slot (Cairo is UTC+2 year-round). */
+/** How far ahead of UTC Cairo is at a given instant: +2 in winter, +3 in summer. */
+function cairoOffsetMs(at: number): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Africa/Cairo",
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).formatToParts(new Date(at));
+  const p: Record<string, string> = {};
+  for (const part of parts) p[part.type] = part.value;
+  const asUTC = Date.UTC(
+    Number(p.year),
+    Number(p.month) - 1,
+    Number(p.day),
+    Number(p.hour) % 24,
+    Number(p.minute),
+    Number(p.second),
+  );
+  return asUTC - at;
+}
+
+/**
+ * The real instant a Cairo wall-clock slot begins.
+ *
+ * This used to hard-code +02:00 on the belief that Cairo never moves. Egypt
+ * brought daylight saving back in 2023, so from late April to late October the
+ * country is UTC+3 — and every session was being placed an hour later than the
+ * time the client had been shown. The countdown ran an hour long, the join
+ * window opened an hour after the session began, and both reminder emails went
+ * out an hour late for half the year.
+ */
 export function slotStartsAtISO(date: string, startTime: string): string {
-  return `${normaliseDate(date)}T${shortTime(startTime) || "00:00"}:00+02:00`;
+  const wall = `${normaliseDate(date)}T${shortTime(startTime) || "00:00"}:00`;
+  const asIfUTC = Date.parse(`${wall}Z`);
+  if (Number.isNaN(asIfUTC)) return `${normaliseDate(date)}T00:00:00+02:00`;
+  // Subtract the offset in force at that moment; a second pass settles the
+  // handful of hours around a DST switch, where the first guess lands in the
+  // neighbouring offset.
+  let instant = asIfUTC - cairoOffsetMs(asIfUTC);
+  instant = asIfUTC - cairoOffsetMs(instant);
+  return new Date(instant).toISOString();
 }
 
 const MONTHS_AR = [
