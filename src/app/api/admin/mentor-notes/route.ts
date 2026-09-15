@@ -56,7 +56,6 @@ export async function GET(request: NextRequest) {
       .select("*")
       .eq("booking_id", bookingId)
       .eq("client_id", clientId)
-      .eq("is_public", true)
       .order("created_at", { ascending: false })
       .limit(1);
 

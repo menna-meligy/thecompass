@@ -7,7 +7,6 @@ import {
   Loader2,
   AlertCircle,
   Check,
-  Lock,
   Eye,
   Calendar,
   FileText
@@ -49,7 +48,6 @@ export default function ClientSessionNotesForm({
 
   // Form states
   const [publicNote, setPublicNote] = useState("");
-  const [privateNote, setPrivateNote] = useState("");
 
   // UI states
   const [loading, setLoading] = useState(true);
@@ -66,7 +64,7 @@ export default function ClientSessionNotesForm({
   // Dirty tracking
   const [isDirty, setIsDirty] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const initialValuesRef = useRef({ publicNote: "", privateNote: "" });
+  const initialValuesRef = useRef({ publicNote: "" });
 
   // Fetch existing notes
   useEffect(() => {
@@ -82,19 +80,11 @@ export default function ClientSessionNotesForm({
           const data = await response.json();
           const { clientNotes = [], mentorNotes = null } = data;
 
-          // Find public and private notes
           const publicN = clientNotes.find((n: ClientNote) => n.is_public);
-          const privateN = clientNotes.find((n: ClientNote) => !n.is_public);
-
           const publicContent = publicN?.[`content_${locale}`] || "";
-          const privateContent = privateN?.[`content_${locale}`] || "";
 
           setPublicNote(publicContent);
-          setPrivateNote(privateContent);
-          initialValuesRef.current = {
-            publicNote: publicContent,
-            privateNote: privateContent,
-          };
+          initialValuesRef.current = { publicNote: publicContent };
 
           if (publicN) setCreatedAt(publicN.created_at);
           if (publicN) setUpdatedAt(publicN.updated_at);
@@ -149,20 +139,6 @@ export default function ClientSessionNotesForm({
         setSuccess(true);
         setError(null);
 
-        // Auto-save private notes too
-        if (privateNote.trim()) {
-          await fetch("/api/client-notes", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              booking_id: bookingId,
-              client_id: clientId,
-              [`content_${locale}`]: privateNote.trim(),
-              is_public: false,
-            }),
-          });
-        }
-
         setIsDirty(false);
         setTimeout(() => setSuccess(false), 2000);
       } catch (err) {
@@ -177,7 +153,7 @@ export default function ClientSessionNotesForm({
         clearTimeout(autoSaveTimeoutRef.current);
       }
     };
-  }, [isDirty, publicNote, privateNote, bookingId, clientId, locale]);
+  }, [isDirty, publicNote, bookingId, clientId, locale]);
 
   // Handle manual save
   const handleSave = async (e?: React.FormEvent) => {
@@ -205,22 +181,8 @@ export default function ClientSessionNotesForm({
       setUpdatedAt(savedNote.updated_at);
       if (!createdAt) setCreatedAt(savedNote.created_at);
 
-      // Save private notes
-      if (privateNote.trim()) {
-        await fetch("/api/client-notes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            booking_id: bookingId,
-            client_id: clientId,
-            [`content_${locale}`]: privateNote.trim(),
-            is_public: false,
-          }),
-        });
-      }
-
       setIsDirty(false);
-      initialValuesRef.current = { publicNote, privateNote };
+      initialValuesRef.current = { publicNote };
       setSuccess(true);
       onSave?.(savedNote);
       setTimeout(() => setSuccess(false), 2000);
@@ -232,10 +194,8 @@ export default function ClientSessionNotesForm({
   };
 
   const publicCharCount = publicNote.length;
-  const privateCharCount = privateNote.length;
   const isPublicValid = publicCharCount >= MIN_CHARS && publicCharCount <= MAX_CHARS;
-  const isPrivateValid = privateCharCount === 0 || (privateCharCount >= MIN_CHARS && privateCharCount <= MAX_CHARS);
-  const isFormValid = isPublicValid && isPrivateValid;
+  const isFormValid = isPublicValid;
 
   if (loading) {
     return (
@@ -331,46 +291,6 @@ export default function ClientSessionNotesForm({
             {isAr
               ? "يرى المرشد هذه الملاحظات لفهم تجربتك بشكل أفضل"
               : "Your mentor will see these notes to better understand your experience"}
-          </p>
-        </div>
-
-        {/* Private Notes */}
-        <div className="space-y-3 pt-2 border-t border-white/10">
-          <div className="flex items-center justify-between gap-2">
-            <label className="text-sm font-semibold text-white flex items-center gap-2">
-              <Lock className="h-4 w-4 text-[#F59E0B]" />
-              {isAr ? "ملاحظات خاصة" : "Private Notes"}
-            </label>
-            <span className={`text-xs font-medium ${
-              isPrivateValid ? "text-white/50" : "text-red-400"
-            }`}>
-              {privateCharCount}/{MAX_CHARS}
-            </span>
-          </div>
-          <textarea
-            value={privateNote}
-            onChange={(e) => {
-              setPrivateNote(e.target.value);
-              setIsDirty(true);
-            }}
-            placeholder={
-              isAr
-                ? "ملاحظات شخصية لك وحدك فقط..."
-                : "Personal reflection just for you (optional)..."
-            }
-            dir={isAr ? "rtl" : "ltr"}
-            rows={4}
-            maxLength={MAX_CHARS}
-            className={`w-full px-4 py-3 rounded-lg bg-white/5 border text-sm text-white placeholder-white/40 focus:outline-none transition-colors resize-none ${
-              isPrivateValid || privateCharCount === 0
-                ? "border-white/10 focus:border-[#F59E0B]/50"
-                : "border-red-500/30 focus:border-red-500/50"
-            }`}
-          />
-          <p className="text-xs text-white/50">
-            {isAr
-              ? "هذه الملاحظات خاصة بك فقط ولن يراها المرشد"
-              : "These notes are private and only you will see them"}
           </p>
         </div>
 

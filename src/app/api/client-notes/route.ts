@@ -83,7 +83,9 @@ export async function POST(request: NextRequest) {
       client_id,
       content_ar,
       content_en,
-      is_public = false,
+      // Everything a client writes is for their mentor to read — the UI no
+      // longer offers a private note, so nothing should default to hidden.
+      is_public = true,
     } = body;
 
     if (!booking_id || !client_id) {
