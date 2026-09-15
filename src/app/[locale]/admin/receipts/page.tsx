@@ -33,6 +33,7 @@ interface Receipt {
   reference: string | null;
   proof_url: string | null;
   validation_errors: string[];
+  ocr_amount: number | null;
   attempts: number;
   holds_slot: boolean;
   uploaded_at: string;
@@ -331,6 +332,14 @@ export default function AdminReceiptsPage() {
                       <li key={e}>{REASONS[e] ? (isAr ? REASONS[e].ar : REASONS[e].en) : e}</li>
                     ))}
                   </ul>
+                  {r.ocr_amount != null && (
+                    <p className="text-sm text-white/80 mt-2">
+                      {t("الفحص قرا: ", "The check read: ")}
+                      <span className="font-bold">{r.ocr_amount.toLocaleString()} {t("ج.م", "EGP")}</span>
+                      {t("  ·  المطلوب: ", "  ·  expected: ")}
+                      <span className="font-bold">{r.amount?.toLocaleString()} {t("ج.م", "EGP")}</span>
+                    </p>
+                  )}
                   <p className="text-white/45 text-xs mt-2">
                     {t(
                       "بصّي على الصورة بنفسك — الفحص بيغلط في قراية الأرقام. لو التحويل سليم اضغطي أكّد الحجز.",

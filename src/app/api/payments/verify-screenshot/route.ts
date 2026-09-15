@@ -170,6 +170,8 @@ export async function POST(req: NextRequest) {
         receipt_image_url: finalProofUrl,
         receipt_validated_at: new Date().toISOString(),
         receipt_validation_status: passed ? "auto_verified" : "needs_review",
+        receipt_ocr_amount: parsed.amount,
+        receipt_ocr_reference: parsed.reference,
         receipt_validation_errors: passed ? null : errors,
         receipt_attempts: (payment.receipt_attempts ?? 0) + 1,
         receipt_last_attempt_at: new Date().toISOString(),

@@ -18,6 +18,13 @@
 alter table public.payments
   add column if not exists receipt_validation_errors jsonb;
 
+-- What the OCR actually read, so the coach can compare it against the image
+-- rather than taking the machine's word for it.
+alter table public.payments
+  add column if not exists receipt_ocr_amount numeric;
+alter table public.payments
+  add column if not exists receipt_ocr_reference text;
+
 -- How many times this client has tried, and when they last did.
 alter table public.payments
   add column if not exists receipt_attempts integer not null default 0;

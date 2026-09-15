@@ -553,6 +553,8 @@ export type Database = {
           receipt_validated_at: string | null;
           receipt_validation_status: string | null;
           receipt_validation_errors: string[] | null;
+          receipt_ocr_amount: number | null;
+          receipt_ocr_reference: string | null;
           receipt_attempts: number;
           receipt_last_attempt_at: string | null;
         };
@@ -578,6 +580,8 @@ export type Database = {
           receipt_validated_at?: string | null;
           receipt_validation_status?: string | null;
           receipt_validation_errors?: string[] | null;
+          receipt_ocr_amount?: number | null;
+          receipt_ocr_reference?: string | null;
           receipt_attempts?: number;
           receipt_last_attempt_at?: string | null;
         };
@@ -603,6 +607,8 @@ export type Database = {
           receipt_validated_at?: string | null;
           receipt_validation_status?: string | null;
           receipt_validation_errors?: string[] | null;
+          receipt_ocr_amount?: number | null;
+          receipt_ocr_reference?: string | null;
           receipt_attempts?: number;
           receipt_last_attempt_at?: string | null;
         };

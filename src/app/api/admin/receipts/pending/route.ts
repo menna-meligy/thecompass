@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
        payment:payments(id, amount, currency, method, status, proof_url, receipt_image_url,
                         gateway_txn_id, admin_approved, approved_at, created_at,
                         receipt_validation_status, receipt_validation_errors,
-                        receipt_attempts, receipt_last_attempt_at)`,
+                        receipt_attempts, receipt_last_attempt_at,
+                        receipt_ocr_amount, receipt_ocr_reference)`,
     )
     .order("created_at", { ascending: false })
     .limit(300);
@@ -90,6 +91,7 @@ export async function GET(request: NextRequest) {
           ? payment.receipt_validation_errors
           : [],
         attempts: payment.receipt_attempts ?? 1,
+        ocr_amount: payment.receipt_ocr_amount ?? null,
         holds_slot: !!b.slot_reserved_at,
         uploaded_at: payment.receipt_last_attempt_at ?? payment.created_at,
         approved_at: payment.approved_at,
