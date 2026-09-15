@@ -71,17 +71,40 @@ export async function POST(request: NextRequest) {
     });
 
     const res = await sendEmail({ to: address, subject, html });
-    if (!res.ok) {
-      logError(new Error("reset code email failed"), {
-        where: "api/auth/reset-code",
-        op: "sendEmail",
-      });
-      return NextResponse.json({ error: "send_failed" }, { status: 502 });
-    }
+    if (res.ok) return NextResponse.json({ ok: true, via: "resend" });
 
-    return NextResponse.json({ ok: true });
+    logError(new Error("reset code email failed, falling back"), {
+      where: "api/auth/reset-code",
+      op: "sendEmail",
+    });
+
+    // Resend refuses every recipient but the account owner until a sending
+    // domain is verified, so for real clients this is currently the only route
+    // that reaches them. It is Supabase's shared mailer — rate-limited to a
+    // handful an hour — hence it is the fallback and not the primary.
+    const fellBack = await sendViaSupabase(address);
+    if (fellBack) return NextResponse.json({ ok: true, via: "supabase" });
+
+    return NextResponse.json({ error: "send_failed" }, { status: 502 });
   } catch (e) {
     logError(e, { where: "api/auth/reset-code", op: "generateLink" });
     return NextResponse.json({ error: "send_failed" }, { status: 500 });
+  }
+}
+
+/** Supabase's own recovery mail. Returns false if it refused (commonly 429). */
+async function sendViaSupabase(email: string): Promise<boolean> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anon) return false;
+  try {
+    const r = await fetch(`${url}/auth/v1/recover`, {
+      method: "POST",
+      headers: { apikey: anon, "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    return r.ok;
+  } catch {
+    return false;
   }
 }
