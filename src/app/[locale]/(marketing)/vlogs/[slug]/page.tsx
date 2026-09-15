@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { bidiSafe } from "@/lib/utils";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { getArticle } from "@/content/articles";
@@ -51,7 +52,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ locale
         {/* hook / lead */}
         <div style={{ padding: "26px 0 6px" }}>
           {hook.map((p, i) => (
-            <p key={i} style={{ color: "rgba(255,255,255,0.82)", fontSize: "1.12rem", lineHeight: 1.95, marginBottom: "16px", fontWeight: i === 0 ? 600 : 400 }}>{p}</p>
+            <p key={i} style={{ color: "rgba(255,255,255,0.82)", fontSize: "1.12rem", lineHeight: 1.95, marginBottom: "16px", fontWeight: i === 0 ? 600 : 400 }}>{bidiSafe(p)}</p>
           ))}
         </div>
 
@@ -69,11 +70,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ locale
 
               <h2 style={{ color: "#fff", fontWeight: 900, fontSize: "1.4rem", lineHeight: 1.35, marginBottom: "14px", display: "flex", alignItems: "baseline", gap: "10px" }}>
                 <span style={{ color: article.accent, fontSize: "1rem", fontWeight: 900 }}>{String(i + 1).padStart(2, "0")}</span>
-                {heading}
+                {bidiSafe(heading)}
               </h2>
 
               {paras.map((p, j) => (
-                <p key={j} style={{ color: "rgba(255,255,255,0.72)", fontSize: "1.02rem", lineHeight: 1.9, marginBottom: "14px" }}>{p}</p>
+                <p key={j} style={{ color: "rgba(255,255,255,0.72)", fontSize: "1.02rem", lineHeight: 1.9, marginBottom: "14px" }}>{bidiSafe(p)}</p>
               ))}
 
               {s.stat && (
@@ -88,7 +89,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ locale
               {/* science callout */}
               <div style={{ display: "flex", gap: "12px", background: "rgba(15,23,42,0.55)", borderInlineStart: `3px solid ${article.accent}`, borderRadius: "10px", padding: "14px 16px", marginTop: "14px" }}>
                 <FlaskConical style={{ width: "18px", height: "18px", color: article.accent, flexShrink: 0, marginTop: "2px" }} />
-                <p style={{ color: "rgba(255,255,255,0.66)", fontSize: "0.9rem", lineHeight: 1.7, margin: 0 }}>{science}</p>
+                <p style={{ color: "rgba(255,255,255,0.66)", fontSize: "0.9rem", lineHeight: 1.7, margin: 0 }}>{bidiSafe(science)}</p>
               </div>
             </section>
           );
@@ -103,7 +104,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ locale
                 <span style={{ flexShrink: 0, width: "22px", height: "22px", borderRadius: "50%", background: article.accent, display: "flex", alignItems: "center", justifyContent: "center", marginTop: "1px" }}>
                   <Check style={{ width: "13px", height: "13px", color: "#0f172a" }} strokeWidth={3} />
                 </span>
-                <span style={{ color: "rgba(255,255,255,0.82)", fontSize: "0.98rem", lineHeight: 1.7 }}>{tk}</span>
+                <span style={{ color: "rgba(255,255,255,0.82)", fontSize: "0.98rem", lineHeight: 1.7 }}>{bidiSafe(tk)}</span>
               </li>
             ))}
           </ul>

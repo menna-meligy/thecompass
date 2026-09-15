@@ -177,7 +177,7 @@ export default function SettingsPage() {
         <div className="bg-[rgba(13,21,38,0.7)] border border-[rgba(245,158,11,0.12)] rounded-2xl p-6 space-y-5">
           <p className="text-sm text-white/40">
             {isAr
-              ? "بيانات الدفع محددة عبر متغيرات البيئة لأسباب أمنية. لتغييرها، قم بتحديث NEXT_PUBLIC_INSTAPAY_NUMBER في Vercel."
+              ? "بيانات الدفع محددة عبر متغيرات البيئة لأسباب أمنية. لتغييرها، قم بتحديث NEXT_PUBLIC_INSTAPAY_NUMBER في Vercel\u200E."
               : "Payment details are managed via environment variables for security. To change them, update NEXT_PUBLIC_INSTAPAY_NUMBER in Vercel."}
           </p>
           <div className="bg-[rgba(245,158,11,0.05)] border border-[rgba(245,158,11,0.12)] rounded-xl p-4 space-y-3">
