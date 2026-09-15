@@ -159,7 +159,9 @@ export function offeringSizeLabel(
   if (offeringType === "career") return isAr ? CAREER_TITLE_AR : CAREER_TITLE_EN;
   if (offeringType === "individual") return isAr ? "جلسة واحدة" : "One session";
   if (!sessionCount || sessionCount < 2) return isAr ? "الورشة كاملة" : "Full workshop";
-  return isAr ? `باقة ${sessionsCount(sessionCount, true)}` : `Bundle of ${sessionCount} sessions`;
+  return isAr
+    ? `الورشة كاملة (${sessionsCount(sessionCount, true)})`
+    : `Bundle of ${sessionCount} sessions`;
 }
 
 export function offeringLabel(o: Offering, isAr: boolean): string {
