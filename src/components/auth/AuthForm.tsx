@@ -262,8 +262,8 @@ export function AuthForm() {
       {/* Logo + title */}
       <div className="text-center mb-8">
         <img src="/logo.svg" alt="البوصلة" className="h-16 w-auto mx-auto mb-4" />
-        <h1 className="text-xl font-black text-white">البوصلة</h1>
-        <p className="text-white/40 text-xs mt-1">منصة التطوير الشخصي والمهني</p>
+        <h1 className="text-3xl font-black text-white">البوصلة</h1>
+        <p className="text-white/70 text-sm mt-1.5">منصة التطوير الشخصي والمهني</p>
       </div>
 
       {/* Card */}
@@ -276,10 +276,10 @@ export function AuthForm() {
             <button
               key={m}
               onClick={() => switchMode(m)}
-              className={`flex-1 py-2 text-sm font-semibold transition-all ${
+              className={`flex-1 py-2.5 text-[0.95rem] font-bold transition-all ${
                 mode === m
-                  ? "bg-[#F59E0B] text-[#0f172a] font-bold"
-                  : "text-white/40 hover:text-white/70"
+                  ? "bg-[#F59E0B] text-[#0f172a]"
+                  : "text-white/65 hover:text-white"
               }`}
               style={{ borderRadius: "4px" }}
             >
@@ -389,7 +389,7 @@ export function AuthForm() {
 
       {mode === "forgot" && (
         <form onSubmit={forgotForm.handleSubmit(handleForgotPassword)} className="space-y-4">
-          <p className="text-white/60 text-sm">{t("forgotPasswordPrompt")}</p>
+          <p className="text-white/75 text-[0.95rem] leading-relaxed">{t("forgotPasswordPrompt")}</p>
           <Input
             label={t("email")}
             type="email"
