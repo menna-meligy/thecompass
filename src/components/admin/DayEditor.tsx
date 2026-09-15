@@ -334,7 +334,7 @@ export default function DayEditor({
                         {slot.committed_offering_type
                           ? t("اتحجز كـ: ", "Taken as: ") +
                             (slot.committed_offering_type === "career"
-                              ? t("جلسة تحديد المسار", "Career session")
+                              ? t("جلسة Self Awareness وتحديد المسار", "Self Awareness & Career Direction")
                               : `${
                                   (isAr
                                     ? slot.assignments.find((a) => a.workshop_id === slot.committed_workshop_id)?.workshop?.title_ar
@@ -349,7 +349,7 @@ export default function DayEditor({
                           : slot.assignments
                               .map((a) =>
                                 a.offering_type === "career"
-                                  ? t("جلسة تحديد المسار", "Career session")
+                                  ? t("جلسة Self Awareness وتحديد المسار", "Self Awareness & Career Direction")
                                   : `${(isAr ? a.workshop?.title_ar : a.workshop?.title_en) ?? "—"} · ${
                                       a.offering_type === "group"
                                         ? t("مجموعة", "group")

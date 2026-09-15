@@ -2,7 +2,7 @@
  * The catalogue of things a client can actually book.
  *
  * There are exactly two shapes:
- *   • the Career Deciding Session (1-on-1, not tied to a workshop)
+ *   • the Self Awareness & Career Direction session (1-on-1, no workshop)
  *   • each workshop, bookable either 1-on-1 or as a group cohort
  *
  * Everything — the admin availability screen, the public calendars, and the
@@ -29,8 +29,8 @@ export const OFFERING_CAPACITY: Record<OfferingType, number> = {
   group: 8,
 };
 
-export const CAREER_TITLE_AR = "جلسة تحديد المسار الوظيفي";
-export const CAREER_TITLE_EN = "Career Deciding Session";
+export const CAREER_TITLE_AR = "جلسة Self Awareness وتحديد المسار";
+export const CAREER_TITLE_EN = "Self Awareness & Career Direction Session";
 
 /** Stable key used in URLs, checkboxes and API params. */
 export const CAREER_KEY = "career";

@@ -16,10 +16,10 @@ import {
 } from "@/lib/schedule-dates";
 
 /**
- * The one calendar the whole product books through — the Career Deciding
- * Session and all three workshops (1-on-1 and group). Point it at an offering
- * key and it shows exactly the times that offering is open for, then hands off
- * to the identical payment + receipt flow.
+ * The one calendar the whole product books through — the Self Awareness &
+ * Career Direction session and all three workshops (1-on-1 and group). Point it
+ * at an offering key and it shows exactly the times that offering is open for,
+ * then hands off to the identical payment + receipt flow.
  *
  * A slot vanishes from here the instant someone's receipt is accepted, on every
  * open browser, because the list refreshes off a Postgres realtime subscription

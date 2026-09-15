@@ -71,7 +71,7 @@ export default function AdminMaterialsPage() {
           const who = row.user?.full_name || b.id.slice(0, 8);
           const what =
             (isAr ? row.workshop?.title_ar : row.workshop?.title_en) ||
-            (isAr ? "جلسة تحديد المسار" : "Career session");
+            (isAr ? "جلسة Self Awareness وتحديد المسار" : "Self Awareness & Career Direction");
           const when = row.slot?.date
             ? ` · ${String(row.slot.date).slice(0, 10)} ${String(row.slot.start_time ?? "").slice(0, 5)}`
             : "";

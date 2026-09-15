@@ -5,7 +5,7 @@ import OfferingCalendar from "@/components/booking/OfferingCalendar";
 import { CAREER_KEY, CAREER_TITLE_AR, CAREER_TITLE_EN, OFFERING_PRICE } from "@/lib/offerings";
 
 /**
- * Booking the Career Deciding Session. Uses the exact same calendar and payment
+ * Booking the Self Awareness & Career Direction session. Uses the exact same calendar and payment
  * flow as the three workshops — there is only one booking path in this product.
  */
 export default function CareerSessionBookingPage() {

@@ -7,7 +7,7 @@ import { OFFERING_PRICE, offeringKey, type OfferingType } from "@/lib/offerings"
 
 /**
  * Booking panel on a workshop page: pick 1-on-1 or group, then the same
- * calendar + payment flow the Career Deciding Session uses.
+ * calendar + payment flow the Self Awareness & Career Direction session uses.
  */
 
 interface Props {
