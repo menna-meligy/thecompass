@@ -86,7 +86,7 @@ export default function CareerCompass() {
           </h2>
           <p className="text-white/55" style={{ fontSize: "1.02rem", lineHeight: 1.8, maxWidth: "34rem", margin: "0 auto" }}>
             {isRtl
-              ? "جاوب ٧ أسئلة سريعة عن شغلك وحياتك، وإحنا عندك نتيجة مخصوصة ليك تساعدك تبدأ طريقك."
+              ? "جاوب ٧ أسئلة سريعة عن شغلك وحياتك، وهنديك نتيجة مخصوصة ليك تساعدك تبدأ طريقك."
               : "Answer 7 quick questions about your career and life, and get a personalized result to help you start your path."}
           </p>
         </div>
@@ -115,7 +115,7 @@ export default function CareerCompass() {
                 </h3>
                 <p className="text-white/50" style={{ fontSize: "0.95rem", lineHeight: 1.7, maxWidth: "28rem", margin: "0 auto 1.75rem" }}>
                   {isRtl
-                    ? "مافيش إجابات صح أو غلط، بس صراحتك هتديك أوضح صورة."
+                    ? "مافيش إجابات صح أو غلط، بس صراحتك هتديك أوضح صورة"
                     : "There are no right or wrong answers. Your honesty gives the clearest picture."}
                 </p>
                 <button
