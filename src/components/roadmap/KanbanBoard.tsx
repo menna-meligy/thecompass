@@ -181,7 +181,10 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
                         {/* The grip only ever meant anything with a mouse. Next
                             to it, two buttons that move the card without a drag
                             — the only route that works on a phone. */}
-                        {canEdit && !isOpen && (
+                        {/* Shown whether or not the card is open: these are
+                            buttons, not a drag handle, and hiding them on an
+                            expanded card left no way to move it on a phone. */}
+                        {canEdit && (
                           <span className="flex items-center flex-shrink-0" style={{ gap: "1px" }} onClick={(e) => e.stopPropagation()}>
                             <button
                               type="button"
@@ -213,7 +216,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
                             >
                               <ChevronDown className="h-3.5 w-3.5" />
                             </button>
-                            <GripVertical className="h-3.5 w-3.5 hidden md:block" style={{ color:"rgba(255,255,255,0.15)" }} />
+                            {!isOpen && <GripVertical className="h-3.5 w-3.5 hidden md:block" style={{ color:"rgba(255,255,255,0.15)" }} />}
                           </span>
                         )}
                         {task.pinned && <Pin className="h-3 w-3 flex-shrink-0" style={{ color: "#F59E0B" }} fill="#F59E0B" />}
