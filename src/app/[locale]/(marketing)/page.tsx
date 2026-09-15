@@ -44,6 +44,7 @@ export default async function HomePage() {
       textEn: "I was working without knowing where I was headed. The sessions showed me exactly where my strengths are — now I'm in sales engineering and sure of it.",
       stars: 5,
       avatar: "كم",
+      avatarEn: "KM",
     },
     {
       name: "سارة عبد الرحمن",
@@ -54,6 +55,7 @@ export default async function HomePage() {
       textEn: "I was torn between three paths and unsure what to apply for. We narrowed it to one goal, I applied knowing exactly what I wanted — and I got in.",
       stars: 5,
       avatar: "سع",
+      avatarEn: "SA",
     },
     {
       name: "هبة فاروق",
@@ -64,6 +66,7 @@ export default async function HomePage() {
       textEn: "Six years of teaching and it never felt like mine. The workshops let me try programming without quitting overnight — I'm now a full-time developer.",
       stars: 5,
       avatar: "هف",
+      avatarEn: "HF",
     },
   ];
 
@@ -300,7 +303,7 @@ export default async function HomePage() {
 
                 <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-[#F59E0B] font-bold text-sm flex-shrink-0" style={{ background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)" }}>
-                    {item.avatar}
+                    {isRtl ? item.avatar : item.avatarEn}
                   </div>
                   <div>
                     <div className="font-bold text-sm text-white">{isRtl ? item.name : item.nameEn}</div>
