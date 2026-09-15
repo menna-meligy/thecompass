@@ -603,7 +603,7 @@ export default function BookingFlow({
                   {/* Asked for as "ok till support approves it": the "تمام" is the
                       client accepting the wait, which is the whole point of the
                       button — without it this reads as a status, not a choice. */}
-                  {isAr ? "تمام، مستني موافقة الدعم" : "OK, waiting for support to approve"}
+                  {isAr ? "انتظار موافقة الدعم" : "Waiting for support to approve"}
                 </Link>
               </div>
             </div>
