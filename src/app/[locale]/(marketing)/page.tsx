@@ -60,7 +60,7 @@ export default async function HomePage() {
     {
       name: "هبة فاروق",
       nameEn: "Heba Farouk",
-      role: "مدرّسة · دلوقتي مبرمجة",
+      role: "مدرّسة · مبرمجة دلوقتي",
       roleEn: "Teacher · now a developer",
       text: "قضيت ٦ سنين في التدريس وأنا حاسة إن ده مش مكاني. الورش خلّتني أجرّب البرمجة من غير ما أسيب شغلي فجأة، ودلوقتي شغالة مبرمجة بدوام كامل.",
       textEn: "Six years of teaching and it never felt like mine. The workshops let me try programming without quitting overnight — I'm now a full-time developer.",
@@ -327,7 +327,7 @@ export default async function HomePage() {
                 {t("latestVlogs")}
               </h2>
               <p className="text-white/45 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
-                {isRtl ? "مقالات علمية بأسلوب بسيط لإلهامك وتوجيهك" : "Science-backed articles to inspire and guide you"}
+                {isRtl ? "مقالات علمية تساعدك في رحلتك" : "Science-backed articles to help you navigate this journey"}
               </p>
             </div>
 

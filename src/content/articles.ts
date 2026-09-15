@@ -69,7 +69,7 @@ const META: Record<string, Meta> = {
   "feeling-lost": {
     title_ar: "لما تحس إنك تايه في مسارك المهني",
     title_en: "When You Feel Lost in Your Career",
-    excerpt_ar: "التوهان مش معناه إنك فاشل، معناه إنك محتاج توقف شوية وتراجع. الخطوات اللي بتطلّعك من نفس المكان.",
+    excerpt_ar: "التوهان مش معناه إنك فاشل، معناه إنك محتاج توقف شوية وتراجع. الخطوات اللي بتحرّكك من مكانك.",
     excerpt_en: "Feeling lost doesn't mean you're failing — it means it's time to pause and reassess. The steps that get you unstuck.",
     date: "2026-07-30",
     accent: "#22D3EE",
@@ -79,7 +79,7 @@ const META: Record<string, Meta> = {
   "professional-identity": {
     title_ar: "إزاي تبني هويتك المهنية",
     title_en: "Building Your Professional Identity",
-    excerpt_ar: "هويتك المهنية مش بس الـCV بتاعك، هي إزاي بتتكلم عن نفسك وإزاي الناس بتحس بيك في أول خمس دقايق.",
+    excerpt_ar: "هويتك المهنية مش بس الـ CV بتاعك، هي إزاي بتتكلم عن نفسك وإزاي الناس بتحس بيك في أول خمس دقايق.",
     excerpt_en: "Your professional identity isn't just your CV — it's how you talk about yourself and how people read you.",
     date: "2026-07-30",
     accent: "#A78BFA",
@@ -99,7 +99,7 @@ const META: Record<string, Meta> = {
   "work-life-balance": {
     title_ar: "التوازن بين شغلك وحياتك",
     title_en: "Balancing Your Work and Your Life",
-    excerpt_ar: "النجاح المهني من غير توازن بيتعب في الآخر. إزاي تحافظ على طاقتك وحماسك من غير ما تحرق نفسك.",
+    excerpt_ar: "النجاح المهني من غير توازن بيرهقك في الآخر. إزاي تحافظ على طاقتك وحماسك من غير ما تحرق نفسك.",
     excerpt_en: "Career success without balance eventually wears you down. Protect your energy without burning out.",
     date: "2026-07-30",
     accent: "#34D399",
@@ -129,7 +129,7 @@ const META: Record<string, Meta> = {
   "healthy-habits": {
     title_ar: "إزاي تبني عادات صحية تفضل معاك",
     title_en: "How to Build Lasting Healthy Habits",
-    excerpt_ar: "اعرف العلم اللي ورا بناء العادات وإزاي تخليها تفضل معاك طول العمر — وليه الـ21 يوم كلام فاضي.",
+    excerpt_ar: "اعرف العلم اللي ورا بناء العادات وإزاي تخليها تفضل معاك طول العمر — وليه كلام الـ21 يوم مالوش أساس علمي.",
     excerpt_en: "The science behind building habits that last — and why the 21-day rule is a myth.",
     date: "2026-05-31",
     accent: "#4ADE80",
