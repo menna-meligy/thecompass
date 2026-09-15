@@ -578,12 +578,22 @@ export default function BookingFlow({
                 )}
               </div>
 
-              <button
-                onClick={() => { setProofFile(null); setProofPreview(null); setVerifyStatus("idle"); setVerifyErrors([]); }}
-                style={{ marginTop: "10px", width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid rgba(245,158,11,0.3)", background: "transparent", color: "#F59E0B", fontWeight: 700, fontSize: "0.85rem", cursor: "pointer" }}
-              >
-                {isAr ? "ارفع صورة أوضح" : "Upload a clearer photo"}
-              </button>
+              {/* Either send another photo, or accept that a human will settle
+                  it — nothing else is worth offering at this point. */}
+              <div style={{ marginTop: "10px", display: "flex", flexDirection: "column", gap: "8px" }}>
+                <button
+                  onClick={() => { setProofFile(null); setProofPreview(null); setVerifyStatus("idle"); setVerifyErrors([]); }}
+                  style={{ width: "100%", padding: "11px", borderRadius: "8px", border: "1px solid rgba(245,158,11,0.35)", background: "transparent", color: "#F59E0B", fontWeight: 700, fontSize: "0.88rem", cursor: "pointer" }}
+                >
+                  {isAr ? "ارفع صورة تانية" : "Upload another photo"}
+                </button>
+                <Link
+                  href={`/${locale}/dashboard/bookings`}
+                  style={{ width: "100%", padding: "11px", borderRadius: "8px", background: "#F59E0B", color: "#0f172a", fontWeight: 900, fontSize: "0.88rem", textAlign: "center", textDecoration: "none" }}
+                >
+                  {isAr ? "تمام، مستني موافقة الدعم" : "OK, waiting for support to approve"}
+                </Link>
+              </div>
             </div>
           );
         })()}
@@ -625,6 +635,7 @@ export default function BookingFlow({
           </div>
         )}
 
+        {verifyStatus !== "review" && (
         <button
           onClick={verifyAndUpload}
           disabled={!canSubmit}
@@ -643,6 +654,7 @@ export default function BookingFlow({
             ? <><Check className="h-4 w-4" />{isAr ? "تم التحقق" : "Verified"}</>
             : isAr ? "تحقق وتابع" : "Verify & Continue"}
         </button>
+        )}
       </div>
     );
   }
