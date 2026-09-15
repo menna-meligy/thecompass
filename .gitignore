@@ -45,6 +45,7 @@ next-env.d.ts
 
 # local scratch / auth state / test scripts
 .scratch/
+.scratch*
 scratchpad-auth-state.json
 scratchpad*.json
 test-receipt.mjs
