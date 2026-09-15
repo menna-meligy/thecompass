@@ -1,9 +1,0 @@
-select 'workshops' t, count(*) n from workshops
-union all select 'sessions', count(*) from sessions
-union all select 'availability_slots', count(*) from availability_slots
-union all select 'slot_assignments', count(*) from slot_assignments
-union all select 'bookings', count(*) from bookings
-union all select 'payments', count(*) from payments
-union all select 'pending_receipts', count(*) from pending_receipts
-union all select 'time_slots', count(*) from time_slots
-union all select 'profiles', count(*) from profiles;

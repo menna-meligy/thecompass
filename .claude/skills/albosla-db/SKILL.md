@@ -10,13 +10,15 @@ Production backend = Supabase project **`irinehjflompktssnbwa`** (region eu-cent
 ## Keys
 - **anon key**: inlined in `.next` client bundles (grep a role:anon JWT with that ref), or from the dashboard.
 - **service_role key**: from the dashboard (Settings → API Keys → Legacy). Enables the Auth admin API + full PostgREST, but **cannot run DDL**.
-- **DB password**: `elbosla123.meme` (rotate in dashboard if needed).
+- **DB password**: NOT stored in this repo — it is a live production credential and
+  this repository is public. Read it from `SUPABASE_DB_PASSWORD` in your shell, or
+  from the Supabase dashboard (Settings → Database).
 
 ## Running SQL / migrations (DDL needs a direct Postgres connection)
 Direct `db.<ref>.supabase.co:5432` is IPv6-only and unreachable locally. Use the **session pooler** (IPv4) via the local docker `supabase_db` container's psql (it has psql + IPv4 egress):
 ```bash
 CID=$(docker ps --format '{{.ID}} {{.Names}}' | grep -i supabase_db | awk '{print $1}' | head -1)
-docker exec -i -e PGPASSWORD="elbosla123.meme" "$CID" \
+docker exec -i -e PGPASSWORD="$SUPABASE_DB_PASSWORD" "$CID" \
   psql -h aws-1-eu-central-1.pooler.supabase.com -p 5432 -U postgres.irinehjflompktssnbwa -d postgres < path/to/migration.sql
 ```
 Pass explicit `-h/-p/-U/-d` flags (don't bundle them in one variable — it breaks arg parsing).
@@ -32,7 +34,8 @@ curl -sS -X POST "$URL/auth/v1/admin/users" -H "apikey: $SRK" -H "Authorization:
   -d '{"email":"x@albosla.test","password":"Albosla123!","email_confirm":true}'
 # then set role: PATCH /rest/v1/profiles?id=eq.<uid> {"role":"admin"}
 ```
-Test accounts: `admin@albosla.test` (admin) + `user@albosla.test` (user), password `Albosla123!`.
+Test accounts: `admin@albosla.test` (admin) + `user@albosla.test` (user). Their
+password is not recorded here — reset it from the Supabase dashboard when needed.
 
 ## Booking slots
 Individual general-session slots come from `sessions` (type=individual, status=published, starts_at>now). Keep future-dated rows so `/book/general` always shows options. Storage buckets `proofs` + `payment-proofs` (both public) hold receipts.

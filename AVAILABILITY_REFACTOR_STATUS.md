@@ -51,7 +51,7 @@ Update `/src/app/[locale]/book/availability/page.tsx`:
 cd /Users/mennaelmeligy/albosla
 npx supabase migration up
 # OR manually run against production Supabase:
-psql postgresql://postgres.irinehjflompktssnbwa:elbosla123.meme@aws-1-eu-central-1.pooler.supabase.com:5432/postgres < supabase/admin_marking_migration.sql
+psql postgresql://postgres.irinehjflompktssnbwa:$SUPABASE_DB_PASSWORD@aws-1-eu-central-1.pooler.supabase.com:5432/postgres < supabase/admin_marking_migration.sql
 ```
 
 ### Testing Checklist
