@@ -600,7 +600,7 @@ export default function BookingFlow({
                 >
                   {/* The point of this button is that the client is content to
                       wait for a person — say that, not a vague "I'll follow up". */}
-                  {isAr ? "تمام، في انتظار موافقة الدعم" : "OK, waiting for support to approve"}
+                  {isAr ? "انتظار موافقة الدعم" : "Waiting for support to approve"}
                 </Link>
               </div>
             </div>
