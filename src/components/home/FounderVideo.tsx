@@ -43,6 +43,19 @@ export default function FounderVideo({ fileId, isRtl, name, role, eyebrow }: Pro
   if (playing) {
     return (
       <div style={frame}>
+        {/* The poster stays underneath. If Drive is slow, blocked by an
+            extension, or refuses to embed, the viewer sees the cover instead
+            of a black rectangle. */}
+        {!posterFailed && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src="/founder-video-cover.jpg"
+            alt=""
+            aria-hidden
+            onError={() => setPosterFailed(true)}
+            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        )}
         <iframe
           src={`https://drive.google.com/file/d/${fileId}/preview`}
           title={name}
@@ -50,6 +63,26 @@ export default function FounderVideo({ fileId, isRtl, name, role, eyebrow }: Pro
           allowFullScreen
           style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
         />
+        {/* Last resort if the embed never paints. */}
+        <a
+          href={`https://drive.google.com/file/d/${fileId}/view`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            position: "absolute",
+            insetInlineEnd: "10px",
+            bottom: "10px",
+            fontSize: "0.7rem",
+            fontWeight: 700,
+            color: "#0f172a",
+            background: "rgba(245,158,11,0.92)",
+            borderRadius: "999px",
+            padding: "5px 12px",
+            textDecoration: "none",
+          }}
+        >
+          {isRtl ? "افتح الفيديو" : "Open video"}
+        </a>
       </div>
     );
   }
