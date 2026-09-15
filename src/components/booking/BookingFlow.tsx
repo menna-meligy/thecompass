@@ -187,7 +187,9 @@ export default function BookingFlow({
       const data = await res.json();
       if (data.booking?.id) {
         setBookingId(data.booking.id);
-        setPaymentDeadline(data.payment_deadline || null);
+        // What the client needs to watch is how long we're holding the
+                // appointment, not the far longer payment window.
+                setPaymentDeadline(data.hold_expires_at || data.payment_deadline || null);
         setStep("proof");
       } else {
         // Handle error response with bilingual support
@@ -758,7 +760,7 @@ export default function BookingFlow({
       {/* Payment deadline timer */}
       {paymentDeadline && (
         <div style={{ marginBottom: "20px" }}>
-          <PaymentCountdownTimer paymentDeadline={paymentDeadline} />
+          <PaymentCountdownTimer paymentDeadline={paymentDeadline} mode="hold" />
         </div>
       )}
 

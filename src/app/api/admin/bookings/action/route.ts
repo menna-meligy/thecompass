@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     // The seat is already held from the receipt upload; make sure of it anyway.
-    await (admin as any).rpc("reserve_slot_for_booking", { p_booking: bookingId });
+    await (admin as any).rpc("reserve_slot_for_booking", { p_booking: bookingId, p_hold_minutes: null });
 
     // Welcome the client the moment their seat is real. Sent from here rather
     // than the browser so it can't be lost to a closed tab, and never fatal —

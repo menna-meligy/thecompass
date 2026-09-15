@@ -32,6 +32,15 @@ export const OFFERING_CAPACITY: Record<OfferingType, number> = {
 export const CAREER_TITLE_AR = "جلسة Self Awareness وتحديد المسار";
 export const CAREER_TITLE_EN = "Self Awareness & Career Direction Session";
 
+/**
+ * How long choosing a slot holds it while the client pays.
+ *
+ * Long enough to make a bank transfer and photograph the receipt; short enough
+ * that an abandoned checkout doesn't keep an appointment off the market. Tell
+ * the client this number — never promise them longer than we actually hold.
+ */
+export const HOLD_MINUTES = 30;
+
 /** Stable key used in URLs, checkboxes and API params. */
 export const CAREER_KEY = "career";
 

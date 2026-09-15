@@ -51,6 +51,10 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createAdminClient();
+
+    // Hand back any window whose holder walked away, before deciding what's free.
+    await (supabase as any).rpc("expire_stale_holds");
+
     const today = cairoNow().date;
 
     const { data, error } = await (supabase as any)

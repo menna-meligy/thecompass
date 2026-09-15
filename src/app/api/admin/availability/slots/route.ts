@@ -19,6 +19,9 @@ export async function GET(_request: NextRequest) {
   if (!guard.ok) return guard.response;
   const { admin } = guard;
 
+  // Same lazy expiry the public feed does, so the coach sees the same truth.
+  await (admin as any).rpc("expire_stale_holds");
+
   const { data: slots, error } = await admin
     .from("availability_slots")
     .select(

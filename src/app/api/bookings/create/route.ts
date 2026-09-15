@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
-import { capacityFor, parseOfferingKey, priceFor } from "@/lib/offerings";
+import { HOLD_MINUTES, capacityFor, parseOfferingKey, priceFor } from "@/lib/offerings";
 import { isPastSlot, normaliseDate, shortTime, slotStartsAtISO } from "@/lib/schedule-dates";
 
 export const runtime = "nodejs";
@@ -10,10 +10,10 @@ const PAYMENT_WINDOW_MS = 24 * 60 * 60 * 1000;
 /**
  * Creates the booking + its pending payment for a chosen slot.
  *
- * Deliberately does NOT take the slot yet — a slot is only "taken" once the
- * client uploads a receipt (see /api/payments/verify-screenshot). Holding it at
- * this point would let anyone who opens the payment screen and walks away burn
- * an appointment for 24 hours.
+ * Choosing a slot HOLDS it for HOLD_MINUTES, so it stops being offered on every
+ * other calendar the moment someone enters checkout — otherwise two people can
+ * be paying for the same appointment. Uploading a receipt makes that hold
+ * permanent; walking away lets it lapse and the window goes back on sale.
  *
  * The price is resolved on the server from the offering. The browser doesn't
  * get to name its own amount — the receipt is validated against this number.
@@ -159,7 +159,6 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .eq("slot_id", slotId)
       .eq("status", "pending")
-      .is("slot_reserved_at", null)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
@@ -172,10 +171,16 @@ export async function POST(req: NextRequest) {
           .from("payments")
           .update({ amount: price, method })
           .eq("id", pending.id);
+        await (admin as any).rpc("reserve_slot_for_booking", {
+          p_booking: (existing as any).id,
+          p_hold_minutes: HOLD_MINUTES,
+        });
         return NextResponse.json({
           booking: { id: (existing as any).id },
           payment: { id: pending.id },
           payment_deadline: (existing as any).payment_deadline,
+          hold_minutes: HOLD_MINUTES,
+          hold_expires_at: new Date(Date.now() + HOLD_MINUTES * 60_000).toISOString(),
           price,
           success: true,
         });
@@ -239,10 +244,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Take the window now, so nobody else is offered it while this client pays.
+    const { data: reservation } = await (admin as any).rpc("reserve_slot_for_booking", {
+      p_booking: booking.id,
+      p_hold_minutes: HOLD_MINUTES,
+    });
+
+    if (reservation === "full" || reservation === "unavailable" || reservation === "committed_elsewhere") {
+      await admin.from("payments").delete().eq("booking_id", booking.id);
+      await admin.from("bookings").delete().eq("id", booking.id);
+      return NextResponse.json(
+        {
+          error: "slot_full",
+          message: t("هذا الموعد اتحجز للتو. اختار موعد تاني.", "This time was just taken. Please pick another."),
+        },
+        { status: 409 },
+      );
+    }
+
     return NextResponse.json({
       booking: { id: booking.id },
       payment: { id: payment?.id },
       payment_deadline: paymentDeadline,
+      hold_minutes: HOLD_MINUTES,
+      hold_expires_at: new Date(Date.now() + HOLD_MINUTES * 60_000).toISOString(),
       price,
       slot: {
         date: normaliseDate(s.date),

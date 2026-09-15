@@ -135,8 +135,10 @@ export async function POST(req: NextRequest) {
     // straight back (see /api/admin/bookings/action).
     let reservation: string | null = null;
     if (!hasFraudSignal) {
+      // No expiry: an accepted receipt holds the window until the coach decides.
       const { data, error: reserveError } = await (admin as any).rpc("reserve_slot_for_booking", {
         p_booking: bookingId,
+        p_hold_minutes: null,
       });
       if (reserveError) {
         console.error("reserve_slot_for_booking failed:", reserveError.message);

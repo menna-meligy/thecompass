@@ -148,6 +148,31 @@ export function bookingApprovedEmail(d: BookingApprovedData): { subject: string;
   };
 }
 
+export interface PasswordResetData {
+  userName: string;
+  code: string;
+  appUrl?: string;
+}
+
+/** The six-digit recovery code, sent through Resend rather than Supabase's
+ *  shared mailer (which is rate-limited to a handful of messages an hour). */
+export function passwordResetEmail(d: PasswordResetData): { subject: string; html: string } {
+  return {
+    subject: "رمز إعادة تعيين كلمة المرور — البوصلة",
+    html: layout(`
+      <h2 style="color:#fff; margin:0 0 10px;">إعادة تعيين كلمة المرور 🔑</h2>
+      <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
+      <p style="line-height:1.7; margin:0;">وصلنا طلب لإعادة تعيين كلمة المرور لحسابك. اكتب الرمز ده في الصفحة عشان تكمّل:</p>
+      <div style="margin:18px 0; padding:18px; text-align:center; background:rgba(245,158,11,0.10); border:1px solid rgba(245,158,11,0.30); border-radius:12px;">
+        <span style="font-size:32px; font-weight:900; letter-spacing:10px; color:#F59E0B; font-family:monospace;">${d.code}</span>
+      </div>
+      <p style="line-height:1.7; margin:0; font-size:14px; color:#9ca3af;">
+        الرمز صالح لمدة ساعة واحدة. لو مش إنت اللي طلبت ده، تجاهل الرسالة وكلمة مرورك هتفضل زي ما هي.
+      </p>
+    `),
+  };
+}
+
 export interface ActivationEmailData {
   userName: string;
   activationLink: string;

@@ -5,6 +5,15 @@ import { Clock, AlertTriangle } from "lucide-react";
 
 interface PaymentCountdownTimerProps {
   paymentDeadline: string;
+  /**
+   * "hold"    — the window is reserved until this moment (what actually matters
+   *             while the client is paying)
+   * "payment" — how long is left to complete payment at all
+   *
+   * They are different promises and must never be described in the same words:
+   * we hold the appointment for minutes, the payment window is far longer.
+   */
+  mode?: "hold" | "payment";
   onExpired?: () => void;
 }
 
@@ -16,7 +25,7 @@ function formatTimeRemaining(ms: number): { hours: number; minutes: number; seco
   return { hours, minutes, seconds };
 }
 
-export default function PaymentCountdownTimer({ paymentDeadline, onExpired }: PaymentCountdownTimerProps) {
+export default function PaymentCountdownTimer({ paymentDeadline, mode = "payment", onExpired }: PaymentCountdownTimerProps) {
   const [timeRemaining, setTimeRemaining] = useState<{ hours: number; minutes: number; seconds: number } | null>(null);
   const [isExpired, setIsExpired] = useState(false);
 
@@ -50,8 +59,14 @@ export default function PaymentCountdownTimer({ paymentDeadline, onExpired }: Pa
       <div className="bg-red-500/10 border border-red-500/25 rounded-lg p-4 flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-bold text-red-500">انتهت مهلة الدفع</p>
-          <p className="text-sm text-white/70">عذراً، لم تكمل الدفع في الوقت المحدد وتم إلغاء حجزك.</p>
+          <p className="font-bold text-red-500">
+            {mode === "hold" ? "انتهى حجز الموعد" : "انتهت مهلة الدفع"}
+          </p>
+          <p className="text-sm text-white/70">
+            {mode === "hold"
+              ? "الموعد رجع متاح لغيرك. لسه تقدر تكمّل الدفع، بس لو الموعد اتاخد هتحتاج تختار غيره."
+              : "عذراً، لم تكمل الدفع في الوقت المحدد وتم إلغاء حجزك."}
+          </p>
         </div>
       </div>
     );
@@ -68,11 +83,11 @@ export default function PaymentCountdownTimer({ paymentDeadline, onExpired }: Pa
       <Clock className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isLowTime ? "text-red-500" : "text-amber-500"}`} />
       <div className="flex-1">
         <p className={`font-bold ${isLowTime ? "text-red-500" : "text-amber-500"}`}>
-          ⏳ استكمل الدفع في الوقت المحدد
+          {mode === "hold" ? "⏳ الموعد محجوزلك" : "⏳ استكمل الدفع في الوقت المحدد"}
         </p>
         <div className="text-sm text-white/70 mt-1">
           <div className="flex justify-between items-center">
-            <span>المهلة المتبقية:</span>
+            <span>{mode === "hold" ? "باقي على انتهاء الحجز:" : "المهلة المتبقية:"}</span>
             <span className={`font-mono font-bold text-lg ${isLowTime ? "text-red-400" : "text-amber-400"}`}>
               {String(hours).padStart(2, "0")}:{String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
             </span>

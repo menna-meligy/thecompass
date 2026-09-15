@@ -54,6 +54,7 @@ function authErrorKey(message: string): string {
   if (m.includes("token has expired") || m.includes("invalid") && m.includes("otp")) {
     return "invalidOrExpiredCode";
   }
+  if (m.includes("rate limit") || m.includes("too many")) return "rateLimited";
   return "generic";
 }
 
@@ -200,13 +201,26 @@ export function AuthForm() {
   async function handleForgotPassword(data: ForgotData) {
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.resetPasswordForEmail(data.email);
-    if (error) {
-      setError(t(`errors.${authErrorKey(error.message)}`));
-    } else {
-      setResetEmail(data.email);
-      setMessage(t("resetCodeSent"));
-      setMode("reset");
+    // Not supabase.auth.resetPasswordForEmail: that goes through Supabase's
+    // shared mailer, which rate-limits to a few messages an hour and was
+    // failing with a 429 the client only ever saw as "something went wrong".
+    try {
+      const res = await fetch("/api/auth/reset-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: data.email }),
+      });
+      if (res.status === 429) {
+        setError(t("errors.rateLimited"));
+      } else if (!res.ok) {
+        setError(t("errors.generic"));
+      } else {
+        setResetEmail(data.email);
+        setMessage(t("resetCodeSent"));
+        setMode("reset");
+      }
+    } catch {
+      setError(t("errors.generic"));
     }
     setLoading(false);
   }
@@ -279,6 +293,26 @@ export function AuthForm() {
       {error && (
         <div className="mb-4 p-3 bg-[rgba(220,38,38,0.12)] border border-[rgba(220,38,38,0.25)] rounded-lg text-red-400 text-sm">
           {error}
+          {/* The message tells them to recover the password — give them the
+              button rather than making them find it. */}
+          {error === t("errors.emailAlreadyRegistered") && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => switchMode("forgot")}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#F59E0B] text-[#0f172a] hover:brightness-110 transition"
+              >
+                {t("forgotPassword")}
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode("login")}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold text-white/70 border border-white/15 hover:text-white hover:border-white/30 transition"
+              >
+                {t("login")}
+              </button>
+            </div>
+          )}
         </div>
       )}
 

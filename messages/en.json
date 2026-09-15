@@ -175,6 +175,7 @@
       "nameRequired": "Name is required",
       "emailAlreadyRegistered": "This email already has an account. Try logging in or resetting your password.",
       "invalidOrExpiredCode": "Invalid or expired code",
+      "rateLimited": "Too many requests in a short time. Wait a minute and try again.",
       "generic": "Something went wrong. Please try again."
     }
   },

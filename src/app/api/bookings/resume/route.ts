@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { isPastSlot } from "@/lib/schedule-dates";
+import { HOLD_MINUTES } from "@/lib/offerings";
 
 export const runtime = "nodejs";
 
@@ -97,10 +98,31 @@ export async function POST(req: NextRequest) {
     const method = payment_method === "vodafone_cash" ? "vodafone_cash" : "instapay";
     await admin.from("payments").update({ method }).eq("id", payment.id);
 
+    // Coming back to pay re-takes the window (their old hold may have lapsed).
+    const { data: reservation } = await (admin as any).rpc("reserve_slot_for_booking", {
+      p_booking: b.id,
+      p_hold_minutes: HOLD_MINUTES,
+    });
+
+    if (reservation === "full" || reservation === "unavailable" || reservation === "committed_elsewhere") {
+      return NextResponse.json(
+        {
+          error: "slot_taken",
+          message: t(
+            "للأسف الموعد ده اتحجز وانت بعيد. اختار موعد تاني.",
+            "Someone took this time while you were away. Please pick another.",
+          ),
+        },
+        { status: 409 },
+      );
+    }
+
     return NextResponse.json({
       booking: { id: b.id },
       payment: { id: payment.id },
       payment_deadline: b.payment_deadline,
+      hold_minutes: HOLD_MINUTES,
+      hold_expires_at: new Date(Date.now() + HOLD_MINUTES * 60_000).toISOString(),
       success: true,
     });
   } catch (err) {
