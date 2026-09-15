@@ -158,12 +158,25 @@
     "noAccount": "ليس لديك حساب؟",
     "hasAccount": "لديك حساب بالفعل؟",
     "forgotPassword": "نسيت كلمة المرور؟",
+    "forgotPasswordPrompt": "اكتب بريدك الإلكتروني وهنبعتلك رمز لإعادة تعيين كلمة المرور.",
+    "sendResetCode": "إرسال رمز إعادة التعيين",
+    "resetCodeSent": "بعتنالك رمز مكوّن من 6 أرقام على بريدك الإلكتروني.",
+    "resetCode": "رمز إعادة التعيين",
+    "newPassword": "كلمة المرور الجديدة",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "passwordUpdated": "تم تحديث كلمة المرور، جارٍ تسجيل دخولك.",
+    "backToLogin": "الرجوع لتسجيل الدخول",
+    "accountCreatedCheckEmail": "تم إنشاء حسابك. افتح بريدك الإلكتروني لتفعيله.",
     "errors": {
       "emailRequired": "البريد الإلكتروني مطلوب",
       "emailInvalid": "البريد الإلكتروني غير صحيح",
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMin": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
-      "nameRequired": "الاسم مطلوب"
+      "wrongPassword": "كلمة المرور غير صحيحة",
+      "nameRequired": "الاسم مطلوب",
+      "emailAlreadyRegistered": "هذا البريد الإلكتروني مسجّل بحساب بالفعل. جرّب تسجيل الدخول أو استعادة كلمة المرور.",
+      "invalidOrExpiredCode": "الرمز غير صحيح أو انتهت صلاحيته",
+      "generic": "حصل خطأ ما، حاول تاني."
     }
   },
   "admin": {

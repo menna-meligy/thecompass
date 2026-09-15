@@ -1,0 +1,29 @@
+<!-- البوصلة — sign-in link email (Supabase "Magic Link" template).
+     Subject to set: رابط الدخول لبوصلتك | The Compass — Sign-in link -->
+<div style="font-family: Arial, 'Segoe UI', sans-serif; background:#0f172a; padding:28px 16px; margin:0;">
+  <div style="max-width:560px; margin:0 auto; background:#0d1526; border:1px solid rgba(245,158,11,0.25); border-radius:16px; overflow:hidden;">
+    <div style="background:linear-gradient(135deg, rgba(245,158,11,0.18), rgba(13,21,38,0.9)); padding:24px 28px;">
+      <span style="color:#F59E0B; font-size:1.5rem; font-weight:900;">البوصلة | The Compass</span>
+    </div>
+    <div dir="rtl" style="padding:28px 28px 8px; color:#e5e7eb;">
+      <h2 style="color:#fff; margin:0 0 12px;">رابط الدخول لحسابك في البوصلة</h2>
+      <p style="line-height:1.9; margin:0 0 20px;">اضغط الزر تحت عشان تدخل على حسابك في البوصلة. الرابط ده لمرة واحدة وهينتهي بعد فترة قصيرة.</p>
+    </div>
+    <div style="text-align:center; margin:6px 0 26px;">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block; background:#F59E0B; color:#0f172a; font-weight:bold; text-decoration:none; padding:13px 34px; border-radius:12px; font-size:1rem;">تسجيل الدخول / Sign in</a>
+    </div>
+    <div dir="ltr" style="padding:0 28px 20px; color:#e5e7eb; border-top:1px solid rgba(245,158,11,0.1);">
+      <h3 style="color:#fff; margin:20px 0 10px; font-size:1rem;">Your sign-in link for The Compass</h3>
+      <p style="line-height:1.7; margin:0 0 14px;">Click the button above to sign in to your Compass account. This link is for one-time use and expires shortly.</p>
+    </div>
+    <div style="padding:0 28px 28px; color:#e5e7eb;">
+      <p dir="rtl" style="line-height:1.7; color:#9ca3af; font-size:0.85rem; margin:0 0 6px;">لو الزر مش شغّال، افتح اللينك ده / If the button doesn't work, open this link:</p>
+      <p style="line-height:1.5; word-break:break-all; margin:0 0 18px;"><a href="{{ .ConfirmationURL }}" style="color:#F59E0B; font-size:0.82rem;">{{ .ConfirmationURL }}</a></p>
+      <p dir="rtl" style="line-height:1.7; color:#9ca3af; font-size:0.82rem; margin:0 0 6px;">لو إنت مطلبتش الرابط ده، تجاهل الرسالة دي — حسابك آمن.</p>
+      <p style="line-height:1.7; color:#9ca3af; font-size:0.82rem; margin:0;">If you didn't request this, ignore this email — your account is safe.</p>
+    </div>
+    <div style="padding:16px 28px; border-top:1px solid rgba(245,158,11,0.12);">
+      <p style="color:rgba(255,255,255,0.4); font-size:12px; margin:0;">البوصلة — ليك طريق شبهك.. طريق مخصوص ليك · The Compass</p>
+    </div>
+  </div>
+</div>

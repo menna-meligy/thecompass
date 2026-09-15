@@ -119,13 +119,6 @@ export default function AdminReceiptsPage() {
         setError(data.message || data.error || t("العملية فشلت", "That didn't work"));
         return;
       }
-      if (action === "confirm") {
-        fetch("/api/send-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "payment_approved", booking_id: bookingId }),
-        }).catch(() => {});
-      }
       await load();
     } finally {
       setBusy(null);

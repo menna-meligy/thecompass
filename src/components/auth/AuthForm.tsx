@@ -10,11 +10,11 @@ import { createClient } from "@/lib/supabase/client";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
-type AuthMode = "login" | "register" | "magic";
+type AuthMode = "login" | "register" | "magic" | "forgot" | "reset";
 
 const loginSchema = z.object({
   email: z.string().min(1, "emailRequired").email("emailInvalid"),
-  password: z.string().min(6, "passwordMin"),
+  password: z.string().min(6, "wrongPassword"),
 });
 
 const registerSchema = z.object({
@@ -27,9 +27,35 @@ const magicSchema = z.object({
   email: z.string().min(1, "emailRequired").email("emailInvalid"),
 });
 
+const forgotSchema = z.object({
+  email: z.string().min(1, "emailRequired").email("emailInvalid"),
+});
+
+const resetSchema = z.object({
+  code: z.string().min(6, "invalidOrExpiredCode").max(6, "invalidOrExpiredCode"),
+  password: z.string().min(6, "passwordMin"),
+});
+
 type LoginData = z.infer<typeof loginSchema>;
 type RegisterData = z.infer<typeof registerSchema>;
 type MagicData = z.infer<typeof magicSchema>;
+type ForgotData = z.infer<typeof forgotSchema>;
+type ResetData = z.infer<typeof resetSchema>;
+
+// Maps a raw Supabase Auth error to a translated, user-safe message.
+// Supabase's own error text (e.g. "Invalid login credentials") is English-only
+// and exposes internal wording we don't want surfaced verbatim.
+function authErrorKey(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login credentials")) return "wrongPassword";
+  if (m.includes("user already registered") || m.includes("already registered")) {
+    return "emailAlreadyRegistered";
+  }
+  if (m.includes("token has expired") || m.includes("invalid") && m.includes("otp")) {
+    return "invalidOrExpiredCode";
+  }
+  return "generic";
+}
 
 export function AuthForm() {
   const t = useTranslations("auth");
@@ -51,8 +77,13 @@ export function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [resetEmail, setResetEmail] = useState<string | null>(null);
 
   const supabase = createClient();
+
+  // Translates a form field's zod error key ("emailRequired", "passwordMin", ...)
+  // into display text. Field errors are keys, not messages — see zod schemas above.
+  const fieldError = (key?: string) => (key ? t(`errors.${key}`) : undefined);
 
   const loginForm = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -66,12 +97,26 @@ export function AuthForm() {
     resolver: zodResolver(magicSchema),
   });
 
+  const forgotForm = useForm<ForgotData>({
+    resolver: zodResolver(forgotSchema),
+  });
+
+  const resetForm = useForm<ResetData>({
+    resolver: zodResolver(resetSchema),
+  });
+
+  function switchMode(m: AuthMode) {
+    setMode(m);
+    setError(null);
+    setMessage(null);
+  }
+
   async function handleLogin(data: LoginData) {
     setLoading(true);
     setError(null);
     const { data: authData, error } = await supabase.auth.signInWithPassword(data);
     if (error) {
-      setError(error.message);
+      setError(t(`errors.${authErrorKey(error.message)}`));
     } else {
       const { data: profile } = await supabase
         .from("profiles")
@@ -100,13 +145,19 @@ export function AuthForm() {
       },
     });
     if (error) {
-      setError(error.message);
+      setError(t(`errors.${authErrorKey(error.message)}`));
     } else if (authData.session) {
       // Email confirmations disabled — session is already active, go straight in.
       router.push(redirectTo ?? `/${locale}/dashboard`);
       router.refresh();
+    } else if (authData.user?.identities?.length === 0) {
+      // Supabase returns a fake "success" (no error, no session) when the email
+      // already belongs to a confirmed account, to avoid leaking which emails
+      // are registered. Detect it via the empty identities array and tell the
+      // person honestly instead of pretending we sent them an activation email.
+      setError(t("errors.emailAlreadyRegistered"));
     } else {
-      setMessage("تم إنشاء حسابك في البوصلة 🧭 — بعتنالك إيميل التفعيل، افتحه واضغط \"تفعيل الحساب\" عشان تبدأ رحلتك.");
+      setMessage(t("accountCreatedCheckEmail"));
     }
     setLoading(false);
   }
@@ -121,11 +172,52 @@ export function AuthForm() {
       },
     });
     if (error) {
-      setError(error.message);
+      setError(t(`errors.${authErrorKey(error.message)}`));
     } else {
       setMessage(t("magicLinkSent"));
     }
     setLoading(false);
+  }
+
+  async function handleForgotPassword(data: ForgotData) {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(data.email);
+    if (error) {
+      setError(t(`errors.${authErrorKey(error.message)}`));
+    } else {
+      setResetEmail(data.email);
+      setMessage(t("resetCodeSent"));
+      setMode("reset");
+    }
+    setLoading(false);
+  }
+
+  async function handleResetPassword(data: ResetData) {
+    if (!resetEmail) return;
+    setLoading(true);
+    setError(null);
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: resetEmail,
+      token: data.code,
+      type: "recovery",
+    });
+    if (verifyError) {
+      setError(t(`errors.${authErrorKey(verifyError.message)}`));
+      setLoading(false);
+      return;
+    }
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: data.password,
+    });
+    if (updateError) {
+      setError(t(`errors.${authErrorKey(updateError.message)}`));
+      setLoading(false);
+      return;
+    }
+    setMessage(t("passwordUpdated"));
+    router.push(redirectTo ?? `/${locale}/dashboard`);
+    router.refresh();
   }
 
   return (
@@ -141,26 +233,24 @@ export function AuthForm() {
       <div style={{ background: "rgba(15,23,42,0.75)", border: "1px solid rgba(245,158,11,0.18)", backdropFilter: "blur(20px)", borderRadius: "10px", padding: "2rem" }}>
 
       {/* Mode tabs */}
-      <div className="flex mb-6" style={{ border: "1px solid rgba(245,158,11,0.15)", borderRadius: "6px", padding: "4px", background: "rgba(15,23,42,0.5)" }}>
-        {(["login", "register", "magic"] as AuthMode[]).map((m) => (
-          <button
-            key={m}
-            onClick={() => {
-              setMode(m);
-              setError(null);
-              setMessage(null);
-            }}
-            className={`flex-1 py-2 text-sm font-semibold transition-all ${
-              mode === m
-                ? "bg-[#F59E0B] text-[#0f172a] font-bold"
-                : "text-white/40 hover:text-white/70"
-            }`}
-            style={{ borderRadius: "4px" }}
-          >
-            {m === "login" ? t("login") : m === "register" ? t("register") : t("magicLink")}
-          </button>
-        ))}
-      </div>
+      {(mode === "login" || mode === "register" || mode === "magic") && (
+        <div className="flex mb-6" style={{ border: "1px solid rgba(245,158,11,0.15)", borderRadius: "6px", padding: "4px", background: "rgba(15,23,42,0.5)" }}>
+          {(["login", "register", "magic"] as AuthMode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => switchMode(m)}
+              className={`flex-1 py-2 text-sm font-semibold transition-all ${
+                mode === m
+                  ? "bg-[#F59E0B] text-[#0f172a] font-bold"
+                  : "text-white/40 hover:text-white/70"
+              }`}
+              style={{ borderRadius: "4px" }}
+            >
+              {m === "login" ? t("login") : m === "register" ? t("register") : t("magicLink")}
+            </button>
+          ))}
+        </div>
+      )}
 
       {message && (
         <div className="mb-4 p-3 bg-[rgba(34,197,94,0.12)] border border-[rgba(34,197,94,0.25)] rounded-lg text-green-400 text-sm">
@@ -179,15 +269,22 @@ export function AuthForm() {
           <Input
             label={t("email")}
             type="email"
-            error={loginForm.formState.errors.email?.message}
+            error={fieldError(loginForm.formState.errors.email?.message)}
             {...loginForm.register("email")}
           />
           <Input
             label={t("password")}
             type="password"
-            error={loginForm.formState.errors.password?.message}
+            error={fieldError(loginForm.formState.errors.password?.message)}
             {...loginForm.register("password")}
           />
+          <button
+            type="button"
+            onClick={() => switchMode("forgot")}
+            className="text-xs text-white/40 hover:text-[#F59E0B] transition-colors"
+          >
+            {t("forgotPassword")}
+          </button>
           <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
             {t("login")}
           </Button>
@@ -198,19 +295,19 @@ export function AuthForm() {
         <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
           <Input
             label={t("fullName")}
-            error={registerForm.formState.errors.full_name?.message}
+            error={fieldError(registerForm.formState.errors.full_name?.message)}
             {...registerForm.register("full_name")}
           />
           <Input
             label={t("email")}
             type="email"
-            error={registerForm.formState.errors.email?.message}
+            error={fieldError(registerForm.formState.errors.email?.message)}
             {...registerForm.register("email")}
           />
           <Input
             label={t("password")}
             type="password"
-            error={registerForm.formState.errors.password?.message}
+            error={fieldError(registerForm.formState.errors.password?.message)}
             {...registerForm.register("password")}
           />
           <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
@@ -224,12 +321,62 @@ export function AuthForm() {
           <Input
             label={t("email")}
             type="email"
-            error={magicForm.formState.errors.email?.message}
+            error={fieldError(magicForm.formState.errors.email?.message)}
             {...magicForm.register("email")}
           />
           <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
             {t("sendMagicLink")}
           </Button>
+        </form>
+      )}
+
+      {mode === "forgot" && (
+        <form onSubmit={forgotForm.handleSubmit(handleForgotPassword)} className="space-y-4">
+          <p className="text-white/60 text-sm">{t("forgotPasswordPrompt")}</p>
+          <Input
+            label={t("email")}
+            type="email"
+            error={fieldError(forgotForm.formState.errors.email?.message)}
+            {...forgotForm.register("email")}
+          />
+          <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
+            {t("sendResetCode")}
+          </Button>
+          <button
+            type="button"
+            onClick={() => switchMode("login")}
+            className="text-xs text-white/40 hover:text-[#F59E0B] transition-colors block mx-auto"
+          >
+            {t("backToLogin")}
+          </button>
+        </form>
+      )}
+
+      {mode === "reset" && (
+        <form onSubmit={resetForm.handleSubmit(handleResetPassword)} className="space-y-4">
+          <Input
+            label={t("resetCode")}
+            inputMode="numeric"
+            maxLength={6}
+            error={fieldError(resetForm.formState.errors.code?.message)}
+            {...resetForm.register("code")}
+          />
+          <Input
+            label={t("newPassword")}
+            type="password"
+            error={fieldError(resetForm.formState.errors.password?.message)}
+            {...resetForm.register("password")}
+          />
+          <Button type="submit" loading={loading} disabled={!ready} className="w-full" size="lg">
+            {t("resetPassword")}
+          </Button>
+          <button
+            type="button"
+            onClick={() => switchMode("login")}
+            className="text-xs text-white/40 hover:text-[#F59E0B] transition-colors block mx-auto"
+          >
+            {t("backToLogin")}
+          </button>
         </form>
       )}
 

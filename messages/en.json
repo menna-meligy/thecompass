@@ -158,12 +158,25 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "forgotPassword": "Forgot password?",
+    "forgotPasswordPrompt": "Enter your email and we'll send you a reset code.",
+    "sendResetCode": "Send reset code",
+    "resetCodeSent": "We sent a 6-digit code to your email.",
+    "resetCode": "Reset code",
+    "newPassword": "New password",
+    "resetPassword": "Reset password",
+    "passwordUpdated": "Password updated. Signing you in.",
+    "backToLogin": "Back to login",
+    "accountCreatedCheckEmail": "Account created. Check your email to activate it.",
     "errors": {
       "emailRequired": "Email is required",
       "emailInvalid": "Invalid email address",
       "passwordRequired": "Password is required",
       "passwordMin": "Password must be at least 6 characters",
-      "nameRequired": "Name is required"
+      "wrongPassword": "Wrong password",
+      "nameRequired": "Name is required",
+      "emailAlreadyRegistered": "This email already has an account. Try logging in or resetting your password.",
+      "invalidOrExpiredCode": "Invalid or expired code",
+      "generic": "Something went wrong. Please try again."
     }
   },
   "admin": {

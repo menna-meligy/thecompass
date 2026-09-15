@@ -242,6 +242,20 @@ otp_expiry = 3600
 subject = "تفعيل حساب البوصلة | The Compass — Account Activation"
 content_path = "./supabase/templates/confirmation.html"
 
+# Sign-in link (signInWithOtp). These config.toml [auth.email.template.*] blocks only
+# take effect for `supabase start` (local dev). The hosted project's live templates
+# are separate and must be set to match in Supabase Dashboard → Authentication →
+# Emails, or pushed via `supabase login` + the Management API.
+[auth.email.template.magic_link]
+subject = "رابط الدخول لبوصلتك | The Compass — Sign-in link"
+content_path = "./supabase/templates/magic_link.html"
+
+# Password reset — sends a 6-digit {{ .Token }} the user types into the app's
+# reset-password screen (code-based, no callback route required).
+[auth.email.template.recovery]
+subject = "إعادة تعيين كلمة المرور | The Compass — Password reset code"
+content_path = "./supabase/templates/recovery.html"
+
 # Use a production-ready SMTP server
 # [auth.email.smtp]
 # enabled = true

@@ -7,12 +7,19 @@ import DayEditor from "./DayEditor";
 import type { AdminSlot } from "./availability-types";
 import { allOfferings, type WorkshopLite } from "@/lib/offerings";
 import { normaliseDate } from "@/lib/schedule-dates";
+import { createClient } from "@/lib/supabase/client";
 
 /**
  * The coach's availability screen: one month calendar, click a day, then either
  * open bookable times on it or close it entirely. What's set here is exactly
  * what clients see on every booking calendar.
+ *
+ * It refreshes itself. A client can take a window at any moment, and a screen
+ * that was loaded five minutes ago would keep showing that window as free —
+ * the coach would believe she still had the slot long after it was gone.
  */
+
+const REFRESH_MS = 15_000;
 export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean }) {
   const [slots, setSlots] = useState<AdminSlot[]>([]);
   const [workshops, setWorkshops] = useState<WorkshopLite[]>([]);
@@ -75,6 +82,24 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
 
   useEffect(() => {
     load();
+  }, [load]);
+
+  // Stay in step with what clients are doing, without the coach having to think
+  // about it: react to slot/booking changes, and poll as a fallback for when
+  // the realtime socket isn't available.
+  useEffect(() => {
+    const supabase = createClient();
+    const channel = supabase
+      .channel("admin-availability")
+      .on("postgres_changes", { event: "*", schema: "public", table: "availability_slots" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "bookings" }, () => load())
+      .subscribe();
+
+    const timer = setInterval(load, REFRESH_MS);
+    return () => {
+      clearInterval(timer);
+      supabase.removeChannel(channel);
+    };
   }, [load]);
 
   const offerings = useMemo(() => allOfferings(workshops), [workshops]);

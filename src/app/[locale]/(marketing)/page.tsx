@@ -3,6 +3,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import WorkshopCard from "@/components/workshops/WorkshopCard";
 import ArticleCard from "@/components/content/ArticleCard";
+import FounderVideo from "@/components/home/FounderVideo";
 import { getAllArticles } from "@/content/articles";
 import type { Workshop, Announcement } from "@/types/index";
 import { getLocalizedField } from "@/lib/utils";
@@ -351,19 +352,13 @@ export default async function HomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            {/* YouTube Shorts Embed */}
-            <div className="rounded-2xl overflow-hidden" style={{background:"rgba(245,158,11,0.08)",border:"1px solid rgba(245,158,11,0.15)",aspectRatio:"9/16",display:"flex",alignItems:"center",justifyContent:"center"}}>
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://drive.google.com/file/d/1ugvcP3yB1vPyM35QtwH4GA8joBVv7Lgi/preview"
-                title="Menna's Introduction"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                style={{borderRadius:"8px"}}
-              />
-            </div>
+            <FounderVideo
+              fileId="1ugvcP3yB1vPyM35QtwH4GA8joBVv7Lgi"
+              isRtl={isRtl}
+              name="Menna Elmelegy"
+              role={isRtl ? "المؤسِّسة ومدرِّبة المسار المهني" : "Founder & Career Coach"}
+              eyebrow={isRtl ? "كلمة من المؤسِّسة" : "A word from the founder"}
+            />
             {/* Text content */}
             <div>
               <p className="text-white/70 text-base leading-relaxed mb-4" style={{lineHeight:1.8}}>

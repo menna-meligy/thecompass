@@ -16,6 +16,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- One account per email address (case-insensitive). See unique_email_migration.sql
+-- for applying this to an already-running database.
+CREATE UNIQUE INDEX IF NOT EXISTS profiles_email_unique_idx
+  ON public.profiles (lower(email));
+
 -- Workshops
 CREATE TABLE IF NOT EXISTS public.workshops (
   id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,

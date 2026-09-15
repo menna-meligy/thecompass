@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import { useTranslations } from "next-intl";
-import { CheckCircle, Lock, MapPin, Star, Zap, Trophy } from "lucide-react";
+import { Lock, MapPin, Star, Trophy, Sprout, BookOpen, Target, Crown, type LucideIcon } from "lucide-react";
 import type { RoadmapProgress } from "@/types/index";
 
 /* ── Node definitions ── */
@@ -12,17 +12,17 @@ interface RoadmapNode {
   titleAr: string;
   titleEn: string;
   xpRequired: number;
-  icon: string;
+  icon: LucideIcon;
   color: string;
 }
 
 const NODES: RoadmapNode[] = [
-  { id: 1, titleAr: "المبتدئ",  titleEn: "Beginner",     xpRequired: 0,    icon: "🌱", color: "#4CAF50" },
-  { id: 2, titleAr: "المتعلم",  titleEn: "Learner",      xpRequired: 100,  icon: "📚", color: "#2196F3" },
-  { id: 3, titleAr: "المتقدم",  titleEn: "Advanced",     xpRequired: 300,  icon: "⭐", color: "#9C27B0" },
-  { id: 4, titleAr: "الخبير",   titleEn: "Expert",       xpRequired: 600,  icon: "🎯", color: "#FF5722" },
-  { id: 5, titleAr: "المحترف",  titleEn: "Professional", xpRequired: 1000, icon: "🏆", color: "#D4A017" },
-  { id: 6, titleAr: "الأسطورة", titleEn: "Legend",       xpRequired: 1500, icon: "👑", color: "#F59E0B" },
+  { id: 1, titleAr: "المبتدئ",  titleEn: "Beginner",     xpRequired: 0,    icon: Sprout,   color: "#4CAF50" },
+  { id: 2, titleAr: "المتعلم",  titleEn: "Learner",      xpRequired: 100,  icon: BookOpen, color: "#2196F3" },
+  { id: 3, titleAr: "المتقدم",  titleEn: "Advanced",     xpRequired: 300,  icon: Star,     color: "#9C27B0" },
+  { id: 4, titleAr: "الخبير",   titleEn: "Expert",       xpRequired: 600,  icon: Target,   color: "#FF5722" },
+  { id: 5, titleAr: "المحترف",  titleEn: "Professional", xpRequired: 1000, icon: Trophy,   color: "#D4A017" },
+  { id: 6, titleAr: "الأسطورة", titleEn: "Legend",       xpRequired: 1500, icon: Crown,    color: "#F59E0B" },
 ];
 
 /* ── SVG path waypoints for the winding game path ── */
@@ -269,18 +269,16 @@ export function RoadmapPath({ progress }: RoadmapPathProps) {
                   filter={isCompleted && !isLocked ? "url(#nodeGlow)" : undefined}
                 />
 
-                {/* Node icon text */}
-                <text
-                  x={pos.x}
-                  y={pos.y + 1}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize={isLocked ? "14" : "16"}
-                  fill={isLocked ? "#9E8E8E" : "white"}
-                  style={{ userSelect: "none" }}
-                >
-                  {isLocked ? "🔒" : isCurrent ? "📍" : node.icon}
-                </text>
+                {/* Node icon */}
+                {(() => {
+                  const IconComp = isLocked ? Lock : isCurrent ? MapPin : node.icon;
+                  const size = isLocked ? 14 : 16;
+                  return (
+                    <g transform={`translate(${pos.x - size / 2}, ${pos.y - size / 2})`} style={{ pointerEvents: "none" }}>
+                      <IconComp width={size} height={size} color={isLocked ? "#9E8E8E" : "white"} strokeWidth={2.5} />
+                    </g>
+                  );
+                })()}
 
                 {/* "YOU ARE HERE" badge for current */}
                 {isCurrent && (

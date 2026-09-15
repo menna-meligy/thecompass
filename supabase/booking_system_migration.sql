@@ -331,6 +331,14 @@ begin
   ) then
     alter publication supabase_realtime add table public.availability_slots;
   end if;
+  if not exists (
+    select 1 from pg_publication_tables
+     where pubname = 'supabase_realtime'
+       and schemaname = 'public'
+       and tablename = 'bookings'
+  ) then
+    alter publication supabase_realtime add table public.bookings;
+  end if;
 exception when others then
   -- publication may not exist on self-hosted stacks; ignore
   null;
