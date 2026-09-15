@@ -54,7 +54,7 @@ const TABS = [
 
 /** Why the automatic check refused a receipt, in plain language. */
 const REASONS: Record<string, { ar: string; en: string }> = {
-  amount_mismatch: { ar: "المبلغ المقروء مش مطابق لسعر الجلسة", en: "Amount read doesn't match the session price" },
+  amount_mismatch: { ar: "المبلغ المقروء مش مطابق للسعر المطلوب", en: "Amount read doesn't match the expected price" },
   amount_unreadable: { ar: "مقدرناش نقرا المبلغ", en: "Couldn't read the amount" },
   date_too_old: { ar: "تاريخ التحويل مش النهاردة", en: "Transfer date isn't today" },
   date_future: { ar: "تاريخ التحويل في المستقبل", en: "Transfer date is in the future" },

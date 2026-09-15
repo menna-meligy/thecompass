@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Check, Copy, ExternalLink, Upload, Loader2, X, Calendar, Clock, MapPin, ChevronLeft } from "lucide-react";
 import QRCode from "qrcode";
 import { ocrReceipt, parseReceipt } from "@/lib/payments/receipt";
+import { offeringNoun, parseOfferingKey } from "@/lib/offerings";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import PaymentCountdownTimer from "./PaymentCountdownTimer";
@@ -66,6 +67,10 @@ export default function BookingFlow({
   const t = useTranslations("booking");
   const locale = useLocale();
   const isAr = locale === "ar";
+  // A group cohort is a "ورشة", a 1-on-1 / career call is a "جلسة". Saying
+  // "سعر الجلسة" on a workshop booking reads wrong to the client.
+  const noun = offeringNoun(parseOfferingKey(offering)?.offeringType ?? "career", isAr);
+  const nounEn = offeringNoun(parseOfferingKey(offering)?.offeringType ?? "career", false);
 
   const [step, setStep] = useState<Step>("payment");
   const [selectedMethod, setSelectedMethod] = useState<"instapay" | "vodafone_cash" | null>(null);
@@ -546,7 +551,7 @@ export default function BookingFlow({
         {verifyStatus === "review" && (() => {
           const amt = ocrAmount != null ? ocrAmount.toLocaleString() : "؟";
           const M: Record<string, { ar: string; en: string }> = {
-            amount_mismatch: { ar: `المبلغ في الصورة (${amt} جنيه) مش مطابق لسعر الجلسة (${price.toLocaleString()} جنيه).`, en: `The amount on the image (${amt} EGP) doesn't match the session price (${price.toLocaleString()} EGP).` },
+            amount_mismatch: { ar: `المبلغ في الصورة (${amt} جنيه) مش مطابق لسعر ${noun} (${price.toLocaleString()} جنيه).`, en: `The amount on the image (${amt} EGP) doesn't match ${nounEn}'s price (${price.toLocaleString()} EGP).` },
             amount_unreadable: { ar: "مقدرناش نقرا المبلغ من الصورة.", en: "We couldn't read the amount from the image." },
             date_too_old: { ar: "مقدرناش نتأكد إن تاريخ التحويل هو النهاردة.", en: "We couldn't confirm the transfer date is today." },
             date_future: { ar: "تاريخ التحويل اللي قريناه مش مظبوط.", en: "The transfer date we read doesn't look right." },
@@ -600,8 +605,8 @@ export default function BookingFlow({
         {verifyStatus === "invalid" && (() => {
           const amt = ocrAmount != null ? ocrAmount.toLocaleString() : "؟";
           const M: Record<string, { ar: string; en: string }> = {
-            amount_mismatch: { ar: `المبلغ في الإيصال (${amt} جنيه) مش مطابق لسعر الجلسة (${price.toLocaleString()} جنيه).`, en: `The receipt amount (${amt} EGP) doesn't match the session price (${price.toLocaleString()} EGP).` },
-            amount_unreadable: { ar: `المبلغ في الإيصال مش مطابق لسعر الجلسة (${price.toLocaleString()} جنيه).`, en: `The receipt amount doesn't match the session price (${price.toLocaleString()} EGP).` },
+            amount_mismatch: { ar: `المبلغ في الإيصال (${amt} جنيه) مش مطابق لسعر ${noun} (${price.toLocaleString()} جنيه).`, en: `The receipt amount (${amt} EGP) doesn't match ${nounEn}'s price (${price.toLocaleString()} EGP).` },
+            amount_unreadable: { ar: `المبلغ في الإيصال مش مطابق لسعر ${noun} (${price.toLocaleString()} جنيه).`, en: `The receipt amount doesn't match ${nounEn}'s price (${price.toLocaleString()} EGP).` },
             date_too_old: { ar: "تاريخ التحويل مش تاريخ النهاردة.", en: "The transfer date isn't today." },
             date_future: { ar: "تاريخ التحويل في الإيصال مش مظبوط.", en: "The transfer date on the receipt is invalid." },
             date_unreadable: { ar: "تاريخ التحويل مش تاريخ النهاردة.", en: "The transfer date isn't today." },

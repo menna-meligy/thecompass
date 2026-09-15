@@ -127,6 +127,16 @@ export function offeringLabel(o: Offering, isAr: boolean): string {
   return isAr ? o.labelAr : o.labelEn;
 }
 
+/**
+ * What to call the thing being booked in running prose ("سعر الورشة" vs
+ * "سعر الجلسة"). A group cohort is a workshop; a 1-on-1 and the career call are
+ * sessions. Use this instead of hard-coding "الجلسة" in client-facing copy.
+ */
+export function offeringNoun(offeringType: OfferingType, isAr: boolean): string {
+  if (offeringType === "group") return isAr ? "الورشة" : "the workshop";
+  return isAr ? "الجلسة" : "the session";
+}
+
 /** Title to show a client / store on a booking, given the resolved workshop. */
 export function offeringTitle(
   offeringType: OfferingType,
