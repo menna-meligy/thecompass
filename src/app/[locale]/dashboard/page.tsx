@@ -9,6 +9,9 @@ import { Calendar, BookOpen, ChevronRight, ClipboardList, Map, User, Compass, St
 import type { AssessmentResult } from "@/lib/compass/types";
 import { ZONE_LABELS } from "@/lib/compass/templates";
 import NextSessionCountdown from "@/components/dashboard/NextSessionCountdown";
+import { slotStartsAtISO, formatISODate, shortTime } from "@/lib/schedule-dates";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { meetingLink } from "@/lib/meeting";
 
 export default async function DashboardPage() {
   const t = await getTranslations("dashboard");
@@ -26,7 +29,9 @@ export default async function DashboardPage() {
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
         .from("bookings")
-        .select("*, session:sessions(*, workshop:workshops(*)), payment:payments(*)")
+        .select(
+          "*, workshop:workshops(id, title_ar, title_en), slot:availability_slots(date, start_time, end_time), payment:payments(*)",
+        )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(10),
@@ -71,16 +76,32 @@ export default async function DashboardPage() {
   };
 
   const now = new Date();
-  const upcoming = (bookings as Booking[] | null)?.filter(
-    (b) => b.session?.starts_at && new Date(b.session.starts_at) > now && b.status !== "cancelled"
-  ) || [];
-  const past = (bookings as Booking[] | null)?.filter(
-    (b) => b.session?.starts_at && new Date(b.session.starts_at) <= now
-  ) || [];
+  // Bookings hang off availability_slots now; the old `sessions` join was always
+  // null, so this whole section (and the next-session countdown) never appeared.
+  type Row = Booking & {
+    offering_type?: string | null;
+    google_meet_link?: string | null;
+    workshop?: { id: string; title_ar: string; title_en: string } | null;
+    slot?: { date?: string; start_time?: string; end_time?: string } | null;
+  };
+  const withStart = ((bookings as unknown as Row[]) ?? [])
+    .map((b) => ({
+      b,
+      startsAt: b.slot?.date && b.slot?.start_time ? slotStartsAtISO(b.slot.date, b.slot.start_time) : null,
+      title: offeringTitle(isOfferingType(b.offering_type) ? b.offering_type : "career", b.workshop, isAr),
+    }))
+    .filter((x) => x.startsAt);
 
-  const nextSession = [...upcoming].sort(
-    (a, b) => new Date(a.session!.starts_at!).getTime() - new Date(b.session!.starts_at!).getTime()
-  )[0] || null;
+  const upcoming = withStart.filter(
+    (x) => new Date(x.startsAt!) > now && x.b.status !== "cancelled",
+  );
+  const past = withStart.filter((x) => new Date(x.startsAt!) <= now);
+
+  // The countdown is only a promise worth making once the seat is paid for.
+  const nextSession =
+    [...upcoming]
+      .filter((x) => x.b.status === "confirmed")
+      .sort((a, b) => new Date(a.startsAt!).getTime() - new Date(b.startsAt!).getTime())[0] || null;
 
   const quickLinks = [
     { href: `/${locale}/dashboard/bookings`, label: t("bookings"), icon: ClipboardList },
@@ -110,17 +131,11 @@ export default async function DashboardPage() {
       </div>
 
       {/* Next session countdown */}
-      {nextSession?.session?.starts_at && (
+      {nextSession?.startsAt && (
         <NextSessionCountdown
-          startsAt={nextSession.session.starts_at}
-          title={
-            getLocalizedField(
-              (nextSession.session.workshop as unknown as Record<string, unknown>) || {},
-              "title",
-              locale
-            ) || (locale === "ar" ? "جلسة" : "Session")
-          }
-          locationOrLink={nextSession.session.location_or_link}
+          startsAt={nextSession.startsAt!}
+          title={nextSession.title}
+          locationOrLink={meetingLink(nextSession.b.google_meet_link)}
           locale={locale}
         />
       )}
@@ -257,29 +272,22 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {upcoming.slice(0, 3).map((booking) => (
+              {upcoming.slice(0, 3).map(({ b, startsAt, title }) => (
                 <div
-                  key={booking.id}
+                  key={b.id}
                   className="bg-[rgba(30,41,59,0.6)] border border-[rgba(245,158,11,0.12)] rounded-xl p-4 border-s-2"
                   style={{ borderInlineStartColor: "#F59E0B" }}
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-white text-sm">
-                        {getLocalizedField(
-                          (booking.session?.workshop as unknown as Record<string, unknown>) || {},
-                          "title",
-                          locale
-                        )}
-                      </p>
+                      <p className="font-medium text-white text-sm">{title}</p>
                       <p className="text-xs text-white/40 mt-1">
-                        {booking.session?.starts_at
-                          ? formatDateTime(booking.session.starts_at, locale)
-                          : ""}
+                        {b.slot?.date ? formatISODate(b.slot.date, isAr) : ""}
+                        {b.slot?.start_time ? ` · ${shortTime(b.slot.start_time)}` : ""}
                       </p>
                     </div>
-                    <Badge variant={booking.status === "confirmed" ? "success" : "warning"}>
-                      {statusLabel(booking.status)}
+                    <Badge variant={b.status === "confirmed" ? "success" : "warning"}>
+                      {statusLabel(b.status)}
                     </Badge>
                   </div>
                 </div>
@@ -300,24 +308,17 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-3">
-              {past.slice(0, 3).map((booking) => (
+              {past.slice(0, 3).map(({ b, startsAt, title }) => (
                 <div
-                  key={booking.id}
+                  key={b.id}
                   className="bg-[rgba(30,41,59,0.6)] border border-[rgba(245,158,11,0.12)] rounded-xl p-4 border-s-2"
                   style={{ borderInlineStartColor: "#F59E0B" }}
                 >
                   <div>
-                    <p className="font-medium text-white text-sm">
-                      {getLocalizedField(
-                        (booking.session?.workshop as unknown as Record<string, unknown>) || {},
-                        "title",
-                        locale
-                      )}
-                    </p>
+                    <p className="font-medium text-white text-sm">{title}</p>
                     <p className="text-xs text-white/40 mt-1">
-                      {booking.session?.starts_at
-                        ? formatDateTime(booking.session.starts_at, locale)
-                        : ""}
+                      {b.slot?.date ? formatISODate(b.slot.date, isAr) : ""}
+                      {b.slot?.start_time ? ` · ${shortTime(b.slot.start_time)}` : ""}
                     </p>
                   </div>
                 </div>

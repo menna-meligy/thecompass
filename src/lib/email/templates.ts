@@ -105,6 +105,49 @@ export function reminder30MinEmail(d: ReminderData): { subject: string; html: st
   };
 }
 
+export interface BookingApprovedData extends ReminderData {
+  /** True when this is the client's first confirmed booking with us. */
+  isFirst?: boolean;
+}
+
+/**
+ * Sent the moment the coach approves the receipt. It confirms the seat and
+ * sets expectations about the join link — it deliberately does NOT carry the
+ * link (see src/lib/meeting.ts), so it says exactly when the link arrives
+ * instead of leaving the client hunting for it.
+ */
+export function bookingApprovedEmail(d: BookingApprovedData): { subject: string; html: string } {
+  const when = formatCairo(d.startsAt);
+  const cta = d.appUrl ? ctaButton(`${d.appUrl}/ar/dashboard/bookings`, "شوف حجزك") : "";
+  const heading = d.isFirst ? "أهلاً بيك في البوصلة 🧭" : "حجزك اتأكد ✅";
+  const subject = d.isFirst
+    ? `أهلاً بيك في البوصلة — جلستك الأولى اتأكدت (${d.workshopTitle})`
+    : `حجزك اتأكد — ${d.workshopTitle}`;
+
+  const opening = d.isFirst
+    ? `تحويلك وصل واتأكد، ومكانك في <strong style="color:#F59E0B;">${d.workshopTitle}</strong> بقى محجوز. دي أول خطوة في طريقك معانا، وإحنا مستنيينك.`
+    : `تحويلك وصل واتأكد، ومكانك في <strong style="color:#F59E0B;">${d.workshopTitle}</strong> بقى محجوز.`;
+
+  return {
+    subject,
+    html: layout(`
+      <h2 style="color:#fff; margin:0 0 10px;">${heading}</h2>
+      <p style="line-height:1.7; margin:0 0 6px;">أهلاً ${d.userName}،</p>
+      <p style="line-height:1.7; margin:0;">${opening}</p>
+      ${detailsBox(when, null)}
+      <div style="background:rgba(59,130,246,0.10); border:1px solid rgba(59,130,246,0.30); border-radius:10px; padding:12px 14px; margin:14px 0;">
+        <p style="margin:0; line-height:1.7; font-size:14px; color:#bfdbfe;">
+          🎥 <strong>لينك الجلسة</strong> هيظهر لك في لوحة التحكم قبل الميعاد بـ15 دقيقة، وهنبعتهولك على الإيميل كمان — مش محتاج تدوّر عليه.
+        </p>
+      </div>
+      <p style="line-height:1.7; margin:0 0 4px; font-size:14px; color:#9ca3af;">
+        قبل الجلسة، اكتب أهم حاجة عايز تخرج بيها منها — ده بيخلي الجلسة أنفع ليك بكتير.
+      </p>
+      ${cta}
+    `),
+  };
+}
+
 export interface ActivationEmailData {
   userName: string;
   activationLink: string;

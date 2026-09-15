@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock, Video } from "lucide-react";
+import { Clock, Video, ArrowRight } from "lucide-react";
+import { joinState, linkAppearsNote } from "@/lib/meeting";
 
 interface Props {
   startsAt: string;
@@ -11,8 +12,12 @@ interface Props {
 }
 
 function diff(target: number) {
-  const ms = Math.max(0, target - Date.now());
+  // `raw` keeps its sign so we can tell "about to start" from "long over";
+  // `ms` stays clamped because the clock should never count below zero.
+  const raw = target - Date.now();
+  const ms = Math.max(0, raw);
   return {
+    raw,
     ms,
     d: Math.floor(ms / 86_400_000),
     h: Math.floor((ms % 86_400_000) / 3_600_000),
@@ -32,8 +37,10 @@ export default function NextSessionCountdown({ startsAt, title, locationOrLink, 
   }, [target]);
 
   const isOnline = typeof locationOrLink === "string" && locationOrLink.startsWith("http");
-  const joinable = t.ms <= 15 * 60_000 && t.ms >= 0; // join opens 15 min before
-  const started = t.ms === 0;
+  // Once the door is open the clock stops being the point — swap it for the way
+  // in. Derived from ticking state so the server and the first client render agree.
+  const join = joinState(new Date(target), new Date(target - t.raw));
+  const isOpen = isOnline && join === "open";
 
   const units: { v: number; ar: string; en: string }[] = [
     { v: t.d, ar: "يوم", en: "days" },
@@ -59,10 +66,20 @@ export default function NextSessionCountdown({ startsAt, title, locationOrLink, 
           <p className="text-white font-black text-lg leading-tight truncate">{title}</p>
         </div>
 
-        {/* Countdown boxes */}
+        {/* Countdown boxes — replaced by the join button once it's time */}
         <div className="flex items-center gap-2" dir="ltr">
-          {started ? (
-            <span className="text-[#86EFAC] font-bold text-sm">{isAr ? "بدأت دلوقتي!" : "Live now!"}</span>
+          {isOpen ? (
+            <a
+              href={locationOrLink!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#22C55E] hover:brightness-110 text-[#0f172a] font-black text-sm px-5 py-3 rounded-xl transition"
+              dir={isAr ? "rtl" : "ltr"}
+            >
+              <Video className="h-4 w-4" />
+              {isAr ? "ادخل الجلسة دلوقتي" : "Join your session now"}
+              <ArrowRight className="h-4 w-4" style={{ transform: isAr ? "rotate(180deg)" : undefined }} />
+            </a>
           ) : (
             units.map((u, i) => (
               <div key={i} className="flex flex-col items-center">
@@ -76,16 +93,10 @@ export default function NextSessionCountdown({ startsAt, title, locationOrLink, 
         </div>
       </div>
 
-      {isOnline && (joinable || started) && (
-        <a
-          href={locationOrLink!}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative mt-4 inline-flex items-center gap-2 bg-[#F59E0B] hover:bg-[#FBBF24] text-[#0f172a] font-bold text-sm px-5 py-2.5 rounded-xl transition-colors"
-        >
-          <Video className="h-4 w-4" />
-          {isAr ? "انضم للجلسة" : "Join session"}
-        </a>
+      {isOnline && join === "too_early" && (
+        <p className="relative mt-4 text-xs leading-relaxed" style={{ color: "rgba(191,219,254,0.85)" }}>
+          🎥 {linkAppearsNote(isAr)}
+        </p>
       )}
     </div>
   );

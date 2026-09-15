@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireAdmin } from "@/lib/admin-guard";
+import { sendEmail } from "@/lib/email/resend";
+import { bookingApprovedEmail } from "@/lib/email/templates";
+import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { slotStartsAtISO } from "@/lib/schedule-dates";
+import { logError } from "@/lib/observability/logger";
 
 export const runtime = "nodejs";
 
@@ -26,7 +31,13 @@ export async function POST(request: NextRequest) {
 
   const { data: booking } = await admin
     .from("bookings")
-    .select("id, status, slot_reserved_at, payment:payments(id, status, proof_url, created_at)")
+    .select(
+      `id, status, user_id, offering_type, slot_reserved_at,
+       user:profiles(email, full_name),
+       workshop:workshops(title_ar, title_en),
+       slot:availability_slots(date, start_time),
+       payment:payments(id, status, proof_url, created_at)`,
+    )
     .eq("id", bookingId)
     .maybeSingle();
 
@@ -73,6 +84,11 @@ export async function POST(request: NextRequest) {
     // The seat is already held from the receipt upload; make sure of it anyway.
     await (admin as any).rpc("reserve_slot_for_booking", { p_booking: bookingId });
 
+    // Welcome the client the moment their seat is real. Sent from here rather
+    // than the browser so it can't be lost to a closed tab, and never fatal —
+    // a bounced email must not make the coach think the approval failed.
+    await sendApprovalEmail(admin, booking as any);
+
     return NextResponse.json({ ok: true, status: "confirmed" });
   }
 
@@ -108,4 +124,33 @@ export async function POST(request: NextRequest) {
   await (admin as any).rpc("release_slot_for_booking", { p_booking: bookingId });
 
   return NextResponse.json({ ok: true, status: "cancelled", released: true });
+}
+
+async function sendApprovalEmail(admin: any, b: any) {
+  try {
+    const email = b?.user?.email;
+    if (!email || !b?.slot?.date || !b?.slot?.start_time) return;
+
+    // "your first session" only if this is their first confirmed booking.
+    const { count } = await admin
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", b.user_id)
+      .in("status", ["confirmed", "attended", "completed"]);
+
+    const { subject, html } = bookingApprovedEmail({
+      userName: b.user?.full_name || "صديقنا",
+      workshopTitle: offeringTitle(
+        isOfferingType(b.offering_type) ? b.offering_type : "career",
+        b.workshop,
+        true,
+      ),
+      startsAt: slotStartsAtISO(b.slot.date, b.slot.start_time),
+      appUrl: process.env.NEXT_PUBLIC_APP_URL || "",
+      isFirst: (count ?? 1) <= 1,
+    });
+    await sendEmail({ to: email, subject, html });
+  } catch (e) {
+    logError(e, { where: "api/admin/bookings/action", op: "sendApprovalEmail" });
+  }
 }

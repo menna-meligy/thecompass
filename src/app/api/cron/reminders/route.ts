@@ -16,6 +16,7 @@ import { sendEmail } from "@/lib/email/resend";
 import { reminder1DayEmail, reminder30MinEmail } from "@/lib/email/templates";
 import { logError } from "@/lib/observability/logger";
 import { offeringTitle, isOfferingType } from "@/lib/offerings";
+import { meetingLink } from "@/lib/meeting";
 import { slotStartsAtISO } from "@/lib/schedule-dates";
 
 export const runtime = "nodejs";
@@ -100,7 +101,8 @@ export async function GET(req: NextRequest) {
         b.workshop,
         true,
       );
-      const link = b.google_meet_link ?? null;
+      // Always resolve to a real room: a reminder without a door is useless.
+      const link = meetingLink(b.google_meet_link);
 
       const due1d = !b.reminder_1d_sent_at && ms <= DAY && ms > 30 * MIN;
       const due30m = !b.reminder_30m_sent_at && ms <= 35 * MIN && ms > 0;

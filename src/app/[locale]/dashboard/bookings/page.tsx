@@ -4,12 +4,13 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
 import { offeringTitle, isOfferingType } from "@/lib/offerings";
-import { formatISODate, normaliseDate, shortTime } from "@/lib/schedule-dates";
+import { formatISODate, normaliseDate, shortTime, slotStartsAtISO } from "@/lib/schedule-dates";
 import type { Booking } from "@/types/index";
 import {
   Calendar, Clock, CheckCircle2, FileText, Compass, BookOpen, ArrowRight, MapPin, AlertTriangle, MessageSquare, Video
 } from "lucide-react";
 import PaymentCountdownTimer from "@/components/booking/PaymentCountdownTimer";
+import MySessionsBoard, { type MySession } from "@/components/dashboard/MySessionsBoard";
 import dynamic from "next/dynamic";
 
 const ClientReflectionsCard = dynamic(
@@ -21,6 +22,7 @@ const ClientSessionNotesForm = dynamic(
 const MentorNotesDisplay = dynamic(
   () => import("@/components/dashboard/MentorNotesDisplay")
 );
+const SessionJoin = dynamic(() => import("@/components/dashboard/SessionJoin"));
 
 const STATUS_STYLES: Record<string, { bg: string; color: string; border: string; label: string; labelAr: string }> = {
   pending:   { bg: "rgba(245,158,11,0.12)",  color: "#F59E0B", border: "rgba(245,158,11,0.35)",  label: "Pending",   labelAr: "قيد الانتظار" },
@@ -68,6 +70,37 @@ export default async function BookingsPage() {
 
   const isAr = locale === "ar";
 
+  // The same bookings, shaped for the calendar / countdown / history board.
+  const mySessions: MySession[] = rows.map((booking) => {
+    const b = booking as unknown as {
+      id: string;
+      status: string;
+      offering_type?: string | null;
+      google_meet_link?: string | null;
+      workshop?: { title_ar: string; title_en: string } | null;
+      slot?: { date?: string; start_time?: string; end_time?: string } | null;
+      payment?: { proof_url?: string | null; receipt_validation_status?: string | null } | null;
+    };
+    const offeringType = isOfferingType(b.offering_type) ? b.offering_type : "career";
+
+    let state: MySession["state"];
+    if (b.status === "cancelled") state = "cancelled";
+    else if (b.status === "attended" || b.status === "completed") state = "attended";
+    else if (b.status === "confirmed") state = "confirmed";
+    else if (b.payment?.proof_url) state = "awaiting_review";
+    else state = "awaiting_payment";
+
+    return {
+      id: b.id,
+      title: offeringTitle(offeringType, b.workshop, isAr),
+      date: b.slot?.date ? normaliseDate(b.slot.date) : null,
+      start_time: b.slot?.start_time ?? null,
+      end_time: b.slot?.end_time ?? null,
+      state,
+      meetLink: b.google_meet_link ?? null,
+    };
+  });
+
   return (
     <div className="min-h-screen bg-[#0f172a] px-4 py-10">
       <div style={{ maxWidth: "52rem", margin: "0 auto" }}>
@@ -79,6 +112,8 @@ export default async function BookingsPage() {
             {isAr ? "حجوزاتك الحالية والسابقة" : "Your current and past bookings"}
           </p>
         </div>
+
+        <MySessionsBoard sessions={mySessions} locale={locale} />
 
         {/* ── Action Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
@@ -207,6 +242,8 @@ export default async function BookingsPage() {
               // the older spelling. Either means the session happened, so the
               // reflection + notes section belongs here.
               const isPastBooking = booking.status === "attended" || booking.status === "completed";
+              const sessionStartsAt =
+                b.slot?.date && b.slot?.start_time ? slotStartsAtISO(b.slot.date, b.slot.start_time) : null;
               // Notes are stored one per booking; show the client which session
               // each one is about rather than a bare "Mentor Notes" card.
               const sessionLabel = [
@@ -309,34 +346,14 @@ export default async function BookingsPage() {
                       );
                     })()}
 
-                    {/* Google Meet link for confirmed + paid bookings */}
-                    {booking.status === "confirmed" && booking.payment?.status === "paid" && (booking as any)?.google_meet_link && (
+                    {booking.status === "confirmed" && booking.payment?.status === "paid" && sessionStartsAt && (
                       <>
                         <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
-                        <a
-                          href={(booking as any).google_meet_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            display: "flex", alignItems: "center", gap: "10px",
-                            padding: "12px 14px", borderRadius: "8px",
-                            background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.3)",
-                            textDecoration: "none", transition: "all 0.2s",
-                            marginBottom: "12px",
-                          }}
-                          className="hover:bg-[rgba(59,130,246,0.2)] hover:border-[rgba(59,130,246,0.5)]"
-                        >
-                          <Video className="h-4 w-4 text-blue-400" style={{ flexShrink: 0 }} />
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", marginBottom: "2px" }}>
-                              {isAr ? "رابط الجلسة" : "Session Link"}
-                            </p>
-                            <p style={{ fontSize: "0.8rem", color: "#60A5FA", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                              {isAr ? "انقر للدخول إلى الجلسة" : "Click to join meeting"}
-                            </p>
-                          </div>
-                          <ArrowRight className="h-3.5 w-3.5 text-blue-400" style={{ flexShrink: 0, transform: isAr ? "rotate(180deg)" : undefined }} />
-                        </a>
+                        <SessionJoin
+                          startsAt={sessionStartsAt}
+                          bookingLink={(booking as unknown as { google_meet_link?: string | null }).google_meet_link}
+                          locale={locale}
+                        />
                       </>
                     )}
 
