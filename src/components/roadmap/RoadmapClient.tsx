@@ -56,9 +56,11 @@ interface Props {
   isAdmin?: boolean;
   targetUserId?: string;
   clientName?: string;
+  /** Open straight onto a tab — the dashboard links in with ?tab=mentor. */
+  initialTab?: "mentee" | "mentor";
 }
 
-export default function RoadmapClient({ userId, locale, isAdmin = false, targetUserId, clientName }: Props) {
+export default function RoadmapClient({ userId, locale, isAdmin = false, targetUserId, clientName, initialTab }: Props) {
   const isAr = locale === "ar";
   const regTitle = isAr ? "انضميت للبوصلة" : "Joined The Compass";
 
@@ -73,7 +75,10 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
   const [sessionMilestones, setSessionMilestones] = useState<SessionMilestone[]>([]);
 
   const [ready, setReady] = useState(false);
-  const [activeTab, setActiveTab] = useState<"mentee" | "mentor">("mentee");
+  const [activeTab, setActiveTab] = useState<"mentee" | "mentor">(initialTab ?? "mentee");
+  // A failed write used to only reach the console: the card stayed on screen and
+  // the mentor walked away believing the note was saved.
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const supabase = createClient();
   const uid = targetUserId || userId;
@@ -191,8 +196,13 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
             track: "mentor",
             steps: task.steps ?? [],
           }, { onConflict: "id" });
-          if (error) console.error("mentor note save failed:", error.message);
+          if (error) {
+            console.error("mentor note save failed:", error.message);
+            setSaveError(error.message);
+            return;
+          }
         }
+        setSaveError(null);
         // Remove deleted tasks
         const nextIds = next.map((t) => t.id);
         const removed = prev.filter((t) => !nextIds.includes(t.id));
@@ -266,11 +276,24 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
 
       {/* ── BOTTOM: Tabs + Kanban ── */}
       <div className="flex-1 overflow-auto" style={{ padding: "1.5rem 1.5rem 2rem" }}>
+        {/* Save failure — the note is NOT stored, say so plainly */}
+        {saveError && (
+          <div style={{
+            marginBottom: "16px", padding: "12px 16px", borderRadius: "8px",
+            background: "rgba(239,68,68,0.10)", border: "1px solid rgba(239,68,68,0.30)",
+            color: "#FCA5A5", fontSize: "0.83rem", lineHeight: 1.6,
+          }}>
+            {isAr
+              ? "الملاحظة دي مااتسجلتش. اعمل ريفريش وجرّب تاني — لو فضلت تفشل، صلاحيات حسابك محتاجة مراجعة."
+              : "That note was not saved. Refresh and try again — if it keeps failing, your account's permissions need checking."}
+          </div>
+        )}
+
         {/* Tab bar */}
         <div className="flex gap-0 mb-6" style={{ borderBottom: "1px solid rgba(245,158,11,0.12)" }}>
           {([
-            { key: "mentee" as const, label: tab1Label },
-            { key: "mentor" as const, label: tab2Label },
+            { key: "mentee" as const, label: tab1Label, count: 0 },
+            { key: "mentor" as const, label: tab2Label, count: mentorTasks.length },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -288,7 +311,18 @@ export default function RoadmapClient({ userId, locale, isAdmin = false, targetU
                 marginBottom: "-1px",
               }}
             >
-              {tab.label}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                {tab.label}
+                {tab.count > 0 && (
+                  <span style={{
+                    fontSize: "0.68rem", fontWeight: 800, padding: "1px 7px", borderRadius: "999px",
+                    background: activeTab === tab.key ? "rgba(245,158,11,0.20)" : "rgba(167,139,250,0.18)",
+                    color: activeTab === tab.key ? "#F59E0B" : "#A78BFA",
+                  }}>
+                    {tab.count}
+                  </span>
+                )}
+              </span>
             </button>
           ))}
         </div>

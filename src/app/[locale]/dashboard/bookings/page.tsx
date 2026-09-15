@@ -27,6 +27,7 @@ const STATUS_STYLES: Record<string, { bg: string; color: string; border: string;
   confirmed: { bg: "rgba(34,197,94,0.12)",   color: "#22C55E", border: "rgba(34,197,94,0.35)",   label: "Confirmed", labelAr: "مؤكد" },
   cancelled: { bg: "rgba(239,68,68,0.12)",   color: "#EF4444", border: "rgba(239,68,68,0.35)",   label: "Cancelled", labelAr: "ملغي" },
   completed: { bg: "rgba(99,102,241,0.12)",  color: "#818CF8", border: "rgba(99,102,241,0.35)",  label: "Completed", labelAr: "مكتمل" },
+  attended:  { bg: "rgba(168,85,247,0.12)",  color: "#C084FC", border: "rgba(168,85,247,0.35)",  label: "Attended",  labelAr: "تمّ الحضور" },
 };
 
 const PAYMENT_STYLES: Record<string, { bg: string; color: string; label: string; labelAr: string }> = {
@@ -48,7 +49,7 @@ export default async function BookingsPage() {
   const { data: bookings } = await supabase
     .from("bookings")
     .select(
-      "*, workshop:workshops(id, title_ar, title_en), slot:availability_slots(date, start_time, end_time), payment:payments(*), payment_deadline, google_meet_link",
+      "*, workshop:workshops(id, title_ar, title_en), slot:availability_slots(id, date, start_time, end_time), payment:payments(*), payment_deadline, google_meet_link",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
@@ -202,7 +203,10 @@ export default async function BookingsPage() {
               const workshopTitle = offeringTitle(offeringType, b.workshop, isAr);
               const statusStyle = STATUS_STYLES[booking.status] || STATUS_STYLES.pending;
               const paymentStyle = booking.payment ? PAYMENT_STYLES[booking.payment.status] || PAYMENT_STYLES.pending : null;
-              const isPastBooking = booking.status === "completed";
+              // 'attended' is what the coach's "حضر" button sets; 'completed' is
+              // the older spelling. Either means the session happened, so the
+              // reflection + notes section belongs here.
+              const isPastBooking = booking.status === "attended" || booking.status === "completed";
 
               return (
                 <div key={booking.id} className="space-y-3">
@@ -258,15 +262,43 @@ export default async function BookingsPage() {
                       </div>
                     </div>
 
-                    {/* Payment deadline timer for pending bookings */}
-                    {booking.status === "pending" && (booking as any).payment_deadline && (
-                      <>
-                        <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
-                        <div style={{ marginBottom: "12px" }}>
-                          <PaymentCountdownTimer paymentDeadline={(booking as any).payment_deadline} />
-                        </div>
-                      </>
-                    )}
+                    {/* Unfinished payment: the countdown is useless without a
+                        way back into it, which is what stranded clients before. */}
+                    {booking.status === "pending" && (() => {
+                      const pay = booking.payment as unknown as {
+                        status?: string;
+                        proof_url?: string | null;
+                        receipt_validation_status?: string | null;
+                      } | undefined;
+                      const underReview = !!pay?.proof_url && pay?.receipt_validation_status !== "needs_review";
+                      const needsClearer = pay?.receipt_validation_status === "needs_review";
+                      if (underReview) return null;
+
+                      return (
+                        <>
+                          <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", margin: "12px 0" }} />
+                          {(booking as any).payment_deadline && (
+                            <div style={{ marginBottom: "12px" }}>
+                              <PaymentCountdownTimer paymentDeadline={(booking as any).payment_deadline} />
+                            </div>
+                          )}
+                          <Link
+                            href={`/${locale}/book/resume/${booking.id}`}
+                            style={{
+                              display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+                              padding: "12px 16px", borderRadius: "8px", marginBottom: "12px",
+                              background: "#F59E0B", color: "#0f172a",
+                              fontWeight: 900, fontSize: "0.9rem", textDecoration: "none",
+                            }}
+                          >
+                            {needsClearer
+                              ? (isAr ? "ارفع صورة أوضح للإيصال" : "Upload a clearer receipt")
+                              : (isAr ? "أكمل الدفع" : "Complete payment")}
+                            <ArrowRight className="h-4 w-4" style={{ transform: isAr ? "rotate(180deg)" : undefined }} />
+                          </Link>
+                        </>
+                      );
+                    })()}
 
                     {/* Google Meet link for confirmed + paid bookings */}
                     {booking.status === "confirmed" && booking.payment?.status === "paid" && (booking as any)?.google_meet_link && (

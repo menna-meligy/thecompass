@@ -29,6 +29,7 @@ interface Props {
   onCloseDay: (date: string) => Promise<void>;
   onReopenDay: (date: string) => Promise<void>;
   onDeleteSlot: (slotId: string) => Promise<void>;
+  onCancelBooking: (bookingId: string) => Promise<void>;
 }
 
 export default function DayEditor({
@@ -41,6 +42,7 @@ export default function DayEditor({
   onCloseDay,
   onReopenDay,
   onDeleteSlot,
+  onCancelBooking,
 }: Props) {
   const [mode, setMode] = useState<Mode>(null);
   const [startTime, setStartTime] = useState("09:00");
@@ -266,8 +268,8 @@ export default function DayEditor({
                 <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10">
                   <p className="text-white/70 text-sm mb-4 leading-relaxed">
                     {t(
-                      "هيتشال اليوم ده من كل التقاويم وميقدرش أي عميل يحجز فيه. لو فيه حجوزات متأكدة لازم تلغيها الأول.",
-                      "This day is removed from every calendar and nobody can book it. If it already has held bookings you must cancel those first.",
+                      "هيتشال اليوم ده من كل التقاويم وميقدرش أي عميل يحجز فيه. لو فيه حجوزات قايمة، ألغيها من قائمة مواعيد اليوم تحت الأول.",
+                      "This day is removed from every calendar and nobody can book it. If any bookings are still live, cancel them from the list of times below first.",
                     )}
                   </p>
                   <button
@@ -358,21 +360,47 @@ export default function DayEditor({
                       </p>
 
                       {held.length > 0 && (
-                        <ul className="mt-2 space-y-1 border-t border-white/10 pt-2">
+                        <div className="mt-2 border-t border-white/10 pt-2 space-y-1.5">
+                          <p className="text-[0.7rem] text-white/35">
+                            {t(
+                              "عشان تمسحي الموعد ده لازم تلغي حجوزاته الأول:",
+                              "To delete this time, cancel its bookings first:",
+                            )}
+                          </p>
                           {held.map((b) => (
-                            <li key={b.id} className="text-xs text-white/60 flex items-center gap-2">
+                            <div key={b.id} className="flex items-center gap-2 text-xs">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />
-                              <span className="truncate">
+                              <span className="text-white/70 truncate flex-1 min-w-0">
                                 {b.user?.full_name || b.user?.email || b.user_id.slice(0, 8)}
+                                <span className="text-white/35">
+                                  {" · "}
+                                  {b.status === "confirmed"
+                                    ? t("مؤكد", "confirmed")
+                                    : t("إيصال للمراجعة", "receipt to review")}
+                                </span>
                               </span>
-                              <span className="text-white/30">
-                                {b.status === "confirmed"
-                                  ? t("مؤكد", "confirmed")
-                                  : t("إيصال للمراجعة", "receipt to review")}
-                              </span>
-                            </li>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (
+                                    !window.confirm(
+                                      t(
+                                        "هتلغي حجز العميل ده ويرجع الموعد متاح. متأكدة؟",
+                                        "This cancels the client's booking and frees the time. Are you sure?",
+                                      ),
+                                    )
+                                  )
+                                    return;
+                                  run(() => onCancelBooking(b.id));
+                                }}
+                                disabled={busy}
+                                className="flex-shrink-0 px-2 py-1 rounded border border-red-500/30 text-red-300 hover:bg-red-500/15 transition-colors disabled:opacity-40"
+                              >
+                                {t("ألغِ الحجز", "Cancel booking")}
+                              </button>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       )}
                     </div>
                   );

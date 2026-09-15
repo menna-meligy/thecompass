@@ -61,7 +61,9 @@ export default async function AdminClientRoadmapPage({ params }: PageProps) {
     .from("bookings")
     .select("id, session_id, status, created_at, sessions(*, workshops(*))")
     .eq("user_id", userId)
-    .eq("status", "completed")
+    // A session the client actually sat is marked 'attended'; 'completed' is the
+    // older spelling. Gating on 'completed' alone hid this whole section.
+    .in("status", ["attended", "completed"])
     .order("created_at", { ascending: false })
     .limit(5);
 

@@ -1,7 +1,7 @@
 export type UserRole = "user" | "admin";
 export type SessionType = "group" | "individual";
 export type SessionStatus = "draft" | "published" | "completed";
-export type BookingStatus = "pending" | "confirmed" | "cancelled" | "completed";
+export type BookingStatus = "pending" | "confirmed" | "attended" | "cancelled" | "completed";
 export type PaymentStatus =
   | "pending"
   | "paid"

@@ -23,6 +23,28 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
 
   const t = (ar: string, en: string) => (isAr ? ar : en);
 
+  /** Turns an API error code into something the coach can act on. */
+  const explain = (data: { error?: string; message?: string; count?: number }) => {
+    switch (data.error) {
+      case "has_bookings":
+        return t(
+          "فيه عميل حاجز الموعد ده. ألغي حجزه من قائمة مواعيد اليوم الأول، وبعدين امسحي الموعد.",
+          "A client is holding this time. Cancel their booking in the list of times below, then delete it.",
+        );
+      case "day_has_bookings":
+        return t(
+          `فيه ${data.count ?? ""} حجز قايم في اليوم ده. ألغيهم من قائمة مواعيد اليوم الأول.`,
+          `${data.count ?? ""} booking(s) are still live on this day. Cancel them in the list of times below first.`,
+        );
+      case "end_before_start":
+        return t("وقت البداية لازم يكون قبل النهاية.", "Start time must be before end time.");
+      case "no_offerings":
+        return t("اختاري نوع جلسة واحد على الأقل.", "Pick at least one session type.");
+      default:
+        return data.message || data.error || t("العملية فشلت", "That didn't work");
+    }
+  };
+
   const load = useCallback(async () => {
     setRefreshing(true);
     try {
@@ -69,8 +91,7 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
       body: JSON.stringify(body),
     });
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.message || data.error || t("العملية فشلت", "That didn't work"));
+      throw new Error(explain(await res.json().catch(() => ({}))));
     }
     await load();
   }
@@ -86,11 +107,22 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
 
   const handleReopenDay = (date: string) => post({ mode: "unblock_day", date });
 
+  const handleCancelBooking = async (bookingId: string) => {
+    const res = await fetch("/api/admin/bookings/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ booking_id: bookingId, action: "cancel" }),
+    });
+    if (!res.ok) {
+      throw new Error(explain(await res.json().catch(() => ({}))));
+    }
+    await load();
+  };
+
   const handleDeleteSlot = async (slotId: string) => {
     const res = await fetch(`/api/admin/availability/slots/${slotId}`, { method: "DELETE" });
     if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.message || data.error || t("تعذّر الحذف", "Couldn't delete"));
+      throw new Error(explain(await res.json().catch(() => ({}))));
     }
     await load();
   };
@@ -159,6 +191,7 @@ export default function CentralizedAvailabilityManager({ isAr }: { isAr: boolean
           onCloseDay={handleCloseDay}
           onReopenDay={handleReopenDay}
           onDeleteSlot={handleDeleteSlot}
+          onCancelBooking={handleCancelBooking}
         />
       )}
     </div>

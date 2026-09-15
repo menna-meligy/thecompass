@@ -24,10 +24,9 @@ export async function DELETE(
 
   if (held && held.length > 0) {
     return NextResponse.json(
-      {
-        error: "has_bookings",
-        message: "A client already holds this slot. Cancel their booking first.",
-      },
+      // The UI turns this code into a localised message and offers to cancel
+      // the holder right there, rather than leaving the coach stuck.
+      { error: "has_bookings" },
       { status: 409 },
     );
   }

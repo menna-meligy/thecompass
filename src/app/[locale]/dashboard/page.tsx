@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatDateTime, formatCurrency, getLocalizedField } from "@/lib/utils";
 import Badge from "@/components/ui/Badge";
 import type { Booking, RoadmapProgress } from "@/types/index";
-import { Calendar, BookOpen, ChevronRight, ClipboardList, Map, User, Compass } from "lucide-react";
+import { Calendar, BookOpen, ChevronRight, ClipboardList, Map, User, Compass, StickyNote } from "lucide-react";
 import type { AssessmentResult } from "@/lib/compass/types";
 import { ZONE_LABELS } from "@/lib/compass/templates";
 import NextSessionCountdown from "@/components/dashboard/NextSessionCountdown";
@@ -21,7 +21,7 @@ export default async function DashboardPage() {
 
   if (!user) redirect(`/${locale}/auth`);
 
-  const [{ data: profile }, { data: bookings }, { data: roadmap }, { data: latestAssessment }] =
+  const [{ data: profile }, { data: bookings }, { data: roadmap }, { data: latestAssessment }, { data: mentorNotes }] =
     await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
@@ -43,6 +43,17 @@ export default async function DashboardPage() {
         .order("completed_at", { ascending: false })
         .limit(1)
         .single(),
+      // Mentor notes live on the roadmap board (user_tasks, track='mentor').
+      // They were only reachable via Roadmap -> a second tab, so clients never
+      // found them; surface the latest ones here too.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any)
+        .from("user_tasks")
+        .select("id, title, icon, status, updated_at")
+        .eq("user_id", user.id)
+        .eq("track", "mentor")
+        .order("updated_at", { ascending: false })
+        .limit(4),
     ]);
 
   const isAr = locale === "ar";
@@ -190,6 +201,43 @@ export default async function DashboardPage() {
         locale={locale}
         assessment={latestAssessment as { result_snapshot: AssessmentResult; happiness_score: number; completed_at: string } | null}
       />
+
+      {/* Mentor notes — written by the mentor on the client's journey board */}
+      {Array.isArray(mentorNotes) && mentorNotes.length > 0 && (
+        <div className="mt-10">
+          <h2 className="font-bold text-white mb-4 flex items-center gap-2 text-base">
+            <StickyNote className="h-5 w-5 text-[#A78BFA]" />
+            {isAr ? "ملاحظات المنتور" : "Mentor Notes"}
+            <span
+              className="text-xs font-bold px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(167,139,250,0.15)", color: "#A78BFA" }}
+            >
+              {mentorNotes.length}
+            </span>
+          </h2>
+          <div
+            className="rounded-xl p-5"
+            style={{ background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.22)" }}
+          >
+            <div className="space-y-2.5">
+              {(mentorNotes as unknown as { id: string; title: string; icon: string | null }[]).map((note) => (
+                <div key={note.id} className="flex items-start gap-3">
+                  <span className="text-lg leading-none mt-0.5 flex-shrink-0">{note.icon || "📝"}</span>
+                  <p className="text-sm text-white/80 leading-relaxed">{note.title}</p>
+                </div>
+              ))}
+            </div>
+            <Link
+              href={`/${locale}/dashboard/roadmap?tab=mentor`}
+              className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold"
+              style={{ color: "#A78BFA" }}
+            >
+              {isAr ? "شوف كل الملاحظات" : "See all notes"}
+              <ChevronRight className="h-4 w-4" style={{ transform: isAr ? "rotate(180deg)" : undefined }} />
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="grid md:grid-cols-2 gap-8 mt-10">
         {/* Upcoming Sessions */}

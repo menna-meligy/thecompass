@@ -125,12 +125,7 @@ export async function POST(request: NextRequest) {
 
     if (held && held.length > 0) {
       return NextResponse.json(
-        {
-          error: "has_bookings",
-          message:
-            "This day already has paid/held bookings. Cancel them first if you really need to close the day.",
-          count: held.length,
-        },
+        { error: "day_has_bookings", count: held.length },
         { status: 409 },
       );
     }
