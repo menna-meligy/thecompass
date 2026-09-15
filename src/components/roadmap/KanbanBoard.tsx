@@ -59,6 +59,21 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
     setTasks((prev) => prev.map((t) => t.id === id ? { ...t, status: newStatus } : t));
   }
 
+  /**
+   * Step a card one column along.
+   *
+   * Dragging used to be the only way to move a card, built on the HTML5 drag
+   * events — which touch devices never fire. On a phone the drag did nothing
+   * while the long press selected the card's text instead, and the columns
+   * stack vertically there, so the drop target sat off screen below anyway.
+   */
+  function shiftTask(id: string, dir: -1 | 1) {
+    if (readOnly) return;
+    const current = tasks.find((t) => t.id === id)?.status ?? "todo";
+    const next = COLS[COLS.findIndex((c) => c.id === current) + dir];
+    if (next) moveTask(id, next.id);
+  }
+
   // Derive a task's column from its steps: all done → done, some → in_progress, none → todo.
   function statusFromSteps(steps: TaskStep[], current: Status): Status {
     if (!steps.length) return current;
@@ -119,7 +134,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
 
       {/* Columns */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {COLS.map((col) => {
+        {COLS.map((col, colIdx) => {
           const colTasks = tasks.filter((t) => t.status === col.id).sort((a, b) => a.position - b.position);
           const isOver = !readOnly && dragOver === col.id;
           return (
@@ -155,6 +170,7 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
                         border: `1px solid ${allDone ? "rgba(34,197,94,0.35)" : task.pinned ? "rgba(245,158,11,0.25)" : "rgba(245,158,11,0.10)"}`,
                         borderRadius: "10px", overflow: "hidden",
                         opacity: dragging === task.id ? 0.35 : 1, transition: "opacity 0.15s, border-color 0.2s",
+                        WebkitUserSelect: "none", userSelect: "none",
                       }}
                     >
                       {/* Card header row */}
@@ -162,7 +178,44 @@ export default function KanbanBoard({ tasks, setTasks, locale, readOnly = false,
                         onClick={() => task.pinned ? null : setExpanded(isOpen ? null : task.id)}
                         style={{ padding: "11px 12px", display: "flex", alignItems: "center", gap: "9px", cursor: task.pinned ? "default" : "pointer" }}
                       >
-                        {canEdit && !isOpen && <GripVertical className="h-3.5 w-3.5 flex-shrink-0" style={{ color:"rgba(255,255,255,0.15)" }} />}
+                        {/* The grip only ever meant anything with a mouse. Next
+                            to it, two buttons that move the card without a drag
+                            — the only route that works on a phone. */}
+                        {canEdit && !isOpen && (
+                          <span className="flex items-center flex-shrink-0" style={{ gap: "1px" }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              aria-label={isAr ? "ارجع خطوة" : "Move back"}
+                              disabled={colIdx === 0}
+                              onClick={() => shiftTask(task.id, -1)}
+                              style={{
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                width: "26px", height: "26px", borderRadius: "6px", border: "none",
+                                background: colIdx === 0 ? "transparent" : "rgba(255,255,255,0.06)",
+                                color: colIdx === 0 ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)",
+                                cursor: colIdx === 0 ? "default" : "pointer",
+                              }}
+                            >
+                              <ChevronUp className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={isAr ? "خطوة للأمام" : "Move forward"}
+                              disabled={colIdx === COLS.length - 1}
+                              onClick={() => shiftTask(task.id, 1)}
+                              style={{
+                                display: "flex", alignItems: "center", justifyContent: "center",
+                                width: "26px", height: "26px", borderRadius: "6px", border: "none",
+                                background: colIdx === COLS.length - 1 ? "transparent" : "rgba(255,255,255,0.06)",
+                                color: colIdx === COLS.length - 1 ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.55)",
+                                cursor: colIdx === COLS.length - 1 ? "default" : "pointer",
+                              }}
+                            >
+                              <ChevronDown className="h-3.5 w-3.5" />
+                            </button>
+                            <GripVertical className="h-3.5 w-3.5 hidden md:block" style={{ color:"rgba(255,255,255,0.15)" }} />
+                          </span>
+                        )}
                         {task.pinned && <Pin className="h-3 w-3 flex-shrink-0" style={{ color: "#F59E0B" }} fill="#F59E0B" />}
                         <span style={{ fontSize:"1.1rem", flexShrink:0 }}>{task.icon}</span>
                         <span style={{ flex: 1, fontSize: "0.875rem", fontWeight: task.pinned ? 700 : 600, color: allDone ? "#86EFAC" : task.pinned ? "#F59E0B" : "rgba(255,255,255,0.9)", minWidth: 0, wordBreak: "break-word", lineHeight: 1.35 }}>
