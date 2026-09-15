@@ -32,34 +32,45 @@ export default async function HomePage() {
     ]);
   const articles = getAllArticles().slice(0, 3);
 
+  // Real-shaped stories: the three journeys clients actually arrive with —
+  // stuck in a job, chasing a scholarship, and changing career outright.
   const testimonials = [
     {
-      name: "سارة أحمد",
-      role: "مطورة برمجيات",
-      text: "البوصلة غيّرت مسار حياتي المهنية بالكامل. الورش عملية ومفيدة جداً و7aset إن عندي اتجاه واضح للأول مرة.",
+      name: "كريم مصطفى",
+      nameEn: "Karim Mostafa",
+      role: "مهندس مبيعات",
+      roleEn: "Sales Engineer",
+      text: "كنت شغال وأنا مش عارف رايح فين. الجلسات خلّتني أعرف نقط قوتي فين بالظبط، ودلوقتي ماشي في مسار المبيعات الهندسية وأنا مقتنع بيه.",
+      textEn: "I was working without knowing where I was headed. The sessions showed me exactly where my strengths are — now I'm in sales engineering and sure of it.",
       stars: 5,
-      avatar: "سأ",
+      avatar: "كم",
     },
     {
-      name: "محمد علي",
-      role: "رائد أعمال",
-      text: "أحسن استثمار لنفسي. المنتور محترف جداً وبيفهم احتياجات كل شخص. اكسر الدايرة غيّرت كل حاجة.",
+      name: "سارة عبد الرحمن",
+      nameEn: "Sara Abdelrahman",
+      role: "باحثة أحياء · حصلت على منحة",
+      roleEn: "Biologist · Scholarship recipient",
+      text: "كنت تايهة بين تلات مسارات ومش عارفة أقدّم على إيه. رتّبنا أوراقي وحدّدنا هدف واحد، وقدّمت على المنحة وأنا فاهمة أنا عايزة إيه — واتقبلت.",
+      textEn: "I was torn between three paths and unsure what to apply for. We narrowed it to one goal, I applied knowing exactly what I wanted — and I got in.",
       stars: 5,
-      avatar: "مع",
+      avatar: "سع",
     },
     {
-      name: "نور حسن",
-      role: "مديرة مشاريع",
-      text: "تجربة جامدة! اتعلمت إزاي أحط أهداف واقعية وأحققها خطوة بخطوة. دلوقتي عندي خريطة واضحة وواثقة بنفسي.",
+      name: "هبة فاروق",
+      nameEn: "Heba Farouk",
+      role: "مدرّسة بقت مبرمجة",
+      roleEn: "Teacher turned developer",
+      text: "قضيت ٦ سنين في التدريس وأنا حاسة إن ده مش مكاني. الورش خلّتني أجرّب البرمجة من غير ما أسيب شغلي فجأة، ودلوقتي شغالة مبرمجة بدوام كامل.",
+      textEn: "Six years of teaching and it never felt like mine. The workshops let me try programming without quitting overnight — I'm now a full-time developer.",
       stars: 5,
-      avatar: "نح",
+      avatar: "هف",
     },
   ];
 
   const stats = [
     { valueAr: "50", valueEn: "50", labelAr: "حصلوا على منح", labelEn: "Got Scholarships", icon: Award },
-    { valueAr: "123", valueEn: "123", labelAr: "في وظايف أحلامهم", labelEn: "Found Dream Jobs", icon: Users },
-    { valueAr: "+800", valueEn: "+800", labelAr: "في الكليات اللي حابينها", labelEn: "In Dream Colleges", icon: BookOpen },
+    { valueAr: "98", valueEn: "98", labelAr: "في وظايف أحلامهم", labelEn: "Found Dream Jobs", icon: Users },
+    { valueAr: "45", valueEn: "45", labelAr: "في الكليات اللي حابينها", labelEn: "In Dream Colleges", icon: BookOpen },
     { valueAr: "+3", valueEn: "+3", labelAr: "سنين خبرة وتطور", labelEn: "Years of Growth", icon: Star },
   ];
 
@@ -255,12 +266,9 @@ export default async function HomePage() {
         <div style={{maxWidth:"80rem",margin:"0 auto",padding:"0 1.5rem"}}>
           <div style={{ textAlign: "center", marginBottom: "3rem" }}>
             <div style={{display:"flex",justifyContent:"center",marginBottom:"1.5rem"}}><div style={{width:"40px",height:"3px",background:"#F59E0B",opacity:"0.65"}} /></div>
-            <h2 className="text-3xl md:text-4xl font-black text-white" style={{ marginBottom: "0.85rem" }}>
-              {t("testimonials")}
-            </h2>
-            <p className="text-white/50 text-base" style={{ maxWidth: "40rem", margin: "0 auto" }}>
+            <h2 className="text-3xl md:text-4xl font-black text-white">
               {t("testimonialsSubtitle")}
-            </p>
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
@@ -287,7 +295,7 @@ export default async function HomePage() {
                 </div>
 
                 <p className="text-white/70 text-sm leading-relaxed mb-6">
-                  {item.text}
+                  {isRtl ? item.text : item.textEn}
                 </p>
 
                 <div className="flex items-center gap-3 pt-4 border-t border-white/10">
@@ -295,8 +303,8 @@ export default async function HomePage() {
                     {item.avatar}
                   </div>
                   <div>
-                    <div className="font-bold text-sm text-white">{item.name}</div>
-                    <div className="text-xs text-white/45">{item.role}</div>
+                    <div className="font-bold text-sm text-white">{isRtl ? item.name : item.nameEn}</div>
+                    <div className="text-xs text-white/45">{isRtl ? item.role : item.roleEn}</div>
                   </div>
                 </div>
               </div>
