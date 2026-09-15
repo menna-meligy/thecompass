@@ -16,7 +16,16 @@ function getResend(): Resend | null {
 }
 
 export interface SendResult {
+  /** No error occurred. NOT the same as "a message reached the recipient". */
   ok: boolean;
+  /**
+   * The only field that means an email actually left the building.
+   *
+   * `ok` is true for a skipped send too, so callers that checked `ok` alone
+   * reported success when nothing had been sent — that is how password-reset
+   * codes silently went nowhere while the screen said one was on its way.
+   */
+  delivered: boolean;
   /** true when Resend isn't configured — treated as a non-error no-op. */
   skipped?: boolean;
   id?: string;
@@ -30,7 +39,7 @@ export async function sendEmail(opts: {
   from?: string;
 }): Promise<SendResult> {
   const resend = getResend();
-  if (!resend) return { ok: true, skipped: true, error: "Resend not configured" };
+  if (!resend) return { ok: true, delivered: false, skipped: true, error: "Resend not configured" };
 
   const from = opts.from || process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
   try {
@@ -46,11 +55,11 @@ export async function sendEmail(opts: {
         op: "sendEmail",
         extra: { subject: opts.subject },
       });
-      return { ok: false, error: error.message };
+      return { ok: false, delivered: false, error: error.message };
     }
-    return { ok: true, id: data?.id };
+    return { ok: true, delivered: true, id: data?.id };
   } catch (e) {
     logError(e, { where: "lib/email/resend", op: "sendEmail", extra: { subject: opts.subject } });
-    return { ok: false, error: (e as Error).message };
+    return { ok: false, delivered: false, error: (e as Error).message };
   }
 }

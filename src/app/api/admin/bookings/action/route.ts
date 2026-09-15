@@ -132,11 +132,11 @@ export async function POST(request: NextRequest) {
 async function sendApprovalEmail(
   admin: any,
   b: any,
-): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
+): Promise<{ ok: boolean; delivered: boolean; skipped?: boolean; error?: string }> {
   try {
     const email = b?.user?.email;
     if (!email || !b?.slot?.date || !b?.slot?.start_time) {
-      return { ok: false, error: "no_recipient" };
+      return { ok: false, delivered: false, error: "no_recipient" };
     }
 
     // "your first session" only if this is their first confirmed booking.
@@ -160,6 +160,6 @@ async function sendApprovalEmail(
     return await sendEmail({ to: email, subject, html });
   } catch (e) {
     logError(e, { where: "api/admin/bookings/action", op: "sendApprovalEmail" });
-    return { ok: false, error: e instanceof Error ? e.message : "send_failed" };
+    return { ok: false, delivered: false, error: e instanceof Error ? e.message : "send_failed" };
   }
 }

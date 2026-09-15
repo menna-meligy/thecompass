@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
       if (due30m) {
         const { subject, html } = reminder30MinEmail(data_);
         const res = await sendEmail({ to: email, subject, html });
-        if (res.ok && !res.skipped) {
+        if (res.delivered) {
           await markSent(supabase, b.id, "reminder_30m_sent_at");
           summary.sent30m++;
         } else if (!res.ok) {
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
       } else if (due1d) {
         const { subject, html } = reminder1DayEmail(data_);
         const res = await sendEmail({ to: email, subject, html });
-        if (res.ok && !res.skipped) {
+        if (res.delivered) {
           await markSent(supabase, b.id, "reminder_1d_sent_at");
           summary.sent1d++;
         } else if (!res.ok) {

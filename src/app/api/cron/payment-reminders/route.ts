@@ -141,7 +141,7 @@ export async function GET(req: NextRequest) {
         });
 
         const res = await sendEmail({ to: email, subject, html });
-        if (res.ok && !res.skipped) {
+        if (res.delivered) {
           await (supabase as any)
             .from("bookings")
             .update({ payment_reminder_sent_at: now.toISOString() })

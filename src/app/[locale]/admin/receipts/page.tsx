@@ -120,7 +120,7 @@ export default function AdminReceiptsPage() {
         return;
       }
       const data = await res.json().catch(() => ({}));
-      if (action === "confirm" && data?.email && data.email.ok === false) {
+      if (action === "confirm" && data?.email && data.email.delivered === false) {
         setError(
           t(
             "الحجز اتأكد، بس الإيميل مبعتش للعميل، كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",

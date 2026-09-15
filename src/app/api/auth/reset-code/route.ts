@@ -80,12 +80,15 @@ export async function POST(request: NextRequest) {
     });
 
     const res = await sendEmail({ to: address, subject, html });
-    if (res.ok) {
+    // `ok` is also true when Resend isn't configured and the send was skipped.
+    // Treating that as success meant the code went nowhere, the fallback below
+    // never ran, and the client was told to check their inbox.
+    if (res.delivered) {
       markSent(address);
       return NextResponse.json({ ok: true, via: "resend" });
     }
 
-    logError(new Error("reset code email failed, falling back"), {
+    logError(new Error(`reset code not delivered by Resend (${res.skipped ? "not configured" : res.error}), falling back`), {
       where: "api/auth/reset-code",
       op: "sendEmail",
     });

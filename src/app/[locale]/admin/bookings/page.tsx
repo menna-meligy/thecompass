@@ -130,7 +130,7 @@ export default function AdminBookingsPage() {
         return;
       }
       const data = await res.json().catch(() => ({}));
-      if (action === "confirm" && data?.email && data.email.ok === false) {
+      if (action === "confirm" && data?.email && data.email.delivered === false) {
         setNotice(
           t(
             "الحجز اتأكد، بس الإيميل مبعتش للعميل، كلّميه بنفسك. (الإيميل محتاج دومين متفعّل في Resend)",
