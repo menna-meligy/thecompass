@@ -598,9 +598,10 @@ export default function BookingFlow({
                   href={`/${locale}/dashboard/bookings`}
                   style={{ width: "100%", padding: "11px", borderRadius: "8px", background: "#F59E0B", color: "#0f172a", fontWeight: 900, fontSize: "0.88rem", textAlign: "center", textDecoration: "none" }}
                 >
-                  {/* The point of this button is that the client is content to
-                      wait for a person — say that, not a vague "I'll follow up". */}
-                  {isAr ? "انتظار موافقة الدعم" : "Waiting for support to approve"}
+                  {/* Asked for as "ok till support approves it": the "تمام" is the
+                      client accepting the wait, which is the whole point of the
+                      button — without it this reads as a status, not a choice. */}
+                  {isAr ? "تمام، مستني موافقة الدعم" : "OK, waiting for support to approve"}
                 </Link>
               </div>
             </div>
